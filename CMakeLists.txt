@@ -130,6 +130,8 @@ endif()
 
 
 add_subdirectory(application)
+add_subdirectory(engine)
+add_subdirectory(gameplay)
 
 add_subdirectory(thirdparty/imgui)
 
@@ -137,6 +139,7 @@ add_executable(Hail "main.cpp")
 
 target_include_directories(Hail PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nlohmann
 )
 
-target_link_libraries(Hail app_lib imgui_lib ${SDL2_LIBRARIES})
+target_link_libraries(Hail app_lib  engine_lib gameplay_lib imgui_lib ${SDL2_LIBRARIES})
