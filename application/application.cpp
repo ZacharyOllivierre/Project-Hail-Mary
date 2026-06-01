@@ -25,7 +25,7 @@ Application::Application()
 
 	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 
-	_window = SDL_CreateWindow("Moonline", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _logical_width, _logical_height, SDL_WINDOW_SHOWN);
+	_window = SDL_CreateWindow("window_name", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _logical_width, _logical_height, SDL_WINDOW_SHOWN);
 	init_assert(_window, "SDL_CreateWindow Error");
 
 	if (SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
