@@ -1,8 +1,18 @@
 #pragma once
 #include <SDL.h>
 #include "base/vector2.h"
-#include "base/depth_layer.h"
 #include "input/input_system.h"
+
+enum class DepthLayer
+{
+    Background,
+    Terrain,
+    Object,
+    Character,
+    Effect,
+    UI,
+	Count
+};
 
 class GameObject
 {
