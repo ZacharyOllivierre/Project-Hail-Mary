@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL.h>
-#include "base/vector2.h"
-#include "input/input_system.h"
+#include "../tools/vector2.h"
+#include "../input/input_system.h"
 
 enum class DepthLayer
 {

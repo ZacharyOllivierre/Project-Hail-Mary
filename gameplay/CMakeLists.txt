@@ -1,3 +1,7 @@
 file(GLOB_RECURSE GAMEPLAY ./  *.cpp)
 
-add_library(gameplay_lib ${GAMEPLAY})
+if(GAMEPLAY)
+    add_library(gameplay_lib ${GAMEPLAY})
+else()
+    add_library(gameplay_lib INTERFACE)
+endif()

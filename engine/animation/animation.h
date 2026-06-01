@@ -1,5 +1,5 @@
 #pragma once
-#include "../base/timer.h"
+#include "../tools/timer.h"
 #include "../resources/atlas.h"
 
 #include <SDL.h>

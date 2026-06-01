@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animation.h"
-#include "../base/singleton.h"
+#include "../tools/singleton.h"
 #include "../resources/resource_types.h"
 
 #include <memory>
@@ -42,4 +42,3 @@ public:
 private:
 	std::unordered_map<std::string, AnimationDefinition> _definitions;
 };
-

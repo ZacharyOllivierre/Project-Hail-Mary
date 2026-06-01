@@ -1,7 +1,7 @@
 #pragma once
 
 #include "input_types.h"
-#include "../base/singleton.h"
+#include "../tools/singleton.h"
 
 #include <SDL.h>
 #include <vector>
