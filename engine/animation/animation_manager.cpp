@@ -1,4 +1,4 @@
-#include "animation_manager.h"
+/*#include "animation_manager.h"
 
 #include "../resources/resource_manager.h"
 
@@ -93,4 +93,4 @@ std::unique_ptr<Animation> AnimationManager::create_animation(
 	animation->set_interval_seconds(1.0 / definition->_fps);
 	return animation;
 }
-
+*/
