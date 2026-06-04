@@ -1,6 +1,8 @@
 #include "resource_manager.h"
 #include "../io/path_manager.h"
 
+#include <iostream>
+
 ResourceManager::ResourceManager()
 {
 }
@@ -16,6 +18,15 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "PathManager init fail");
 			return false;
+	}
+
+	if (!_texture_manager.load_texture(renderer, "test", PathManager::instance()->assets() / "textures/map.png"))
+	{
+		std::cout << "Load texture failed." << std::endl;
+	}
+	else
+	{
+		std::cout << "Texture loaded." << std::endl;
 	}
 }
 
@@ -34,7 +45,7 @@ Mix_Music* ResourceManager::find_music(const std::string_view& key) const
 	return _audio_manager.find_music(key);
 }
 
-SDL_Texture* ResourceManager::find_texture(const std::string_view& key) const
+SDL_Texture* ResourceManager::find_texture(const std::string_view& key)
 {
 	return _texture_manager.find_texture(key);
 }

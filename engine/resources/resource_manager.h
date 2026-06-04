@@ -25,7 +25,7 @@ public:
 	TTF_Font* find_font(const std::string_view& key) const;
 	Mix_Chunk* find_sound(const std::string_view& key) const;
 	Mix_Music* find_music(const std::string_view& key) const;
-	SDL_Texture* find_texture(const std::string_view& key) const;
+	SDL_Texture* find_texture(const std::string_view& key);
 
 	TextureManager& texture_manager();
 	const TextureManager& texture_manager() const;

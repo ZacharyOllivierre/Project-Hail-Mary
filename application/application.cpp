@@ -1,6 +1,7 @@
 #include "application.h"
 
 #include "../engine/core/scene/scene_manager.h"
+#include "../engine/resources/resource_manager.h"
 
 #include <ctime>
 #include <iostream>
@@ -58,6 +59,9 @@ bool Application::init(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
+
+	ResourceManager::instance()->init(_renderer);
+
 	return true;
 }
 
@@ -100,6 +104,11 @@ int Application::run(int argc, char** argv)
 		SDL_RenderClear(_renderer);
 
 		SceneManager::instance()->on_render(_renderer);
+
+		//---------------test--------------------
+		SDL_Rect dst{ 100,100,100,100 };
+		SDL_RenderCopy(_renderer, ResourceManager::instance()->find_texture("test"), nullptr, &dst);
+		//---------------test--------------------
 
 		SDL_RenderPresent(_renderer);
 	}

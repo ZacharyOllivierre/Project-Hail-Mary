@@ -1,7 +1,21 @@
 #include "texture_manager.h"
-
+#include <SDL_image.h>
 #include <iostream>
 #include <utility>
+
+bool TextureManager::load_texture(SDL_Renderer* renderer, const std::string& key,std::filesystem::path file_path)
+{
+	if (!renderer)
+	{
+		std::cout << "Load texture failed: renderer is empty." << std::endl;
+
+		return false;
+	}
+
+	SDL_Texture* texture = IMG_LoadTexture(renderer, file_path.string().c_str());
+
+	return store_texture(key,texture);
+}
 
 bool TextureManager::store_texture(const std::string& key, SDL_Texture* texture)
 {
