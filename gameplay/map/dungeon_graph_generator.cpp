@@ -7,14 +7,14 @@ DungeonGraph DungeonGraphGenerator::generate(const DungeonConfig &config)
 
     DungeonGraph graph;
 
-    generateMainPath(graph, config);
-    generateBranches(graph, config);
+    generate_main_path(graph, config);
+    generate_branches(graph, config);
 
     return graph;
 }
 
 // Creates room, adds it to dungeon graph's room list
-RoomNode *DungeonGraphGenerator::createRoom(DungeonGraph &graph)
+RoomNode *DungeonGraphGenerator::create_room(DungeonGraph &graph)
 {
     RoomNode room;
     graph.rooms.push_back(room);
@@ -44,10 +44,10 @@ void DungeonGraphGenerator::connect(RoomNode *roomA, RoomNode *roomB)
 }
 
 // Generates main linear main path of n rooms with first as start last as boss
-void DungeonGraphGenerator::generateMainPath(DungeonGraph &graph, const DungeonConfig &config)
+void DungeonGraphGenerator::generate_main_path(DungeonGraph &graph, const DungeonConfig &config)
 {
     // Set first room to start
-    RoomNode *previous = createRoom(graph);
+    RoomNode *previous = create_room(graph);
     previous->type = RoomType::Start;
 
     previous->isMainPath = true;
@@ -56,7 +56,7 @@ void DungeonGraphGenerator::generateMainPath(DungeonGraph &graph, const DungeonC
     // Create n more rooms connecting each to previous
     for (int i = 1; i < config.mainPathLength; i++)
     {
-        RoomNode *current = createRoom(graph);
+        RoomNode *current = create_room(graph);
         connect(previous, current);
 
         current->isMainPath = true;
@@ -70,7 +70,7 @@ void DungeonGraphGenerator::generateMainPath(DungeonGraph &graph, const DungeonC
 
 // Each room has percent change to generate side room
 // Todo fix earlier rooms have higher chance to have side rooms than later ones
-void DungeonGraphGenerator::generateBranches(DungeonGraph &graph, const DungeonConfig &config)
+void DungeonGraphGenerator::generate_branches(DungeonGraph &graph, const DungeonConfig &config)
 {
     int branchCount = 0;
     // Used to iterate only through the origninal rooms in vec
@@ -100,7 +100,7 @@ void DungeonGraphGenerator::generateBranches(DungeonGraph &graph, const DungeonC
 
         if (hasSideRoom)
         {
-            RoomNode *sideRoom = createRoom(graph);
+            RoomNode *sideRoom = create_room(graph);
             sideRoom->isMainPath = false;
             sideRoom->depth = node.depth + 1;
 

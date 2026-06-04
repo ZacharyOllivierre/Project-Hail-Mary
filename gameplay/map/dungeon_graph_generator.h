@@ -46,9 +46,9 @@ public:
     DungeonGraph generate(const DungeonConfig &config);
 
 private:
-    RoomNode *createRoom(DungeonGraph &graph);
+    RoomNode *create_room(DungeonGraph &graph);
     void connect(RoomNode *roomA, RoomNode *roomB);
 
-    void generateMainPath(DungeonGraph &graph, const DungeonConfig &config);
-    void generateBranches(DungeonGraph &graph, const DungeonConfig &config);
+    void generate_main_path(DungeonGraph &graph, const DungeonConfig &config);
+    void generate_branches(DungeonGraph &graph, const DungeonConfig &config);
 };
