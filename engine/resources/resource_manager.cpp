@@ -1,38 +1,22 @@
 #include "resource_manager.h"
+#include "../io/path_manager.h"
 
 ResourceManager::ResourceManager()
-	: _atlas_manager(_texture_manager)
 {
 }
 
-bool ResourceManager::load_atlas(
-	SDL_Renderer* renderer,
-	const AtlasLoadRequest& request
-)
+bool ResourceManager::init(SDL_Renderer* renderer)
 {
-	return _atlas_manager.load_atlas(renderer, request);
-}
+	if (!renderer)
+		return false;
 
-bool ResourceManager::load_atlases(
-	SDL_Renderer* renderer,
-	const std::vector<AtlasLoadRequest>& requests
-)
-{
-	return _atlas_manager.load_atlases(renderer, requests);
-}
+	_renderer = renderer;
 
-bool ResourceManager::load_font(
-	const std::string& key,
-	const std::filesystem::path& file_path,
-	int point_size
-)
-{
-	return _font_manager.load_font(key, file_path, point_size);
-}
-
-Atlas* ResourceManager::find_atlas(const std::string_view& key) const
-{
-	return _atlas_manager.find_atlas(key);
+	if (!PathManager::instance()->init())
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "PathManager init fail");
+			return false;
+	}
 }
 
 TTF_Font* ResourceManager::find_font(const std::string_view& key) const
@@ -53,16 +37,6 @@ Mix_Music* ResourceManager::find_music(const std::string_view& key) const
 SDL_Texture* ResourceManager::find_texture(const std::string_view& key) const
 {
 	return _texture_manager.find_texture(key);
-}
-
-AtlasManager& ResourceManager::atlas_manager()
-{
-	return _atlas_manager;
-}
-
-const AtlasManager& ResourceManager::atlas_manager() const
-{
-	return _atlas_manager;
 }
 
 TextureManager& ResourceManager::texture_manager()
@@ -93,20 +67,4 @@ AudioManager& ResourceManager::audio_manager()
 const AudioManager& ResourceManager::audio_manager() const
 {
 	return _audio_manager;
-}
-
-void ResourceManager::clear()
-{
-	_atlas_manager.clear();
-	_texture_manager.clear();
-	_font_manager.clear();
-	_audio_manager.clear();
-}
-
-size_t ResourceManager::resource_count() const
-{
-	return _atlas_manager.resource_count()
-		+ _texture_manager.resource_count()
-		+ _font_manager.resource_count()
-		+ _audio_manager.resource_count();
 }

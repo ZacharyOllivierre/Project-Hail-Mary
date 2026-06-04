@@ -1,9 +1,15 @@
 #include "audio_manager.h"
 
-AudioManager::~AudioManager()
+bool AudioManager::load_music()
 {
-	clear();
+	return true;
 }
+
+bool AudioManager::load_sound()
+{
+	return true;
+}
+
 
 Mix_Chunk* AudioManager::find_sound(const std::string_view& key) const
 {
@@ -21,27 +27,4 @@ Mix_Music* AudioManager::find_music(const std::string_view& key) const
 		return nullptr;
 
 	return iterator->second;
-}
-
-void AudioManager::clear()
-{
-	for (SoundPool::value_type& sound : _sound_pool)
-	{
-		if (sound.second)
-			Mix_FreeChunk(sound.second);
-	}
-
-	for (MusicPool::value_type& music : _music_pool)
-	{
-		if (music.second)
-			Mix_FreeMusic(music.second);
-	}
-
-	_sound_pool.clear();
-	_music_pool.clear();
-}
-
-size_t AudioManager::resource_count() const
-{
-	return _sound_pool.size() + _music_pool.size();
 }

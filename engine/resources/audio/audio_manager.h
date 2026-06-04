@@ -1,5 +1,4 @@
 #pragma once
-#include "../resource_sub_manager.h"
 
 #include <SDL_mixer.h>
 
@@ -10,16 +9,14 @@
 using SoundPool = std::unordered_map<std::string, Mix_Chunk*>;
 using MusicPool = std::unordered_map<std::string, Mix_Music*>;
 
-class AudioManager : public ResourceSubManager
+class AudioManager
 {
 public:
-	~AudioManager() override;
+	bool load_music();
+	bool load_sound();
 
 	Mix_Chunk* find_sound(const std::string_view& key) const;
 	Mix_Music* find_music(const std::string_view& key) const;
-
-	void clear() override;
-	size_t resource_count() const override;
 
 private:
 	SoundPool _sound_pool;

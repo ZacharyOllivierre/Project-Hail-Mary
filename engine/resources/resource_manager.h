@@ -1,5 +1,4 @@
 #pragma once
-#include "atlas/atlas_manager.h"
 #include "audio/audio_manager.h"
 #include "font/font_manager.h"
 #include "texture/texture_manager.h"
@@ -21,25 +20,13 @@ class ResourceManager : public Singleton<ResourceManager>
 public:
 	ResourceManager();
 
-	bool load_atlas(SDL_Renderer* renderer, const AtlasLoadRequest& request);
-	bool load_atlases(
-		SDL_Renderer* renderer,
-		const std::vector<AtlasLoadRequest>& requests
-	);
-	bool load_font(
-		const std::string& key,
-		const std::filesystem::path& file_path,
-		int point_size
-	);
+	bool init(SDL_Renderer* renderer);
 
-	Atlas* find_atlas(const std::string_view& key) const;
 	TTF_Font* find_font(const std::string_view& key) const;
 	Mix_Chunk* find_sound(const std::string_view& key) const;
 	Mix_Music* find_music(const std::string_view& key) const;
 	SDL_Texture* find_texture(const std::string_view& key) const;
 
-	AtlasManager& atlas_manager();
-	const AtlasManager& atlas_manager() const;
 	TextureManager& texture_manager();
 	const TextureManager& texture_manager() const;
 	FontManager& font_manager();
@@ -47,12 +34,10 @@ public:
 	AudioManager& audio_manager();
 	const AudioManager& audio_manager() const;
 
-	void clear();
-	size_t resource_count() const;
-
 private:
+	SDL_Renderer* _renderer=nullptr;
+
 	TextureManager _texture_manager;
-	AtlasManager _atlas_manager;
 	FontManager _font_manager;
 	AudioManager _audio_manager;
 };

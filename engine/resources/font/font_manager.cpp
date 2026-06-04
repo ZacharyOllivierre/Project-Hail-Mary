@@ -2,16 +2,8 @@
 
 #include <iostream>
 
-FontManager::~FontManager()
-{
-	clear();
-}
 
-bool FontManager::load_font(
-	const std::string& key,
-	const std::filesystem::path& file_path,
-	int point_size
-)
+bool FontManager::load_font(const std::string& key,const std::filesystem::path& file_path,int point_size)
 {
 	if (key.empty())
 	{
@@ -83,20 +75,4 @@ TTF_Font* FontManager::find_font(const std::string_view& key) const
 		return nullptr;
 
 	return iterator->second;
-}
-
-void FontManager::clear()
-{
-	for (FontPool::value_type& font : _font_pool)
-	{
-		if (font.second)
-			TTF_CloseFont(font.second);
-	}
-
-	_font_pool.clear();
-}
-
-size_t FontManager::resource_count() const
-{
-	return _font_pool.size();
 }
