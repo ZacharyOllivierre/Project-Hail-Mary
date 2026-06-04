@@ -1,6 +1,6 @@
 #pragma once
 #include "../tools/timer.h"
-#include "../resources/atlas.h"
+#include "../resources/atlas/atlas.h"
 
 #include <SDL.h>
 

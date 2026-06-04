@@ -1,0 +1,17 @@
+{
+  "characters": [
+    "elves",
+    "joker"
+  ],
+
+  "animation":
+  [
+    "idle",
+    "move"
+  ],
+
+  "textuers":
+  [
+    "die"
+  ] 
+}

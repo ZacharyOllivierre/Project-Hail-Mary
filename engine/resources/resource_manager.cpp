@@ -1,42 +1,112 @@
-#include <filesystem>
-
 #include "resource_manager.h"
-#include "../io/path_manager.h"
 
-bool ResourcesManager::init(SDL_Renderer *renderer)
+ResourceManager::ResourceManager()
+	: _atlas_manager(_texture_manager)
 {
-    std::filesystem::path textures_path = PathManager::instance()->texture();
-
-    load_texture(renderer, textures_path / "map.png");
-
-    return true;
 }
 
-SDL_Texture *ResourcesManager::get_texture(std::string path) const
+bool ResourceManager::load_atlas(
+	SDL_Renderer* renderer,
+	const AtlasLoadRequest& request
+)
 {
-    auto it = texture_pool.find(path);
-
-    // if (it == texture_pool.end())
-    if (true)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Texture ID %s not loaded", path.c_str());
-        return nullptr;
-    }
-
-    return it->second;
+	return _atlas_manager.load_atlas(renderer, request);
 }
 
-void ResourcesManager::load_texture(SDL_Renderer *renderer, const std::string &path)
+bool ResourceManager::load_atlases(
+	SDL_Renderer* renderer,
+	const std::vector<AtlasLoadRequest>& requests
+)
 {
-    if (!renderer)
-        return;
-
-    IMG_LoadTexture(renderer, path.c_str());
-
-    texture_pool[ResourceKey::Map] = texture;
-
-    return;
+	return _atlas_manager.load_atlases(renderer, requests);
 }
-void ResourcesManager::unload_texture(const std::string &path)
+
+bool ResourceManager::load_font(
+	const std::string& key,
+	const std::filesystem::path& file_path,
+	int point_size
+)
 {
+	return _font_manager.load_font(key, file_path, point_size);
+}
+
+Atlas* ResourceManager::find_atlas(const std::string_view& key) const
+{
+	return _atlas_manager.find_atlas(key);
+}
+
+TTF_Font* ResourceManager::find_font(const std::string_view& key) const
+{
+	return _font_manager.find_font(key);
+}
+
+Mix_Chunk* ResourceManager::find_sound(const std::string_view& key) const
+{
+	return _audio_manager.find_sound(key);
+}
+
+Mix_Music* ResourceManager::find_music(const std::string_view& key) const
+{
+	return _audio_manager.find_music(key);
+}
+
+SDL_Texture* ResourceManager::find_texture(const std::string_view& key) const
+{
+	return _texture_manager.find_texture(key);
+}
+
+AtlasManager& ResourceManager::atlas_manager()
+{
+	return _atlas_manager;
+}
+
+const AtlasManager& ResourceManager::atlas_manager() const
+{
+	return _atlas_manager;
+}
+
+TextureManager& ResourceManager::texture_manager()
+{
+	return _texture_manager;
+}
+
+const TextureManager& ResourceManager::texture_manager() const
+{
+	return _texture_manager;
+}
+
+FontManager& ResourceManager::font_manager()
+{
+	return _font_manager;
+}
+
+const FontManager& ResourceManager::font_manager() const
+{
+	return _font_manager;
+}
+
+AudioManager& ResourceManager::audio_manager()
+{
+	return _audio_manager;
+}
+
+const AudioManager& ResourceManager::audio_manager() const
+{
+	return _audio_manager;
+}
+
+void ResourceManager::clear()
+{
+	_atlas_manager.clear();
+	_texture_manager.clear();
+	_font_manager.clear();
+	_audio_manager.clear();
+}
+
+size_t ResourceManager::resource_count() const
+{
+	return _atlas_manager.resource_count()
+		+ _texture_manager.resource_count()
+		+ _font_manager.resource_count()
+		+ _audio_manager.resource_count();
 }
