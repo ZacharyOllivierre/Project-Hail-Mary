@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 
-bool TextureManager::store_texture(const std::string& key, TexturePtr texture)
+bool TextureManager::store_texture(const std::string& key, SDL_Texture* texture)
 {
 	if (key.empty())
 	{
@@ -25,21 +25,11 @@ bool TextureManager::store_texture(const std::string& key, TexturePtr texture)
 	return true;
 }
 
-SDL_Texture* TextureManager::find_texture(const std::string_view& key) const
+SDL_Texture* TextureManager::find_texture(const std::string_view& key)
 {
 	TexturePool::const_iterator iterator = _texture_pool.find(std::string(key));
 	if (iterator == _texture_pool.end())
 		return nullptr;
 
-	return iterator->second.get();
-}
-
-void TextureManager::clear()
-{
-	_texture_pool.clear();
-}
-
-size_t TextureManager::resource_count() const
-{
-	return _texture_pool.size();
+	return iterator->second;
 }

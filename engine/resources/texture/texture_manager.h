@@ -1,5 +1,4 @@
 #pragma once
-#include "texture_loader.h"
 
 #include <SDL.h>
 
@@ -13,7 +12,7 @@ class TextureManager
 {
 public:
 	bool store_texture(const std::string& key, SDL_Texture* texture);
-	SDL_Texture* find_texture(const std::string_view& key) const;
+	SDL_Texture* find_texture(const std::string_view& key);
 
 private:
 	TexturePool _texture_pool;
