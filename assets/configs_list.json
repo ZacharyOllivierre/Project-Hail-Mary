@@ -1,0 +1,8 @@
+{
+  "configs": [
+    "audio_list",
+    "character_information",
+    "fonts_list",
+    "textures_list"
+  ]
+}

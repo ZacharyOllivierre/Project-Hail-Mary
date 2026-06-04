@@ -2,9 +2,10 @@
 
 #include <string>
 
-bool PathManager::init(const std::filesystem::path& start_path)
+bool PathManager::init()
 {
-    std::optional<std::filesystem::path> root_path = find_project_root(start_path);
+    std::optional<std::filesystem::path> root_path =
+        find_project_root(std::filesystem::current_path());
 
     if (!root_path.has_value())
         return false;
@@ -13,18 +14,12 @@ bool PathManager::init(const std::filesystem::path& start_path)
     return true;
 }
 
-bool PathManager::is_initialized() const
-{
-    return !_root.empty();
-}
-
 bool PathManager::ensure_runtime_dirs() const
 {
     try
     {
         std::filesystem::create_directories(player_data());
         std::filesystem::create_directories(saves());
-        std::filesystem::create_directories(logs());
         return true;
     }
     catch (const std::filesystem::filesystem_error&)
@@ -54,11 +49,6 @@ std::filesystem::path PathManager::fonts() const
     return assets() / "fonts";
 }
 
-std::filesystem::path PathManager::preload() const
-{
-    return assets() / "preload";
-}
-
 std::filesystem::path PathManager::audio() const
 {
     return assets() / "audio";
@@ -79,14 +69,9 @@ std::filesystem::path PathManager::saves() const
     return player_data() / "saves";
 }
 
-std::filesystem::path PathManager::logs() const
+std::filesystem::path PathManager::configs_list() const
 {
-    return _root / "logs";
-}
-
-std::filesystem::path PathManager::assets_structure() const
-{
-    return assets() / "assets_structure.json";
+    return assets() / "configs_list.json";
 }
 
 std::filesystem::path PathManager::resolve_project_path(const std::filesystem::path& path) const
@@ -122,20 +107,6 @@ std::filesystem::path PathManager::resolve_config_path(const std::filesystem::pa
     return (configs() / path).lexically_normal();
 }
 
-std::filesystem::path PathManager::preload_file(const std::filesystem::path& file_name) const
-{
-    if (file_name.is_absolute())
-        return file_name.lexically_normal();
-
-    if (path_starts_with(file_name, "assets"))
-        return resolve_project_path(file_name);
-
-    if (path_starts_with(file_name, "preload"))
-        return resolve_asset_path(file_name);
-
-    return (preload() / file_name).lexically_normal();
-}
-
 bool PathManager::path_starts_with(
     const std::filesystem::path& path,
     const std::string& first_part
@@ -158,22 +129,31 @@ std::optional<std::filesystem::path> PathManager::find_project_root(const std::f
         if (!std::filesystem::is_directory(current))
             current = current.parent_path();
 
+        std::optional<std::filesystem::path> magic_root;
         for (int depth = 0; depth < MAX_SEARCH_DEPTH; ++depth)
         {
-            const std::filesystem::path assets_magic_file_path = current / "assets" / ".moonline_root";
             const std::filesystem::path assets_dir_path = current / "assets";
+            const std::filesystem::path assets_magic_file_path = assets_dir_path / "._root";
+            const std::filesystem::path assets_structure_path = assets_dir_path / "configs_list.json";
 
-            const bool has_assets_magic_file = std::filesystem::exists(assets_magic_file_path);
             const bool assets_is_dir = std::filesystem::is_directory(assets_dir_path);
+            const bool has_assets_magic_file = std::filesystem::exists(assets_magic_file_path);
+            const bool has_assets_structure = std::filesystem::exists(assets_structure_path);
 
-            if (has_assets_magic_file && assets_is_dir)
+            if (assets_is_dir && has_assets_structure)
                 return current;
 
+            if (assets_is_dir && has_assets_magic_file && !magic_root.has_value())
+                magic_root = current;
+
             if (current == current.root_path())
-                return std::nullopt;
+                break;
 
             current = current.parent_path();
         }
+
+        if (magic_root.has_value())
+            return magic_root;
     }
     catch (const std::filesystem::filesystem_error&)
     {
