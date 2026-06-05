@@ -28,31 +28,31 @@
 
 inline void execute_render_command(SDL_Renderer* renderer, const RenderCommand& render_command) noexcept
 {
-    if (!renderer || !render_command._texture)
+    if (!renderer || !render_command.texture)
         return;
 
-    SDL_Rect destination_rect = to_sdl_rect(render_command._world_rect);
+    SDL_Rect destination_rect = to_sdl_rect(render_command.world_rect);
     SDL_Point rotation_origin{
-        static_cast<int>(render_command._rotation_origin.x * destination_rect.w),
-        static_cast<int>(render_command._rotation_origin.y * destination_rect.h)
+        static_cast<int>(render_command.rotation_origin.x * destination_rect.w),
+        static_cast<int>(render_command.rotation_origin.y * destination_rect.h)
     };
 
     const SDL_Rect* src_rect = nullptr;
     SDL_Rect converted_src_rect{};
-    if (render_command._use_src_rect)
+    if (render_command.use_src_rect)
     {
-        converted_src_rect = to_sdl_rect(render_command._src_rect);
+        converted_src_rect = to_sdl_rect(render_command.src_rect);
         src_rect = &converted_src_rect;
     }
 
     SDL_RenderCopyEx(
         renderer,
-        render_command._texture,
+        render_command.texture,
         src_rect,
         &destination_rect,
-        render_command._rotation_degrees,
+        render_command.rotation_degrees,
         &rotation_origin,
-        to_sdl_renderer_flip(render_command._flip)
+        to_sdl_renderer_flip(render_command.flip)
     );
 }
 

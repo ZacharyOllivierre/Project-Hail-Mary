@@ -2,6 +2,10 @@
 
 #include "../../engine/scene/scene.h"
 
+#include "../test_obj.h"
+#include <memory>
+
+
 class TestScene final : public Scene
 {
 public:
@@ -15,4 +19,9 @@ public:
 	void on_enter() override;
 	void on_exit() override;
 	void reset() override;
+
+private:
+	std::shared_ptr<TestObj> _t_obj;
+	Rect _rect{ 460, 180, 360, 360 };
+	bool _contain = false;
 };

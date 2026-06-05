@@ -54,9 +54,6 @@ public:
     [[nodiscard]] Vector2 center() const noexcept { return _world_rect.center(); }
     [[nodiscard]] Vector2 size() const noexcept { return _world_rect.size(); }
 
-    [[nodiscard]] virtual Rect render_rect() const noexcept { return _world_rect; }
-    [[nodiscard]] virtual Rect collision_rect() const noexcept { return _world_rect; }
-
     [[nodiscard]] DepthLayer depth_layer() const noexcept { return _depth_layer; }
     [[nodiscard]] int order_in_layer() const noexcept { return _order_in_layer; }
 
@@ -72,14 +69,6 @@ public:
     void set_time_scale(double scale) noexcept { _time_scale = std::max(0.0, scale); }
     [[nodiscard]] double time_scale() const noexcept { return _time_scale; }
     [[nodiscard]] double scaled_delta(double parent_delta) const noexcept { return parent_delta * _time_scale; }
-
-protected:
-    [[nodiscard]] RenderCommand make_render_command() const
-    {
-        RenderCommand command;
-        command._world_rect = render_rect();
-        return command;
-    }
 
 private:
     Rect _world_rect{};
