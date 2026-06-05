@@ -94,6 +94,19 @@ SDL_FRect Camera::world_to_screen(const SDL_FRect &world_rect) const
     return screen_rec;
 }
 
+Rect Camera::world_to_screen(const Rect &world_rect) const
+{
+    Rect screen_rec;
+
+    screen_rec.set_x((world_rect.x() - _x) * _zoom + (_screen_width * 0.5));
+    screen_rec.set_y((world_rect.y() - _y) * _zoom + (_screen_height * 0.5));
+
+    screen_rec.set_width(world_rect.width() * _zoom);
+    screen_rec.set_height(world_rect.height() * _zoom);
+
+    return screen_rec;
+}
+
 // Converts screen pos into world position
 SDL_FPoint Camera::screen_to_world(float screen_x, float screen_y) const
 {

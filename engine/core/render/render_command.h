@@ -15,7 +15,7 @@ enum class SpriteFlip
 
 struct RenderCommand
 {
-    SDL_Texture* texture = nullptr;
+    SDL_Texture *texture = nullptr;
 
     // Destination rectangle in world space.
     // This will be transformed by the camera before rendering.
@@ -38,7 +38,7 @@ struct RenderCommand
 
 struct UIRenderCommand
 {
-    SDL_Texture* texture = nullptr;
+    SDL_Texture *texture = nullptr;
 
     // Destination rectangle in screen/UI space.
     // This is not affected by the world camera.

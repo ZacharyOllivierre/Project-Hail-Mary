@@ -6,9 +6,12 @@
 #include <memory>
 #include <vector>
 
+#include <iostream>
+
 #include "../core/depth_layer.h"
 #include "../core/game_object.h"
 #include "../core/interface/updatable.h"
+#include "../core/camera.h"
 #include "../core/render/sdl_render_command_executor.h"
 #include "../input/contracts/input_event_receiver.h"
 #include "../input/contracts/input_snapshot_receiver.h"
@@ -16,18 +19,23 @@
 class Scene
 {
 public:
-	Scene() = default;
+	Scene() : camera(1000, 700) {
+
+			  };
 	virtual ~Scene() = default;
 
-	virtual void on_enter() = 0;
+	virtual void on_enter()
+	{
+	}
+
 	virtual void on_exit() = 0;
 
 	virtual void on_update(double delta)
 	{
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 		{
 			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject>& obj : objects)
+			for (const std::shared_ptr<GameObject> &obj : objects)
 			{
 				if (!obj || obj->is_destroyed())
 					continue;
@@ -35,7 +43,7 @@ public:
 				if (!obj->is_active())
 					continue;
 
-				Updatable* updatable = dynamic_cast<Updatable*>(obj.get());
+				Updatable *updatable = dynamic_cast<Updatable *>(obj.get());
 				if (!updatable)
 					continue;
 
@@ -46,15 +54,16 @@ public:
 		remove_destroyed_objects();
 	}
 
-	virtual void on_render(SDL_Renderer* renderer)
+	virtual void on_render(SDL_Renderer *renderer)
 	{
 		std::vector<RenderCommand> render_commands;
 		render_commands.reserve(512);
 
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 		{
 			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject>& obj : objects)
+
+			for (const std::shared_ptr<GameObject> &obj : objects)
 			{
 				if (!obj || obj->is_destroyed())
 					continue;
@@ -64,20 +73,30 @@ public:
 
 				obj->submit_render_commands(render_commands);
 			}
+
+			// Translate world rec to screenRec
+			std::cout << "render_commands:" << render_commands.size() << std::endl;
+
+			for (RenderCommand &command : render_commands)
+			{
+				// std::cout << "Translated world rec " << command.world_rect.x() << "to ";
+				// command.world_rect = camera.world_to_screen(command.world_rect);
+				// command.world_rect = {100, 100, 300, 100};
+
+				// camera.follow(command.world_rect.x(), command.world_rect.y(), 0.05);
+			}
 			execute_render_commands(renderer, render_commands);
 		}
-
 	}
 
 	virtual void on_input(
-		const InputSnapshot& input,
-		const std::vector<InputEvent>& events
-	)
+		const InputSnapshot &input,
+		const std::vector<InputEvent> &events)
 	{
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 		{
 			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject>& obj : objects)
+			for (const std::shared_ptr<GameObject> &obj : objects)
 			{
 				if (!obj || obj->is_destroyed())
 					continue;
@@ -88,21 +107,21 @@ public:
 				if (_paused)
 					continue;
 
-				InputSnapshotReceiver* snapshot_receiver =
-					dynamic_cast<InputSnapshotReceiver*>(obj.get());
+				InputSnapshotReceiver *snapshot_receiver =
+					dynamic_cast<InputSnapshotReceiver *>(obj.get());
 				if (snapshot_receiver)
 					snapshot_receiver->on_input_snapshot(input);
 			}
 		}
 
-		for (const InputEvent& input_event : events)
+		for (const InputEvent &input_event : events)
 		{
 			bool consumed = false;
 
-			for (auto& layer : _object_layers)
+			for (auto &layer : _object_layers)
 			{
 				const std::vector<std::shared_ptr<GameObject>> objects = layer;
-				for (const std::shared_ptr<GameObject>& obj : objects)
+				for (const std::shared_ptr<GameObject> &obj : objects)
 				{
 					if (!obj || obj->is_destroyed())
 						continue;
@@ -110,8 +129,8 @@ public:
 					if (!obj->is_active())
 						continue;
 
-					InputEventReceiver* event_receiver =
-						dynamic_cast<InputEventReceiver*>(obj.get());
+					InputEventReceiver *event_receiver =
+						dynamic_cast<InputEventReceiver *>(obj.get());
 					if (!event_receiver)
 						continue;
 
@@ -135,21 +154,20 @@ public:
 		if (!obj)
 			return;
 
-		auto& layer = _object_layers[to_index(obj->depth_layer())];
+		auto &layer = _object_layers[to_index(obj->depth_layer())];
 
 		auto iter = std::lower_bound(layer.begin(), layer.end(), obj,
-			[](const auto& a, const auto& b)
-			{
-				return a->order_in_layer() < b->order_in_layer();
-			}
-		);
+									 [](const auto &a, const auto &b)
+									 {
+										 return a->order_in_layer() < b->order_in_layer();
+									 });
 
 		layer.insert(iter, obj);
 	}
 
 	void clear_objects()
 	{
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 			layer.clear();
 	}
 
@@ -165,10 +183,10 @@ protected:
 
 	void reset_objects()
 	{
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 		{
 			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject>& obj : objects)
+			for (const std::shared_ptr<GameObject> &obj : objects)
 			{
 				if (obj)
 					obj->reset();
@@ -178,24 +196,23 @@ protected:
 
 	void remove_destroyed_objects()
 	{
-		for (auto& layer : _object_layers)
+		for (auto &layer : _object_layers)
 		{
 			layer.erase(
 				std::remove_if(layer.begin(), layer.end(),
-					[](const auto& obj)
-					{
-						return !obj || obj->is_destroyed();
-					}),
-				layer.end()
-			);
+							   [](const auto &obj)
+							   {
+								   return !obj || obj->is_destroyed();
+							   }),
+				layer.end());
 		}
 	}
 
 protected:
 	bool _paused = false;
-
+	Camera camera;
 	std::array<
 		std::vector<std::shared_ptr<GameObject>>,
-		static_cast<size_t>(DepthLayer::Count)
-	> _object_layers;
+		static_cast<size_t>(DepthLayer::Count)>
+		_object_layers;
 };
