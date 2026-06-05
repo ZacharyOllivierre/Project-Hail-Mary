@@ -12,7 +12,6 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
-
 Application::Application()
 {
 	init_assert(!SDL_Init(SDL_INIT_EVERYTHING), "SDL2 Error");
@@ -57,7 +56,7 @@ Application::~Application()
 	SDL_Quit();
 }
 
-bool Application::init(int argc, char** argv)
+bool Application::init(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
@@ -67,7 +66,7 @@ bool Application::init(int argc, char** argv)
 	return true;
 }
 
-int Application::run(int argc, char** argv)
+int Application::run(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
@@ -92,8 +91,7 @@ int Application::run(int argc, char** argv)
 
 		SceneManager::instance()->on_input(
 			_input_system.snapshot(),
-			_input_system.events()
-		);
+			_input_system.events());
 
 		Uint64 current_counter = SDL_GetPerformanceCounter();
 		double delta = static_cast<double>(current_counter - last_counter) / counter_freq;

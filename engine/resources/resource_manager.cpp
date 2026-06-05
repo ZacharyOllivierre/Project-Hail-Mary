@@ -7,7 +7,7 @@ ResourceManager::ResourceManager()
 {
 }
 
-bool ResourceManager::init(SDL_Renderer* renderer)
+bool ResourceManager::init(SDL_Renderer *renderer)
 {
 	if (!renderer)
 		return false;
@@ -17,7 +17,7 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 	if (!PathManager::instance()->init())
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "PathManager init fail");
-			return false;
+		return false;
 	}
 
 	if (!_texture_manager.load_texture(renderer, "test", PathManager::instance()->assets() / "textures/map.png"))
@@ -28,54 +28,65 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 	{
 		std::cout << "Texture loaded." << std::endl;
 	}
+
+	if (!_texture_manager.load_texture(renderer, "test2", PathManager::instance()->assets() / "textures/test.png"))
+	{
+		std::cout << "Load texture failed." << std::endl;
+	}
+	else
+	{
+		std::cout << "Texture loaded." << std::endl;
+	}
+
+	return true;
 }
 
-TTF_Font* ResourceManager::find_font(const std::string_view& key) const
+TTF_Font *ResourceManager::find_font(const std::string_view &key) const
 {
 	return _font_manager.find_font(key);
 }
 
-Mix_Chunk* ResourceManager::find_sound(const std::string_view& key) const
+Mix_Chunk *ResourceManager::find_sound(const std::string_view &key) const
 {
 	return _audio_manager.find_sound(key);
 }
 
-Mix_Music* ResourceManager::find_music(const std::string_view& key) const
+Mix_Music *ResourceManager::find_music(const std::string_view &key) const
 {
 	return _audio_manager.find_music(key);
 }
 
-SDL_Texture* ResourceManager::find_texture(const std::string_view& key)
+SDL_Texture *ResourceManager::find_texture(const std::string_view &key)
 {
 	return _texture_manager.find_texture(key);
 }
 
-TextureManager& ResourceManager::texture_manager()
+TextureManager &ResourceManager::texture_manager()
 {
 	return _texture_manager;
 }
 
-const TextureManager& ResourceManager::texture_manager() const
+const TextureManager &ResourceManager::texture_manager() const
 {
 	return _texture_manager;
 }
 
-FontManager& ResourceManager::font_manager()
+FontManager &ResourceManager::font_manager()
 {
 	return _font_manager;
 }
 
-const FontManager& ResourceManager::font_manager() const
+const FontManager &ResourceManager::font_manager() const
 {
 	return _font_manager;
 }
 
-AudioManager& ResourceManager::audio_manager()
+AudioManager &ResourceManager::audio_manager()
 {
 	return _audio_manager;
 }
 
-const AudioManager& ResourceManager::audio_manager() const
+const AudioManager &ResourceManager::audio_manager() const
 {
 	return _audio_manager;
 }

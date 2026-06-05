@@ -75,17 +75,15 @@ public:
 			}
 
 			// Translate world rec to screenRec
-			std::cout << "render_commands:" << render_commands.size() << std::endl;
+			// std::cout << "render_commands:" << render_commands.size() << std::endl;
 
 			for (RenderCommand &command : render_commands)
 			{
-				// std::cout << "Translated world rec " << command.world_rect.x() << "to ";
-				// command.world_rect = camera.world_to_screen(command.world_rect);
-				// command.world_rect = {100, 100, 300, 100};
-
-				// camera.follow(command.world_rect.x(), command.world_rect.y(), 0.05);
+				command.world_rect = camera.world_to_screen(command.world_rect);
 			}
 			execute_render_commands(renderer, render_commands);
+
+			render_commands.clear();
 		}
 	}
 
