@@ -3,6 +3,8 @@
 #include "../engine/core/scene/scene_manager.h"
 #include "../engine/resources/resource_manager.h"
 
+#include "../gameplay/scene/test_scene.h"
+
 #include <ctime>
 #include <iostream>
 
@@ -76,6 +78,8 @@ int Application::run(int argc, char** argv)
 	_counter_freq = SDL_GetPerformanceFrequency();
 	_last_counter = SDL_GetPerformanceCounter();
 
+	SceneManager::instance()->switch_to<TestScene>();
+
 	while (_active)
 	{
 		_input_system.begin_frame();
@@ -104,11 +108,6 @@ int Application::run(int argc, char** argv)
 		SDL_RenderClear(_renderer);
 
 		SceneManager::instance()->on_render(_renderer);
-
-		//---------------test--------------------
-		SDL_Rect dst{ 100,100,100,100 };
-		SDL_RenderCopy(_renderer, ResourceManager::instance()->find_texture("test"), nullptr, &dst);
-		//---------------test--------------------
 
 		SDL_RenderPresent(_renderer);
 	}

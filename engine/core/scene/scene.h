@@ -33,6 +33,12 @@ public:
 					continue;
 
 				obj->on_update(delta);
+				
+				//update_camer_pos(obj,camera)
+
+				// Compute camera pos relative to world pos
+
+				// Store camera pos for each obj in scene
 			}
 		}
 
@@ -51,7 +57,10 @@ public:
 				if (!obj->is_visible())
 					continue;
 
-				obj->on_render(renderer);
+				// obj->on_render(renderer);
+				//obj-.get_textur;
+				// translate pos
+				//SDL_rend..()
 			}
 		}
 	}
