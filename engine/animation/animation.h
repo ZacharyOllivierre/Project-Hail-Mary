@@ -1,8 +1,9 @@
 #pragma once
-#include "../tools/timer.h"
-#include "../resources/atlas/atlas.h"
 
-#include <SDL.h>
+#include "../core/geometry/rect.h"
+#include "../core/render/render_command.h"
+#include "../resources/atlas/atlas.h"
+#include "../tools/timer.h"
 
 #include <functional>
 
@@ -14,9 +15,13 @@ public:
 	Animation();
 	virtual ~Animation() = default;
 
-	virtual void render(SDL_Renderer* renderer, const SDL_Rect& target_rect, double angle_degrees) const;
-	virtual void render(SDL_Renderer* renderer, const SDL_Point& target_position, double angle_degrees) const;
-	virtual void update(double delta_seconds);
+	void update(double delta_seconds);
+
+	[[nodiscard]] bool build_render_command(
+		const Rect& target_rect,
+		double angle_degrees,
+		RenderCommand& out_command
+	) const;
 
 	void set_atlas(const Atlas* atlas);
 	void set_loop(bool is_loop);

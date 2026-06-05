@@ -28,31 +28,23 @@ Animation::Animation()
 		});
 }
 
-void Animation::render(SDL_Renderer* renderer, const SDL_Rect& target_rect, double angle_degrees) const
+bool Animation::build_render_command(
+	const Rect& target_rect,
+	double angle_degrees,
+	RenderCommand& out_command
+) const
 {
 	const FrameInfo* frame_info = current_frame();
 	if (!frame_info || !frame_info->_texture)
-		return;
+		return false;
 
-	SDL_Rect destination_rect = target_rect;
-	SDL_Point center_point{ destination_rect.w / 2, destination_rect.h / 2 };
-	SDL_RenderCopyEx(renderer, frame_info->_texture, nullptr, &destination_rect, angle_degrees, &center_point, SDL_FLIP_NONE);
-}
-
-void Animation::render(SDL_Renderer* renderer, const SDL_Point& target_position, double angle_degrees) const
-{
-	const FrameInfo* frame_info = current_frame();
-	if (!frame_info || !frame_info->_texture)
-		return;
-
-	SDL_Rect destination_rect{};
-	destination_rect.x = target_position.x;
-	destination_rect.y = target_position.y;
-	destination_rect.w = frame_info->_width;
-	destination_rect.h = frame_info->_height;
-
-	SDL_Point center_point{ frame_info->_width / 2, frame_info->_height / 2 };
-	SDL_RenderCopyEx(renderer, frame_info->_texture, nullptr, &destination_rect, angle_degrees, &center_point, SDL_FLIP_NONE);
+	out_command._texture = frame_info->_texture;
+	out_command._world_rect = target_rect;
+	out_command._use_src_rect = false;
+	out_command._rotation_degrees = angle_degrees;
+	out_command._rotation_origin = Vector2(0.5f, 0.5f);
+	out_command._flip = SpriteFlip::None;
+	return true;
 }
 
 void Animation::update(double delta_seconds)

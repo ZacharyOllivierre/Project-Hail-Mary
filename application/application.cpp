@@ -1,6 +1,6 @@
 #include "application.h"
 
-#include "../engine/core/scene/scene_manager.h"
+#include "../engine/scene/scene_manager.h"
 #include "../engine/resources/resource_manager.h"
 
 #include "../gameplay/scene/test_scene.h"

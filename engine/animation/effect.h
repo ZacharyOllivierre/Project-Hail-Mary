@@ -2,18 +2,18 @@
 
 #include "animation.h"
 #include "../core/game_object.h"
-#include "../tools/vector2.h"
+#include "../core/interface/updatable.h"
 
 #include <memory>
 
-class Effect : public GameObject
+class Effect : public GameObject, public Updatable
 {
 public:
 	Effect(std::string effect_key, std::string animation_key, std::unique_ptr<Animation> animation);
 	~Effect() override = default;
 
-	void on_render(SDL_Renderer* renderer)override;
-	void on_update(double delta)override;
+	void submit_render_commands(std::vector<RenderCommand>& out_commands) const override;
+	void update(double delta) override;
 
 	std::unique_ptr<Effect> clone() const;
 

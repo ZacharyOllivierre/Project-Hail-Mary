@@ -30,11 +30,19 @@ void SceneManager::on_input(
         _current_scene->on_input(input, events);
 }
 
+void SceneManager::shutdown()
+{
+    if (_current_scene)
+    {
+        _current_scene->on_exit();
+        _current_scene = nullptr;
+    }
+
+    _scene_factory.destroy_all_scene();
+}
+
 void SceneManager::reset_current_scene()
 {
     if (_current_scene)
         _current_scene->reset();
 }
-
-
-

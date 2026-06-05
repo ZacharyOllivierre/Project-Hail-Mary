@@ -1,116 +1,95 @@
 #pragma once
-#include <SDL.h>
-#include "../tools/vector2.h"
-#include "../input/input_system.h"
 
-enum class DepthLayer
-{
-    Background,
-    Terrain,
-    Object,
-    Character,
-    Effect,
-    UI,
-    Count
-};
+#include <algorithm>
+#include <vector>
+
+#include "depth_layer.h"
+#include "geometry/rect.h"
+#include "geometry/vector2.h"
+#include "render/render_command.h"
+#include "../input/input_system.h"
 
 class GameObject
 {
 public:
-    explicit GameObject(DepthLayer layer, int order = 0)
-        : _depth_layer(layer), _order_in_layer(order) {}
+    explicit GameObject(DepthLayer layer, int order = 0) noexcept
+        : _depth_layer(layer), _order_in_layer(order) {
+    }
 
     virtual ~GameObject() = default;
 
-    GameObject(const GameObject &) = delete;
-    GameObject &operator=(const GameObject &) = delete;
-    GameObject(GameObject &&) = default;
-    GameObject &operator=(GameObject &&) = default;
+    GameObject(const GameObject&) = delete;
+    GameObject& operator=(const GameObject&) = delete;
+    GameObject(GameObject&&) = default;
+    GameObject& operator=(GameObject&&) = default;
 
-    virtual void on_update(double delta) {}
-    virtual void on_render(SDL_Renderer *renderer) {}
-
-    virtual void on_input(const InputSnapshot &input) {}
-    virtual void on_input_event(const InputEvent &event) {}
+    virtual void submit_render_commands(std::vector<RenderCommand>& out_commands) const
+    {
+        (void)out_commands;
+    }
 
     virtual void reset()
     {
         _visible = true;
         _active = true;
         _destroyed = false;
-        _update_when_paused = false;
-        _input_when_paused = false;
+        _time_scale = 1.0;
     }
 
-    void destroy() { _destroyed = true; }
-    bool is_destroyed() const { return _destroyed; }
+    void destroy() noexcept { _destroyed = true; }
+    [[nodiscard]] bool is_destroyed() const noexcept { return _destroyed; }
 
-    void set_world_position(const Vector2 &position)
+    void set_world_rect(const Rect& rect) noexcept { _world_rect = rect; }
+    void set_position(const Vector2& position) noexcept { _world_rect.set_position(position); }
+    void set_center(const Vector2& center) noexcept { _world_rect.set_center(center); }
+    void set_size(const Vector2& size) noexcept { _world_rect.set_size(size); }
+
+    void move_by(const Vector2& offset) noexcept
     {
-        _world_pos = position;
-        sync_rect();
+        _world_rect.set_position(_world_rect.position() + offset);
     }
-    const Vector2 &position() const { return _world_pos; }
 
-    void set_center_pos(const Vector2 &center_pos)
+    [[nodiscard]] const Rect& world_rect() const noexcept { return _world_rect; }
+    [[nodiscard]] Vector2 position() const noexcept { return _world_rect.position(); }
+    [[nodiscard]] Vector2 center() const noexcept { return _world_rect.center(); }
+    [[nodiscard]] Vector2 size() const noexcept { return _world_rect.size(); }
+
+    [[nodiscard]] virtual Rect render_rect() const noexcept { return _world_rect; }
+    [[nodiscard]] virtual Rect collision_rect() const noexcept { return _world_rect; }
+
+    [[nodiscard]] DepthLayer depth_layer() const noexcept { return _depth_layer; }
+    [[nodiscard]] int order_in_layer() const noexcept { return _order_in_layer; }
+
+    void set_depth_layer(DepthLayer layer) noexcept { _depth_layer = layer; }
+    void set_order_in_layer(int order) noexcept { _order_in_layer = order; }
+
+    void set_visible(bool visible) noexcept { _visible = visible; }
+    [[nodiscard]] bool is_visible() const noexcept { return _visible; }
+
+    void set_active(bool active) noexcept { _active = active; }
+    [[nodiscard]] bool is_active() const noexcept { return _active; }
+
+    void set_time_scale(double scale) noexcept { _time_scale = std::max(0.0, scale); }
+    [[nodiscard]] double time_scale() const noexcept { return _time_scale; }
+    [[nodiscard]] double scaled_delta(double parent_delta) const noexcept { return parent_delta * _time_scale; }
+
+protected:
+    [[nodiscard]] RenderCommand make_render_command() const
     {
-        _world_pos = {center_pos.x - _size.x * 0.5f, center_pos.y - _size.y * 0.5f};
-        sync_rect();
+        RenderCommand command;
+        command._world_rect = render_rect();
+        return command;
     }
-
-    Vector2 center() const
-    {
-        return {_world_pos.x + _size.x * 0.5f, _world_pos.y + _size.y * 0.5f};
-    }
-
-    const Vector2 &size() const { return _size; }
-    void set_size(const Vector2 &size)
-    {
-        _size = size;
-        sync_rect();
-    }
-
-    const SDL_Rect &rect() const { return _obj_rect; }
-
-    DepthLayer depth_layer() const { return _depth_layer; }
-    int order_in_layer() const { return _order_in_layer; }
-
-    void set_visible(bool visible) { _visible = visible; }
-    bool is_visible() const { return _visible; }
-
-    void set_active(bool active) { _active = active; }
-    bool is_active() const { return _active; }
-
-    void set_update_when_paused(bool enable) { _update_when_paused = enable; }
-    bool will_update_when_paused() const { return _update_when_paused; }
-
-    void set_input_when_paused(bool enable) { _input_when_paused = enable; }
-    bool will_input_when_paused() const { return _input_when_paused; }
 
 private:
-    void sync_rect()
-    {
-        _obj_rect.x = static_cast<int>(_world_pos.x);
-        _obj_rect.y = static_cast<int>(_world_pos.y);
+    Rect _world_rect{};
 
-        const int width = static_cast<int>(_size.x);
-        const int height = static_cast<int>(_size.y);
-        _obj_rect.w = width > 0 ? width : 0;
-        _obj_rect.h = height > 0 ? height : 0;
-    }
-
-    Vector2 _world_pos{0, 0};
-    Vector2 _size{0, 0};
-
-    SDL_Rect _obj_rect{0};
-
-    DepthLayer _depth_layer = DepthLayer::Object;
+    DepthLayer _depth_layer = DepthLayer::Item;
     int _order_in_layer = 0;
 
     bool _destroyed = false;
     bool _visible = true;
     bool _active = true;
 
-    bool _update_when_paused = false;
-    bool _input_when_paused = false;
+    double _time_scale = 1.0;
 };

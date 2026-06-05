@@ -80,7 +80,17 @@ std::unique_ptr<Effect> EffectManager::create_effect(const EffectSpawnRequest& r
 		std::move(animation)
 	);
 
-	effect->set_world_position(request._position);
+	effect->set_position(request._position);
+
+	if (request._size.has_value())
+		effect->set_size(*request._size);
+	else if (!definition->_default_size.is_zero())
+		effect->set_size(definition->_default_size);
+
+	if (request._angle_degrees.has_value())
+		effect->set_angle(*request._angle_degrees);
+	else
+		effect->set_angle(definition->_angle_degrees);
 
 	return effect;
 }
