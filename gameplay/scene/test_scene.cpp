@@ -7,7 +7,7 @@ void TestScene::on_enter()
 	_paused = false;
 }
 
-void TestScene::on_update(ouble delta)
+void TestScene::on_update(double delta)
 {
 
 }

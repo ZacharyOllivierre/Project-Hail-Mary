@@ -1,8 +1,6 @@
-
 #pragma once
 
 #include "../../engine/core/scene/scene.h"
-#include "../../engine/core/camera.h"
 
 class TestScene final : public Scene
 {
@@ -17,7 +15,4 @@ public:
 	void on_enter() override;
 	void on_exit() override;
 	void reset() override;
-
-private:
-	Camera _camera;
 };
