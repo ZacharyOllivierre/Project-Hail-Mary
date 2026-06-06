@@ -97,9 +97,6 @@ int Application::run(int argc, char **argv)
 		double delta = static_cast<double>(current_counter - last_counter) / counter_freq;
 		last_counter = current_counter;
 
-		if (delta * 1000 < 1000.0 / FPS)
-			SDL_Delay(static_cast<Uint32>(1000.0 / FPS - delta * 1000));
-
 		SceneManager::instance()->on_update(delta);
 
 		SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0);

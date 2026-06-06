@@ -30,8 +30,6 @@ private:
     const int _logical_width = 1280;
     const int _logical_height = 720;
 
-    double FPS = 60;
-
     Uint64 _last_counter = 0;
     Uint64 _counter_freq = 0;
 

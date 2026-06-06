@@ -25,8 +25,6 @@ void TestObject::update(double delta)
 	{
 		const Vector2 frame_move = _move_input.normalized() * (_move_speed * delta);
 		set_position(position() + frame_move);
-
-		std::cout << position().x << " " << position().y << std::endl;
 	}
 }
 

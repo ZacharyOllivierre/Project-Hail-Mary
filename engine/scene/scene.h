@@ -25,7 +25,7 @@ struct Updatable;
 class Scene
 {
 public:
-	Scene() : camera(1000, 700) {};
+	Scene() : camera(1280, 720) {};
 	virtual ~Scene() = default;
 
 	virtual void on_enter() = 0;

@@ -8,7 +8,7 @@ TestMap::TestMap() : GameObject(DepthLayer::Item)
 {
     _texture = ResourceManager::instance()->find_texture("test2");
     set_position({100, 100});
-    set_size({300, 300});
+    set_size({3000, 3000});
     std::cout << "TestMap()" << std::endl;
 }
 

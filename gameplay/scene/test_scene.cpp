@@ -2,11 +2,14 @@
 
 #include "../../engine/core/geometry/rect.h"
 #include "../../engine/core/render/sdl_convert.h"
+#include "../../engine/input/input_state.h"
 
-void TestScene::spawn_test_objects()
+void TestScene::spawn_test_object()
 {
-	_test_object = create_and_add_object<TestObject>();
-	_test_map = create_and_add_object<TestMap>();
+	if (_test_object)
+		return;
+
+	_test_object = add_object(_test_object_factory.create());
 }
 
 void TestScene::destroy_tracked_objects()
@@ -23,9 +26,10 @@ void TestScene::destroy_tracked_objects()
 
 void TestScene::on_enter()
 {
+	_test_map = add_object(std::make_unique<TestMap>());
 	_paused = false;
 	_contain = false;
-	spawn_test_objects();
+	spawn_test_object();
 }
 
 void TestScene::on_update(double delta)
@@ -73,6 +77,9 @@ void TestScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 
 	if (_test_object && _test_object->is_destroyed())
 		_test_object = nullptr;
+
+	if (!_test_object && input.state.is_just_pressed(InputAction::Attack))
+		spawn_test_object();
 }
 
 void TestScene::on_exit()
@@ -87,5 +94,6 @@ void TestScene::reset()
 	destroy_tracked_objects();
 	_paused = false;
 	_contain = false;
-	spawn_test_objects();
+	spawn_test_object();
+
 }

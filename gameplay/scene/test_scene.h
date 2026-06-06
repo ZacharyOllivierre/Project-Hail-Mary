@@ -4,6 +4,7 @@
 
 #include "../test_map.h"
 #include "../test_object.h"
+#include "../test_object_factory.h"
 
 class TestScene final : public Scene
 {
@@ -20,9 +21,10 @@ public:
 	void reset() override;
 
 private:
-	void spawn_test_objects();
+	void spawn_test_object();
 	void destroy_tracked_objects();
 
+	TestObjectFactory _test_object_factory;
 	TestObject* _test_object = nullptr;
 	TestMap* _test_map = nullptr;
 	Rect _rect{460, 180, 360, 360};
