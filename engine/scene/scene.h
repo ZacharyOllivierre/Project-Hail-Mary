@@ -1,216 +1,128 @@
 #pragma once
 
 #include <SDL.h>
-#include <algorithm>
+
 #include <array>
 #include <memory>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
-#include <iostream>
+#include "../core/camera.h"
 
 #include "../core/depth_layer.h"
 #include "../core/game_object.h"
-#include "../core/interface/updatable.h"
-#include "../core/camera.h"
-#include "../core/render/sdl_render_command_executor.h"
-#include "../input/contracts/input_event_receiver.h"
-#include "../input/contracts/input_snapshot_receiver.h"
+#include "../ui/core/ui_element.h"
+
+struct InputEvent;
+struct InputSnapshot;
+
+struct InputSnapshotReceiver;
+struct InputEventReceiver;
+struct Updatable;
+
 
 class Scene
 {
 public:
-	Scene() : camera(1000, 700) {
-
-			  };
+	Scene() : camera(1000, 700) {};
 	virtual ~Scene() = default;
 
-	virtual void on_enter()
-	{
-	}
-
+	virtual void on_enter() = 0;
 	virtual void on_exit() = 0;
-
-	virtual void on_update(double delta)
-	{
-		for (auto &layer : _object_layers)
-		{
-			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject> &obj : objects)
-			{
-				if (!obj || obj->is_destroyed())
-					continue;
-
-				if (!obj->is_active())
-					continue;
-
-				Updatable *updatable = dynamic_cast<Updatable *>(obj.get());
-				if (!updatable)
-					continue;
-
-				updatable->update(obj->scaled_delta(delta));
-			}
-		}
-
-		remove_destroyed_objects();
-	}
-
-	virtual void on_render(SDL_Renderer *renderer)
-	{
-		std::vector<RenderCommand> render_commands;
-		render_commands.reserve(512);
-
-		for (auto &layer : _object_layers)
-		{
-			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-
-			for (const std::shared_ptr<GameObject> &obj : objects)
-			{
-				if (!obj || obj->is_destroyed())
-					continue;
-
-				if (!obj->is_visible())
-					continue;
-
-				obj->submit_render_commands(render_commands);
-			}
-
-			// Translate world rec to screenRec
-			// std::cout << "render_commands:" << render_commands.size() << std::endl;
-
-			for (RenderCommand &command : render_commands)
-			{
-				command.world_rect = camera.world_to_screen(command.world_rect);
-			}
-			execute_render_commands(renderer, render_commands);
-
-			render_commands.clear();
-		}
-	}
-
-	virtual void on_input(
-		const InputSnapshot &input,
-		const std::vector<InputEvent> &events)
-	{
-		for (auto &layer : _object_layers)
-		{
-			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject> &obj : objects)
-			{
-				if (!obj || obj->is_destroyed())
-					continue;
-
-				if (!obj->is_active())
-					continue;
-
-				if (_paused)
-					continue;
-
-				InputSnapshotReceiver *snapshot_receiver =
-					dynamic_cast<InputSnapshotReceiver *>(obj.get());
-				if (snapshot_receiver)
-					snapshot_receiver->on_input_snapshot(input);
-			}
-		}
-
-		for (const InputEvent &input_event : events)
-		{
-			bool consumed = false;
-
-			for (auto &layer : _object_layers)
-			{
-				const std::vector<std::shared_ptr<GameObject>> objects = layer;
-				for (const std::shared_ptr<GameObject> &obj : objects)
-				{
-					if (!obj || obj->is_destroyed())
-						continue;
-
-					if (!obj->is_active())
-						continue;
-
-					InputEventReceiver *event_receiver =
-						dynamic_cast<InputEventReceiver *>(obj.get());
-					if (!event_receiver)
-						continue;
-
-					if (event_receiver->on_input_event(input_event))
-					{
-						consumed = true;
-						break;
-					}
-				}
-
-				if (consumed)
-					break;
-			}
-		}
-	}
-
 	virtual void reset() = 0;
 
-	void add_object(std::shared_ptr<GameObject> obj)
-	{
-		if (!obj)
-			return;
+	virtual void on_update(double delta);
 
-		auto &layer = _object_layers[to_index(obj->depth_layer())];
+	virtual void on_render(SDL_Renderer* renderer);
 
-		auto iter = std::lower_bound(layer.begin(), layer.end(), obj,
-									 [](const auto &a, const auto &b)
-									 {
-										 return a->order_in_layer() < b->order_in_layer();
-									 });
-
-		layer.insert(iter, obj);
-	}
-
-	void clear_objects()
-	{
-		for (auto &layer : _object_layers)
-			layer.clear();
-	}
+	virtual void on_input(const InputSnapshot& input,const std::vector<InputEvent>& events);
 
 	void pause() { _paused = true; }
 	void resume() { _paused = false; }
-	[[nodiscard]] bool is_paused() const { return _paused; }
+	[[nodiscard]] bool is_paused()const { return _paused; }
 
-protected:
-	static constexpr size_t to_index(DepthLayer layer)
+	template <typename T, typename... Args>
+	T* create_and_add_object(Args&&... args)
 	{
-		return static_cast<size_t>(layer);
+		static_assert(
+			std::is_base_of_v<GameObject, T> || std::is_base_of_v<UiElement, T>,
+			"T must derive from GameObject or UiElement.");
+
+		return add_object(
+			std::make_unique<T>(std::forward<Args>(args)...)
+		);
 	}
 
-	void reset_objects()
+	template <typename T>
+	T* add_object(std::unique_ptr<T> object)
 	{
-		for (auto &layer : _object_layers)
-		{
-			const std::vector<std::shared_ptr<GameObject>> objects = layer;
-			for (const std::shared_ptr<GameObject> &obj : objects)
-			{
-				if (obj)
-					obj->reset();
-			}
-		}
+		static_assert(
+			std::is_base_of_v<SceneObject, T>,
+			"T must derive from SceneObject.");
+
+		static_assert(
+			std::is_base_of_v<GameObject, T> || std::is_base_of_v<UiElement, T>,
+			"T must derive from GameObject or UiElement.");
+
+		if (!object)
+			return nullptr;
+
+		T* raw_object = object.get();
+		bool added = false;
+
+		if constexpr (std::is_base_of_v<GameObject, T>)
+			added = add_game_object(std::move(object));
+		else if constexpr (std::is_base_of_v<UiElement, T>)
+			added = add_ui_root(std::move(object));
+
+		if (!added)
+			return nullptr;
+
+		register_scene_object_interfaces(raw_object);
+
+		return raw_object;
 	}
 
-	void remove_destroyed_objects()
-	{
-		for (auto &layer : _object_layers)
-		{
-			layer.erase(
-				std::remove_if(layer.begin(), layer.end(),
-							   [](const auto &obj)
-							   {
-								   return !obj || obj->is_destroyed();
-							   }),
-				layer.end());
-		}
-	}
+private:
+	void register_scene_object_interfaces(SceneObject* object);
 
 protected:
 	bool _paused = false;
+
+private:
+	void remove_destroyed_objects();
+	bool add_game_object(std::unique_ptr<GameObject> object);
+	bool add_ui_root(std::unique_ptr<UiElement> object);
+
+	struct UpdatableEntry
+	{
+		SceneObject* object = nullptr;
+		Updatable* updatable = nullptr;
+	};
+
+	struct InputSnapshotReceiverEntry
+	{
+		SceneObject* object = nullptr;
+		InputSnapshotReceiver* receiver = nullptr;
+	};
+
+	struct InputEventReceiverEntry
+	{
+		SceneObject* object = nullptr;
+		InputEventReceiver* receiver = nullptr;
+	};
+
+
+protected:
 	Camera camera;
-	std::array<
-		std::vector<std::shared_ptr<GameObject>>,
-		static_cast<size_t>(DepthLayer::Count)>
-		_object_layers;
+
+private:
+	std::array<std::vector<std::unique_ptr<GameObject>>,
+		static_cast<size_t>(DepthLayer::Count)> _object_layers;
+	std::vector<std::unique_ptr<UiElement>> _ui_roots;
+
+	std::vector<UpdatableEntry> _updatables;
+	std::vector<InputSnapshotReceiverEntry> _snapshot_receivers;
+	std::vector<InputEventReceiverEntry> _event_receivers;
 };

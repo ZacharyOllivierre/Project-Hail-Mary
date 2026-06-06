@@ -2,9 +2,8 @@
 
 #include "../../engine/scene/scene.h"
 
-#include "../test_obj.h"
-#include "../test2_obj.h"
-#include <memory>
+#include "../test_map.h"
+#include "../test_object.h"
 
 class TestScene final : public Scene
 {
@@ -21,8 +20,11 @@ public:
 	void reset() override;
 
 private:
-	std::shared_ptr<TestObj> _t_obj;
-	std::shared_ptr<Test2Obj> _t2_obj;
+	void spawn_test_objects();
+	void destroy_tracked_objects();
+
+	TestObject* _test_object = nullptr;
+	TestMap* _test_map = nullptr;
 	Rect _rect{460, 180, 360, 360};
 	bool _contain = false;
 };

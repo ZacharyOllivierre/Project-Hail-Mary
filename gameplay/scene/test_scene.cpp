@@ -3,34 +3,53 @@
 #include "../../engine/core/geometry/rect.h"
 #include "../../engine/core/render/sdl_convert.h"
 
+void TestScene::spawn_test_objects()
+{
+	_test_object = create_and_add_object<TestObject>();
+	_test_map = create_and_add_object<TestMap>();
+}
+
+void TestScene::destroy_tracked_objects()
+{
+	if (_test_object && !_test_object->is_destroyed())
+		_test_object->destroy();
+
+	if (_test_map && !_test_map->is_destroyed())
+		_test_map->destroy();
+
+	_test_object = nullptr;
+	_test_map = nullptr;
+}
+
 void TestScene::on_enter()
 {
 	_paused = false;
-	_t_obj = std::make_shared<TestObj>();
-	_t2_obj = std::make_shared<Test2Obj>();
-
-	Scene::add_object(_t_obj);
-	Scene::add_object(_t2_obj);
-	// Scene::add_object(std::move(_t_obj));
+	_contain = false;
+	spawn_test_objects();
 }
 
 void TestScene::on_update(double delta)
 {
 	Scene::on_update(delta);
 
-	if (_rect.contains(_t_obj.get()->world_rect()))
-		_contain = true;
-	else
+	if (!_test_object)
+	{
 		_contain = false;
+		return;
+	}
 
-	Scene::camera.follow(_t_obj.get()->center().x, _t_obj.get()->center().y, 1);
+	_contain = _rect.contains(_test_object->world_rect());
+	camera.follow(_test_object->center().x, _test_object->center().y, 1);
 }
 
 void TestScene::on_render(SDL_Renderer *renderer)
 {
 	Scene::on_render(renderer);
 
-	const SDL_Rect square_rect = to_sdl_rect(_rect);
+	if (!renderer)
+		return;
+
+	const SDL_Rect square_rect = to_sdl_rect(camera.world_to_screen(_rect));
 
 	Uint8 draw_r = 0;
 	Uint8 draw_g = 0;
@@ -51,16 +70,22 @@ void TestScene::on_render(SDL_Renderer *renderer)
 void TestScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
 {
 	Scene::on_input(input, events);
+
+	if (_test_object && _test_object->is_destroyed())
+		_test_object = nullptr;
 }
 
 void TestScene::on_exit()
 {
-	clear_objects();
+	destroy_tracked_objects();
 	_paused = false;
+	_contain = false;
 }
 
 void TestScene::reset()
 {
-	clear_objects();
+	destroy_tracked_objects();
 	_paused = false;
+	_contain = false;
+	spawn_test_objects();
 }
