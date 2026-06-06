@@ -5,6 +5,7 @@
 #include "../test_map.h"
 #include "../test_object.h"
 #include "../test_object_factory.h"
+#include "../test_ui.h"
 
 class TestScene final : public Scene
 {
@@ -22,11 +23,13 @@ public:
 
 private:
 	void spawn_test_object();
+	void spawn_test_ui();
 	void destroy_tracked_objects();
 
 	TestObjectFactory _test_object_factory;
 	TestObject* _test_object = nullptr;
 	TestMap* _test_map = nullptr;
+	TestUi* _test_ui = nullptr;
 	Rect _rect{460, 180, 360, 360};
 	bool _contain = false;
 };

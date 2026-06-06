@@ -12,6 +12,14 @@ void TestScene::spawn_test_object()
 	_test_object = add_object(_test_object_factory.create());
 }
 
+void TestScene::spawn_test_ui()
+{
+	if (_test_ui)
+		return;
+
+	_test_ui = create_and_add_object<TestUi>();
+}
+
 void TestScene::destroy_tracked_objects()
 {
 	if (_test_object && !_test_object->is_destroyed())
@@ -20,8 +28,12 @@ void TestScene::destroy_tracked_objects()
 	if (_test_map && !_test_map->is_destroyed())
 		_test_map->destroy();
 
+	if (_test_ui && !_test_ui->is_destroyed())
+		_test_ui->destroy();
+
 	_test_object = nullptr;
 	_test_map = nullptr;
+	_test_ui = nullptr;
 }
 
 void TestScene::on_enter()
@@ -30,6 +42,7 @@ void TestScene::on_enter()
 	_paused = false;
 	_contain = false;
 	spawn_test_object();
+	spawn_test_ui();
 }
 
 void TestScene::on_update(double delta)
@@ -95,5 +108,6 @@ void TestScene::reset()
 	_paused = false;
 	_contain = false;
 	spawn_test_object();
+	spawn_test_ui();
 
 }
