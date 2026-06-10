@@ -38,12 +38,12 @@ bool Animation::build_render_command(
 	if (!frame_info || !frame_info->_texture)
 		return false;
 
-	out_command._texture = frame_info->_texture;
-	out_command._world_rect = target_rect;
-	out_command._use_src_rect = false;
-	out_command._rotation_degrees = angle_degrees;
-	out_command._rotation_origin = Vector2(0.5f, 0.5f);
-	out_command._flip = SpriteFlip::None;
+	out_command.texture = frame_info->_texture;
+	out_command.command_rect = target_rect;
+	out_command.use_src_rect = false;
+	out_command.rotation_degrees = angle_degrees;
+	out_command.rotation_origin = Vector2(0.5f, 0.5f);
+	out_command.flip = SpriteFlip::None;
 	return true;
 }
 

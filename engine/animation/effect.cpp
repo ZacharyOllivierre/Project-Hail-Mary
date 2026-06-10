@@ -10,7 +10,7 @@ void Effect::submit_render_commands(std::vector<RenderCommand>& out_commands) co
 	if (!_animation)
 		return;
 
-	RenderCommand render_command = make_render_command();
+	RenderCommand render_command;
 	if (_animation->build_render_command(world_rect(), _angle_degrees, render_command))
 		out_commands.push_back(render_command);
 }

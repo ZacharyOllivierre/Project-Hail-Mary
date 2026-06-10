@@ -1,7 +1,5 @@
 #include "animation_manager.h"
 
-#include "../resources/resource_manager.h"
-
 #include <iostream>
 
 bool AnimationManager::register_animation(
@@ -12,13 +10,6 @@ bool AnimationManager::register_animation(
 	if (request._animation_key.empty())
 	{
 		std::cout << "Register animation failed: animation key is empty." << std::endl;
-		return false;
-	}
-
-	if (request._atlas_key.empty())
-	{
-		std::cout << "Register animation failed: atlas key is empty: "
-			<< request._animation_key << std::endl;
 		return false;
 	}
 
@@ -38,28 +29,12 @@ bool AnimationManager::register_animation(
 
 	AnimationDefinition definition;
 	definition._animation_key = request._animation_key;
-	definition._atlas_key = request._atlas_key;
 	definition._fps = request._fps;
 	definition._loop = request._loop;
 	definition._segment_index = request._segment_index;
 	definition._atlas = atlas;
 
 	_definitions[request._animation_key] = definition;
-	return true;
-}
-
-bool AnimationManager::register_animations(
-	const std::vector<AnimationBuildRequest>& requests,
-	const ResourceManager& resource_manager
-)
-{
-	for (const AnimationBuildRequest& request : requests)
-	{
-		const Atlas* atlas = resource_manager.find_atlas(request._atlas_key);
-		if (!register_animation(request, atlas))
-			return false;
-	}
-
 	return true;
 }
 
@@ -89,4 +64,3 @@ std::unique_ptr<Animation> AnimationManager::create_animation(const std::string_
 	animation->set_interval_seconds(1.0 / definition->_fps);
 	return animation;
 }
-
