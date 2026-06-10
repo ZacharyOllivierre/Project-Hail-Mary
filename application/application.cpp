@@ -87,6 +87,13 @@ int Application::run(int argc, char **argv)
 			if (_event.type == SDL_QUIT)
 				_active = false;
 			_input_system.process_event(_event);
+
+			// Added for button
+			if (TestScene* test_scene = SceneManager::instance()->try_find_scene<TestScene>())
+			{
+    			test_scene->handle_sdl_event(_event);
+			}			
+			// Added for button end
 		}
 
 		SceneManager::instance()->on_input(

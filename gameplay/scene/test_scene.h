@@ -27,6 +27,7 @@ public:
 	void reset() override;
 
 	// Added for button
+	void handle_sdl_event(const SDL_Event& event);
 
 private:
 	void spawn_test_object();

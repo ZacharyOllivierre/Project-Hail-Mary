@@ -4,6 +4,8 @@
 #include "../../engine/core/render/sdl_convert.h"
 #include "../../engine/input/input_state.h"
 
+#include <iostream>
+
 void TestScene::spawn_test_object()
 {
 	if (_test_object)
@@ -63,23 +65,6 @@ void TestScene::on_render(SDL_Renderer *renderer)
 {
 	Scene::on_render(renderer);
 
-	
-	// Added for button
-    if (!_test_button)
-    {
-        SDL_Rect button_rect{ 100, 100, 200, 60 };
-
-        _test_button = std::make_unique<Button>(renderer, button_rect);
-
-        _test_button->set_on_click([]()
-        {
-            std::cout << "Test button clicked!" << std::endl;
-        });
-    }
-
-    _test_button->render();
-	// Added for button end
-
 	if (!renderer)
 		return;
 
@@ -99,6 +84,22 @@ void TestScene::on_render(SDL_Renderer *renderer)
 	SDL_RenderDrawRect(renderer, &square_rect);
 
 	SDL_SetRenderDrawColor(renderer, draw_r, draw_g, draw_b, draw_a);
+
+	// Added for button
+    if (!_test_button)
+    {
+        SDL_Rect button_rect{ 100, 100, 200, 60 };
+
+        _test_button = std::make_unique<Button>(renderer, button_rect);
+
+        _test_button->set_on_click([]()
+        {
+            std::cout << "Test button clicked!" << std::endl;
+        });
+    }
+
+    _test_button->render();
+	// Added for button end
 
 }
 
@@ -133,3 +134,13 @@ void TestScene::reset()
 	spawn_test_ui();
 
 }
+
+// Added for button
+void TestScene::handle_sdl_event(const SDL_Event& event)
+{
+    if (_test_button)
+    {
+        _test_button->handle_event(event);
+    }
+}
+// Added for button end
