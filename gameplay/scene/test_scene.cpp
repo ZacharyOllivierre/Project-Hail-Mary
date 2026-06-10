@@ -63,6 +63,23 @@ void TestScene::on_render(SDL_Renderer *renderer)
 {
 	Scene::on_render(renderer);
 
+	
+	// Added for button
+    if (!_test_button)
+    {
+        SDL_Rect button_rect{ 100, 100, 200, 60 };
+
+        _test_button = std::make_unique<Button>(renderer, button_rect);
+
+        _test_button->set_on_click([]()
+        {
+            std::cout << "Test button clicked!" << std::endl;
+        });
+    }
+
+    _test_button->render();
+	// Added for button end
+
 	if (!renderer)
 		return;
 
@@ -82,6 +99,7 @@ void TestScene::on_render(SDL_Renderer *renderer)
 	SDL_RenderDrawRect(renderer, &square_rect);
 
 	SDL_SetRenderDrawColor(renderer, draw_r, draw_g, draw_b, draw_a);
+
 }
 
 void TestScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
@@ -100,6 +118,10 @@ void TestScene::on_exit()
 	destroy_tracked_objects();
 	_paused = false;
 	_contain = false;
+
+	// Added for button
+	_test_button.reset();
+	// Added for button end
 }
 
 void TestScene::reset()

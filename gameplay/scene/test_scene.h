@@ -6,6 +6,11 @@
 #include "../test_object.h"
 #include "../test_object_factory.h"
 #include "../test_ui.h"
+#include "../../engine/ui/button.h"
+#include <memory>
+
+// Added for button
+#include <iostream>
 
 class TestScene final : public Scene
 {
@@ -21,10 +26,14 @@ public:
 	void on_exit() override;
 	void reset() override;
 
+	// Added for button
+
 private:
 	void spawn_test_object();
 	void spawn_test_ui();
 	void destroy_tracked_objects();
+	//Added for button
+	std::unique_ptr<Button> _test_button;
 
 	TestObjectFactory _test_object_factory;
 	TestObject* _test_object = nullptr;

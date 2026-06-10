@@ -5,3 +5,7 @@ if(GAMEPLAY)
 else()
     add_library(gameplay_lib INTERFACE)
 endif()
+
+target_include_directories(gameplay_lib PRIVATE
+    ${CMAKE_SOURCE_DIR}/engine
+)
