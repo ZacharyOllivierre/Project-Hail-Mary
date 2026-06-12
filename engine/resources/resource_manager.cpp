@@ -1,6 +1,6 @@
 #include "resource_manager.h"
 
-#include "atlas_manager.h"
+#include "atlas/atlas_manager.h"
 #include "../io/path_manager.h"
 
 #include <iostream>

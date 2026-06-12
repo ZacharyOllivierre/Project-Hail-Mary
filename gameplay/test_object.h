@@ -13,7 +13,7 @@ class TestObject : public GameObject, public Updatable, public InputSnapshotRece
 public:
 	explicit TestObject(std::string character_id = "joker");
 	~TestObject() override;
-
+	 
 	void update(double delta) override;
 	void on_input_snapshot(const InputSnapshot& input) override;
 

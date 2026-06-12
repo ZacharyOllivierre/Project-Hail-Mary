@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include "../tools/singleton.h"
 
 #include <SDL.h>

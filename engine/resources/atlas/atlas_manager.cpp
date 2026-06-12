@@ -1,6 +1,6 @@
 #include "atlas_manager.h"
 
-#include "texture/texture_manager.h"
+#include "../texture/texture_manager.h"
 
 #include <iostream>
 
