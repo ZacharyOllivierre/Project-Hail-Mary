@@ -27,13 +27,15 @@ public:
 	void reset() override;
 
 	// Added for button
+	// Lets application send raw SDL events to this scene, like mouse movement
 	void handle_sdl_event(const SDL_Event& event);
 
 private:
 	void spawn_test_object();
 	void spawn_test_ui();
 	void destroy_tracked_objects();
-	//Added for button
+	// Added for button
+	// Owns test button for this scene, starts as nullptr when created, used when button resets
 	std::unique_ptr<Button> _test_button;
 
 	TestObjectFactory _test_object_factory;

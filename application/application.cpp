@@ -89,8 +89,10 @@ int Application::run(int argc, char **argv)
 			_input_system.process_event(_event);
 
 			// Added for button
+			// After SDL recieves an event and processes it, check if a TestScene exists
 			if (TestScene* test_scene = SceneManager::instance()->try_find_scene<TestScene>())
 			{
+				// Forward raw SDL event to scene, allows button to reac to mouse clicks and SDL events
     			test_scene->handle_sdl_event(_event);
 			}			
 			// Added for button end
