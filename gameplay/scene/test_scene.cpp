@@ -141,7 +141,7 @@ void TestScene::reset()
 }
 
 // Added for button
-// Lets pplication send raw SDL events to this scene, like mouse movement
+// Lets application send raw SDL events to this scene, like mouse movement
 void TestScene::handle_sdl_event(const SDL_Event& event)
 {
 	// Only forward event if button already exists, button decides if event matters
