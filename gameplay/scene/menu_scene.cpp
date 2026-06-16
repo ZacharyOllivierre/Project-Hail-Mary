@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+// Runs when menu scene is active
 void MenuScene::on_enter()
 {
 	_paused = false;
@@ -14,15 +15,18 @@ void MenuScene::on_enter()
 	std::cout << "Entered MenuScene" << std::endl;
 }
 
+// Updates menu scene each frame.
 void MenuScene::on_update(double delta)
 {
 	Scene::on_update(delta);
 }
 
+// Renders menu background, title area, and start button every frame.
 void MenuScene::on_render(SDL_Renderer* renderer)
 {
 	Scene::on_render(renderer);
 
+	// Stops rendering if the renderer is missing.
 	if (!renderer)
 		return;
 
@@ -43,14 +47,13 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 	SDL_Rect title_rect{ 440, 120, 400, 80 };
 	SDL_RenderFillRect(renderer, &title_rect);
 
-	// Create button once.
-	// This is done here because Button needs the SDL_Renderer.
+	// Creates start button only once if it does not already exist.
 	if (!_start_button)
 	{
 		create_start_button(renderer);
 	}
 
-	// Draw button every frame.
+	// Renders start button if it exists.
 	if (_start_button)
 	{
 		_start_button->render();
@@ -60,6 +63,7 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor(renderer, old_r, old_g, old_b, old_a);
 }
 
+// Handles menu input, including keyboard input for starting the game.
 void MenuScene::on_input(
 	const InputSnapshot& input,
 	const std::vector<InputEvent>& events
@@ -69,7 +73,7 @@ void MenuScene::on_input(
 
 	Scene::on_input(input, events);
 
-	// Optional: pressing Enter also starts the game.
+	// Starts test scene if the confirm input, like Enter, was just pressed.
 	if (input.state.is_just_pressed(InputAction::Confirm))
 	{
 		std::cout << "Start pressed from keyboard!" << std::endl;
@@ -77,6 +81,7 @@ void MenuScene::on_input(
 	}
 }
 
+// Runs when menu scene is exited.
 void MenuScene::on_exit()
 {
 	std::cout << "Leaving MenuScene" << std::endl;
@@ -87,22 +92,27 @@ void MenuScene::on_exit()
 	_paused = false;
 }
 
+// Resets menu scene back to its starting state.
 void MenuScene::reset()
 {
 	_start_button.reset();
 	_paused = false;
 }
 
+// Sends raw SDL events, like mouse clicks, to the start button.
 void MenuScene::handle_sdl_event(const SDL_Event& event)
 {
+	// Lets button handle the SDL event only if button exists.
 	if (_start_button)
 	{
 		_start_button->handle_event(event);
 	}
 }
 
+// Creates start button and connects it to the test scene.
 void MenuScene::create_start_button(SDL_Renderer* renderer)
 {
+	// Prevents creating another button if one already exists.
 	if (_start_button)
 		return;
 
@@ -111,6 +121,7 @@ void MenuScene::create_start_button(SDL_Renderer* renderer)
 
 	_start_button = std::make_unique<Button>(renderer, button_rect);
 
+	// Runs when start button is clicked.
 	_start_button->set_on_click([]()
 	{
 		std::cout << "Start button clicked!" << std::endl;
