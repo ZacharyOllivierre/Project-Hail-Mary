@@ -4,6 +4,7 @@
 #include "../engine/resources/resource_bootstrapper.h"
 #include "../engine/resources/resource_manager.h"
 
+#include "../gameplay/scene/menu_scene.h"
 #include "../gameplay/scene/test_scene.h"
 
 #include <ctime>
@@ -69,7 +70,6 @@ bool Application::init(int argc, char **argv)
 
 	return true;
 }
-
 int Application::run(int argc, char **argv)
 {
 	(void)argc;
@@ -81,7 +81,7 @@ int Application::run(int argc, char **argv)
 	_counter_freq = SDL_GetPerformanceFrequency();
 	_last_counter = SDL_GetPerformanceCounter();
 
-	SceneManager::instance()->switch_to<TestScene>();
+	SceneManager::instance()->switch_to<MenuScene>();
 
 	while (_active)
 	{
@@ -91,6 +91,15 @@ int Application::run(int argc, char **argv)
 			if (_event.type == SDL_QUIT)
 				_active = false;
 			_input_system.process_event(_event);
+
+			// Added for main menu
+			// After SDL recieves an event and processes it, check if a menu exists
+			if (MenuScene* menu_scene = SceneManager::instance()->try_find_scene<MenuScene>())
+			{
+				// Forward raw SDL event to scene, allows button to react to mouse clicks and SDL events
+				menu_scene->handle_sdl_event(_event);
+			}
+
 		}
 
 		SceneManager::instance()->on_input(

@@ -21,6 +21,10 @@ public:
 	void on_exit() override;
 	void reset() override;
 
+	// Added for button
+	// Lets application send raw SDL events to this scene, like mouse movement
+	void handle_sdl_event(const SDL_Event& event);
+
 private:
 	void spawn_test_object();
 	void spawn_test_ui();

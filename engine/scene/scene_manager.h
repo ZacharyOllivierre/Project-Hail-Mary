@@ -38,6 +38,15 @@ public:
 	template<typename T>
 	bool reset_scene();
 
+	// Added for button
+	template<typename T>
+	T* try_find_scene()
+	{
+    	static_assert(std::is_base_of_v<Scene, T>, "T must derive from Scene");
+		return _scene_factory.try_find_scene<T>();
+	}
+	// Added for button end
+
 private:
 	Scene* _current_scene = nullptr;
 	SceneFactory _scene_factory;
