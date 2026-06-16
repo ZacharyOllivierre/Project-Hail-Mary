@@ -6,6 +6,9 @@
 #include "../test_object.h"
 #include "../test_object_factory.h"
 #include "../test_ui.h"
+#include "../../engine/ui/button.h"
+#include <memory>
+
 
 class TestScene final : public Scene
 {
@@ -20,6 +23,10 @@ public:
 	void on_enter() override;
 	void on_exit() override;
 	void reset() override;
+
+	// Added for button
+	// Lets application send raw SDL events to this scene, like mouse movement
+	void handle_sdl_event(const SDL_Event& event);
 
 private:
 	void spawn_test_object();

@@ -4,6 +4,8 @@
 #include "../../engine/core/render/sdl_convert.h"
 #include "../../engine/input/input_state.h"
 
+#include <iostream>
+
 void TestScene::spawn_test_object()
 {
 	if (_test_object)
@@ -111,3 +113,12 @@ void TestScene::reset()
 	spawn_test_ui();
 
 }
+
+// Added for button
+// Lets application send raw SDL events to this scene, like mouse movement
+void TestScene::handle_sdl_event(const SDL_Event& event)
+{
+	// Only forward event if button already exists, button decides if event matters
+	// Like checking if a mouse clicked a rectangle
+}
+// Added for button end
