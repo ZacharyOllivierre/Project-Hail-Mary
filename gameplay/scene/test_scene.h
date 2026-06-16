@@ -9,8 +9,6 @@
 #include "../../engine/ui/button.h"
 #include <memory>
 
-// Added for button
-#include <iostream>
 
 class TestScene final : public Scene
 {
@@ -34,9 +32,6 @@ private:
 	void spawn_test_object();
 	void spawn_test_ui();
 	void destroy_tracked_objects();
-	// Added for button
-	// Owns test button for this scene, starts as nullptr when created, used when button resets
-	std::unique_ptr<Button> _test_button;
 
 	TestObjectFactory _test_object_factory;
 	TestObject* _test_object = nullptr;

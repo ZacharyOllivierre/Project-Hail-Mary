@@ -3,6 +3,7 @@
 #include "../engine/scene/scene_manager.h"
 #include "../engine/resources/resource_manager.h"
 
+#include "../gameplay/scene/menu_scene.h"
 #include "../gameplay/scene/test_scene.h"
 
 #include <ctime>
@@ -65,7 +66,6 @@ bool Application::init(int argc, char **argv)
 
 	return true;
 }
-
 int Application::run(int argc, char **argv)
 {
 	(void)argc;
@@ -77,7 +77,7 @@ int Application::run(int argc, char **argv)
 	_counter_freq = SDL_GetPerformanceFrequency();
 	_last_counter = SDL_GetPerformanceCounter();
 
-	SceneManager::instance()->switch_to<TestScene>();
+	SceneManager::instance()->switch_to<MenuScene>();
 
 	while (_active)
 	{
@@ -88,6 +88,12 @@ int Application::run(int argc, char **argv)
 				_active = false;
 			_input_system.process_event(_event);
 
+			// Added for main menu
+			if (MenuScene* menu_scene = SceneManager::instance()->try_find_scene<MenuScene>())
+			{
+				menu_scene->handle_sdl_event(_event);
+			}
+			
 			// Added for button
 			// After SDL recieves an event and processes it, check if a TestScene exists
 			if (TestScene* test_scene = SceneManager::instance()->try_find_scene<TestScene>())

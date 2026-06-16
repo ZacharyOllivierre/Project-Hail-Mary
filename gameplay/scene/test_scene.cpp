@@ -84,27 +84,6 @@ void TestScene::on_render(SDL_Renderer *renderer)
 	SDL_RenderDrawRect(renderer, &square_rect);
 
 	SDL_SetRenderDrawColor(renderer, draw_r, draw_g, draw_b, draw_a);
-
-	// Added for button
-	// Create button only one, on_render runs every frame, so check to stop duplication
-    if (!_test_button)
-    {
-
-		// Create a button at x = 100, y = 100, width = 200, height = 60
-        SDL_Rect button_rect{ 100, 100, 200, 60 };
-
-        _test_button = std::make_unique<Button>(renderer, button_rect);
-
-        _test_button->set_on_click([]()
-        {
-            std::cout << "Test button clicked!" << std::endl;
-        });
-    }
-
-	// Draws button every frame after its been created
-    _test_button->render();
-	// Added for button end
-
 }
 
 void TestScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
@@ -123,11 +102,6 @@ void TestScene::on_exit()
 	destroy_tracked_objects();
 	_paused = false;
 	_contain = false;
-
-	// Added for button
-	// Deletes button when leaving scene, prevents button from being in memory when scene ends
-	_test_button.reset();
-	// Added for button end
 }
 
 void TestScene::reset()
@@ -146,10 +120,5 @@ void TestScene::handle_sdl_event(const SDL_Event& event)
 {
 	// Only forward event if button already exists, button decides if event matters
 	// Like checking if a mouse clicked a rectangle
-
-    if (_test_button)
-    {
-        _test_button->handle_event(event);
-    }
 }
 // Added for button end
