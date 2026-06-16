@@ -89,19 +89,13 @@ int Application::run(int argc, char **argv)
 			_input_system.process_event(_event);
 
 			// Added for main menu
+			// After SDL recieves an event and processes it, check if a menu exists
 			if (MenuScene* menu_scene = SceneManager::instance()->try_find_scene<MenuScene>())
 			{
+				// Forward raw SDL event to scene, allows button to react to mouse clicks and SDL events
 				menu_scene->handle_sdl_event(_event);
 			}
-			
-			// Added for button
-			// After SDL recieves an event and processes it, check if a TestScene exists
-			if (TestScene* test_scene = SceneManager::instance()->try_find_scene<TestScene>())
-			{
-				// Forward raw SDL event to scene, allows button to react to mouse clicks and SDL events
-    			test_scene->handle_sdl_event(_event);
-			}			
-			// Added for button end
+
 		}
 
 		SceneManager::instance()->on_input(
