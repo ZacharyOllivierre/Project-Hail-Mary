@@ -2,13 +2,10 @@
 
 #include "../../engine/scene/scene.h"
 
-#include "../test_map.h"
-#include "../test_object.h"
-#include "../test_object_factory.h"
-#include "../test_ui.h"
-#include "../../engine/ui/button.h"
-#include <memory>
-
+#include "../test/test_map.h"
+#include "../test/test_object.h"
+#include "../test/test_object_factory.h"
+#include "../test/test_ui.h"
 
 class TestScene final : public Scene
 {

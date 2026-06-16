@@ -1,0 +1,248 @@
+#include "character.h"
+
+#include "../engine/animation/animation_manager.h"
+#include "../engine/core/render/render_command.h"
+#include "../engine/input/input_state.h"
+
+#include <algorithm>
+#include <iostream>
+#include <utility>
+
+namespace
+{
+	void apply_animation_state(
+		const std::string& character_id,
+		Character::AnimationState new_state,
+		std::unique_ptr<Animation>& animation,
+		Character::AnimationState& animation_state
+	)
+	{
+		if (animation && animation_state == new_state)
+			return;
+
+		std::string animation_key;
+		switch (new_state)
+		{
+		case Character::AnimationState::Move:
+			animation_key = character_id + ".move";
+			break;
+
+		case Character::AnimationState::Die:
+			animation_key = character_id + ".die";
+			break;
+
+		case Character::AnimationState::Idle:
+		default:
+			animation_key = character_id + ".idle";
+			break;
+		}
+
+		std::unique_ptr<Animation> new_animation =
+			AnimationManager::instance()->create_animation(animation_key);
+		if (!new_animation)
+		{
+			std::cout << "Set Character animation failed: "
+				<< animation_key << std::endl;
+			return;
+		}
+
+		animation = std::move(new_animation);
+		animation_state = new_state;
+	}
+}
+
+Character::Character(
+	std::string character_id,
+	const Vector2& start_position,
+	const Vector2& start_size
+)
+	: GameObject(DepthLayer::Character),
+	_character_id(std::move(character_id))
+{
+	set_position(start_position);
+	set_character_size(start_size);
+	apply_animation_state(_character_id, AnimationState::Idle, _animation, _animation_state);
+}
+
+Character::~Character() = default;
+
+void Character::update(double delta)
+{
+	const double frame_delta = scaled_delta(delta);
+	if (_animation)
+		_animation->update(frame_delta);
+
+	if (_is_dead || _move_input.is_zero())
+		return;
+
+	const Vector2 frame_move =
+		_move_input.normalized() * (_move_speed * static_cast<float>(frame_delta));
+	set_position(position() + frame_move);
+}
+
+void Character::on_input_snapshot(const InputSnapshot& input)
+{
+	if (_is_dead)
+		return;
+
+	float move_x = 0.0f;
+	float move_y = 0.0f;
+
+	if (input.state.is_pressed(InputAction::Left))
+		move_x -= 1.0f;
+	if (input.state.is_pressed(InputAction::Right))
+		move_x += 1.0f;
+	if (input.state.is_pressed(InputAction::Up))
+		move_y -= 1.0f;
+	if (input.state.is_pressed(InputAction::Down))
+		move_y += 1.0f;
+
+	_move_input = { move_x, move_y };
+	if (_move_input.x < 0.0f)
+		_facing_direction = FacingDirection::Left;
+	else if (_move_input.x > 0.0f)
+		_facing_direction = FacingDirection::Right;
+
+	apply_animation_state(
+		_character_id,
+		_move_input.is_zero() ? AnimationState::Idle : AnimationState::Move,
+		_animation,
+		_animation_state
+	);
+}
+
+void Character::submit_render_commands(std::vector<RenderCommand>& out_commands) const
+{
+	if (!_animation)
+		return;
+
+	RenderCommand command;
+	if (_animation->build_render_command(world_rect(), 0.0, command))
+	{
+		command.flip = _facing_direction == FacingDirection::Left
+			? SpriteFlip::Horizontal
+			: SpriteFlip::None;
+		out_commands.push_back(std::move(command));
+	}
+}
+
+void Character::set_move_speed(float move_speed) noexcept
+{
+	_move_speed = std::max(0.0f, move_speed);
+}
+
+void Character::set_hp(float hp) noexcept
+{
+	_hp = std::max(0.0f, hp);
+	if (_hp <= 0.0f)
+		die();
+}
+
+void Character::set_mana(float mana) noexcept
+{
+	_mana = std::max(0.0f, mana);
+}
+
+void Character::set_character_size(const Vector2& size)
+{
+	GameObject::set_size(size);
+	_collision_rect.set_size(size);
+}
+
+void Character::set_position(const Vector2& position)
+{
+	GameObject::set_position(position);
+	_collision_rect.set_position(position);
+}
+
+void Character::move_by(const Vector2& offset) noexcept
+{
+	GameObject::set_position(position() + offset);
+	_collision_rect.set_position(_collision_rect.position() + offset);
+}
+
+void Character::die()
+{
+	if (_is_dead)
+		return;
+
+	_is_dead = true;
+	_move_input = Vector2::zero();
+	apply_animation_state(_character_id, AnimationState::Die, _animation, _animation_state);
+}
+
+void Character::take_damage(float damage) noexcept
+{
+	if (_is_dead || damage <= 0.0f)
+		return;
+
+	set_hp(_hp - damage);
+}
+
+bool Character::use_mana(float mana_cost) noexcept
+{
+	if (mana_cost <= 0.0f)
+		return true;
+
+	if (_mana < mana_cost)
+		return false;
+
+	_mana -= mana_cost;
+	return true;
+}
+
+Rect Character::collision_rect() const noexcept
+{
+	return _collision_rect;
+}
+
+const std::string& Character::character_id() const noexcept
+{
+	return _character_id;
+}
+
+float Character::move_speed() const noexcept
+{
+	return _move_speed;
+}
+
+float Character::hp() const noexcept
+{
+	return _hp;
+}
+
+float Character::mana() const noexcept
+{
+	return _mana;
+}
+
+Character::AnimationState Character::animation_state() const noexcept
+{
+	return _animation_state;
+}
+
+Character::FacingDirection Character::facing_direction() const noexcept
+{
+	return _facing_direction;
+}
+
+bool Character::is_dead() const noexcept
+{
+	return _is_dead;
+}
+
+std::string Character::animation_key_for(AnimationState state) const
+{
+	switch (state)
+	{
+	case AnimationState::Move:
+		return _character_id + ".move";
+
+	case AnimationState::Die:
+		return _character_id + ".die";
+
+	case AnimationState::Idle:
+	default:
+		return _character_id + ".idle";
+	}
+}

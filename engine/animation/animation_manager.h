@@ -8,14 +8,10 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <vector>
-
-class ResourceManager;
 
 struct AnimationDefinition
 {
 	std::string _animation_key;
-	std::string _atlas_key;
 	double _fps = 10.0;
 	bool _loop = true;
 	size_t _segment_index = 0;
@@ -30,10 +26,6 @@ public:
 	bool register_animation(
 		const AnimationBuildRequest& request,
 		const Atlas* atlas
-	);
-	bool register_animations(
-		const std::vector<AnimationBuildRequest>& requests,
-		const ResourceManager& resource_manager
 	);
 
 	const AnimationDefinition* find_definition(const std::string_view& key) const;

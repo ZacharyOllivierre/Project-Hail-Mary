@@ -7,11 +7,22 @@
   "animation":
   [
     "idle",
-    "move"
+    "move",
+    "die"
   ],
 
-  "textuers":
-  [
-    "die"
-  ] 
+  "animation_settings": {
+    "idle": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "move": {
+      "fps": 10.0,
+      "loop": true
+    },
+    "die": {
+      "fps": 1.0,
+      "loop": false
+    }
+  }
 }

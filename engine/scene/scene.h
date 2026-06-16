@@ -38,6 +38,8 @@ public:
 
 	virtual void on_input(const InputSnapshot& input,const std::vector<InputEvent>& events);
 
+	void destroy_all_scene_objects();
+
 	void pause() { _paused = true; }
 	void resume() { _paused = false; }
 	[[nodiscard]] bool is_paused()const { return _paused; }

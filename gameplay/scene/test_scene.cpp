@@ -8,7 +8,7 @@
 
 void TestScene::spawn_test_object()
 {
-	if (_test_object)
+	if (_test_object && !_test_object->is_destroyed() && !_test_object->is_dead())
 		return;
 
 	_test_object = add_object(_test_object_factory.create());
@@ -24,14 +24,7 @@ void TestScene::spawn_test_ui()
 
 void TestScene::destroy_tracked_objects()
 {
-	if (_test_object && !_test_object->is_destroyed())
-		_test_object->destroy();
-
-	if (_test_map && !_test_map->is_destroyed())
-		_test_map->destroy();
-
-	if (_test_ui && !_test_ui->is_destroyed())
-		_test_ui->destroy();
+	destroy_all_scene_objects();
 
 	_test_object = nullptr;
 	_test_map = nullptr;
@@ -51,7 +44,7 @@ void TestScene::on_update(double delta)
 {
 	Scene::on_update(delta);
 
-	if (!_test_object)
+	if (!_test_object || _test_object->is_destroyed() || _test_object->is_dead())
 	{
 		_contain = false;
 		return;
@@ -93,7 +86,8 @@ void TestScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 	if (_test_object && _test_object->is_destroyed())
 		_test_object = nullptr;
 
-	if (!_test_object && input.state.is_just_pressed(InputAction::Attack))
+	if ((!_test_object || _test_object->is_destroyed() || _test_object->is_dead()) &&
+		input.state.is_just_pressed(InputAction::Attack))
 		spawn_test_object();
 }
 

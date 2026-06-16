@@ -1,6 +1,7 @@
 #include "application.h"
 
 #include "../engine/scene/scene_manager.h"
+#include "../engine/resources/resource_bootstrapper.h"
 #include "../engine/resources/resource_manager.h"
 
 #include "../gameplay/scene/menu_scene.h"
@@ -62,7 +63,10 @@ bool Application::init(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	ResourceManager::instance()->init(_renderer);
+	init_assert(ResourceManager::instance()->init(_renderer), "ResourceManager init fail");
+	init_assert(
+		ResourceBootstrapper::bootstrap(*ResourceManager::instance(), _renderer),
+		"ResourceBootstrapper init fail");
 
 	return true;
 }

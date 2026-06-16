@@ -164,6 +164,26 @@ void Scene::on_render(SDL_Renderer* renderer)
 	execute_render_commands(renderer, ui_render_commands);
 }
 
+void Scene::destroy_all_scene_objects()
+{
+	for (auto& layer : _object_layers)
+	{
+		for (std::unique_ptr<GameObject>& object : layer)
+		{
+			if (object)
+				object->destroy();
+		}
+	}
+
+	for (std::unique_ptr<UiElement>& ui_root : _ui_roots)
+	{
+		if (ui_root)
+			ui_root->destroy();
+	}
+
+	remove_destroyed_objects();
+}
+
 void Scene::register_scene_object_interfaces(SceneObject* object)
 {
 	if (!object)
