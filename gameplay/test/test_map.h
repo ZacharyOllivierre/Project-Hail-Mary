@@ -1,8 +1,8 @@
 #pragma once
 #include <SDL_image.h>
 
-#include "../engine/core/game_object.h"
-#include "../engine/resources/resource_manager.h"
+#include "../../engine/core/game_object.h"
+#include "../../engine/resources/resource_manager.h"
 
 class TestMap : public GameObject
 {
