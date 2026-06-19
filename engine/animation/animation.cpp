@@ -31,6 +31,7 @@ Animation::Animation()
 bool Animation::build_render_command(
 	const Rect& target_rect,
 	double angle_degrees,
+	SpriteFlip flip,
 	RenderCommand& out_command
 ) const
 {
@@ -43,7 +44,7 @@ bool Animation::build_render_command(
 	out_command.use_src_rect = false;
 	out_command.rotation_degrees = angle_degrees;
 	out_command.rotation_origin = Vector2(0.5f, 0.5f);
-	out_command.flip = SpriteFlip::None;
+	out_command.flip = flip;
 	return true;
 }
 

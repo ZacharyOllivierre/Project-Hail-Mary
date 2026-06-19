@@ -18,10 +18,12 @@ public:
 	std::unique_ptr<Effect> clone() const;
 
 	void set_angle(double angle_degrees);
+	void set_flip(SpriteFlip flip);
 
 private:
 	std::string _effect_key;
 	std::string _animation_key;
 	double _angle_degrees = 0.0;
+	SpriteFlip _flip = SpriteFlip::None;
 	std::unique_ptr<Animation> _animation;
 };

@@ -100,6 +100,10 @@ bool EffectManager::register_effect(const EffectBuildRequest& request)
 	EffectDefinition definition;
 	definition.effect_key = request.effect_key;
 	definition.animation_key = request.animation_key;
+	if (request.default_size.has_value())
+		definition.default_size = *request.default_size;
+	if (request.angle_degrees.has_value())
+		definition.angle_degrees = *request.angle_degrees;
 
 	_definitions[request.effect_key] = definition;
 	return true;

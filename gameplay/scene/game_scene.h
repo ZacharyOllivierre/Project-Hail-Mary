@@ -21,7 +21,7 @@ private:
 	void spawn_player();
 	void spawn_map();
 	void destroy_tracked_objects();
-	void spawn_effect_for_character(const std::string& effect_id, const Vector2& position);
+	void consume_player_effect_requests();
 
 	Character* _player = nullptr;
 

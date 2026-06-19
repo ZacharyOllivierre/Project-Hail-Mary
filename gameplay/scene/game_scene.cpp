@@ -86,6 +86,7 @@ void GameScene::on_render(SDL_Renderer* renderer)
 void GameScene::on_input(const InputSnapshot& input, const std::vector<InputEvent>& events)
 {
 	Scene::on_input(input, events);
+	consume_player_effect_requests();
 
 	if (_player && _player->is_destroyed())
 		_player = nullptr;
@@ -122,11 +123,7 @@ void GameScene::spawn_player()
 		"elves",
 		Vector2(200.0f, 200.0f),
 		Vector2(100.0f, 100.0f),
-		"fire.impact_radial",
-		[this](const std::string& effect_id, const Vector2& position)
-		{
-			spawn_effect_for_character(effect_id, position);
-		}
+		"fire.impact_radial"
 	);
 }
 
@@ -146,17 +143,21 @@ void GameScene::destroy_tracked_objects()
 	_map = nullptr;
 }
 
-void GameScene::spawn_effect_for_character(const std::string& effect_id, const Vector2& position)
+void GameScene::consume_player_effect_requests()
 {
-	EffectSpawnRequest request;
-	request._effect_key = effect_id;
-	request._position = position;
-	request._size = Vector2{ 500,500 };
-
-	std::unique_ptr<Effect> effect =
-		EffectManager::instance()->create_effect(request);
-	if (!effect)
+	if (!_player || _player->is_destroyed() || _player->is_dead())
 		return;
 
-	add_object(std::move(effect));
+	std::vector<EffectSpawnRequest> effect_requests =
+		_player->drain_effect_spawn_requests();
+
+	for (const EffectSpawnRequest& request : effect_requests)
+	{
+		std::unique_ptr<Effect> effect =
+			EffectManager::instance()->create_effect(request);
+		if (!effect)
+			continue;
+
+		add_object(std::move(effect));
+	}
 }

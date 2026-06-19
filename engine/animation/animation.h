@@ -20,6 +20,7 @@ public:
 	[[nodiscard]] bool build_render_command(
 		const Rect& target_rect,
 		double angle_degrees,
+		SpriteFlip flip,
 		RenderCommand& out_command
 	) const;
 

@@ -31,6 +31,7 @@ public:
 	Mix_Chunk* find_sound(const std::string_view& key) const;
 	Mix_Music* find_music(const std::string_view& key) const;
 	SDL_Texture* find_texture(const std::string_view& key);
+	const Atlas* find_atlas(const std::string_view& key) const;
 
 private:
 	const Atlas* build_atlas(SDL_Renderer* renderer, const AtlasLoadRequest& request);

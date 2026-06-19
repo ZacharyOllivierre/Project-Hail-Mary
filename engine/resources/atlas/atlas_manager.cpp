@@ -25,29 +25,29 @@ bool AtlasManager::load_atlas(
 		return false;
 	}
 
-	if (request._atlas_key.empty())
+	if (request.atlas_key.empty())
 	{
 		std::cout << "Load atlas failed: atlas key is empty." << std::endl;
 		return false;
 	}
 
-	if (request._frame_paths.empty())
+	if (request.frame_paths.empty())
 	{
 		std::cout << "Load atlas failed: frame path list is empty: "
-			<< request._atlas_key << std::endl;
+			<< request.atlas_key << std::endl;
 		return false;
 	}
 
-	if (_atlas_pool.contains(request._atlas_key))
+	if (_atlas_pool.contains(request.atlas_key))
 		return true;
 
-	Atlas atlas(request._atlas_key);
+	Atlas atlas(request.atlas_key);
 
-	for (size_t frame_index = 0; frame_index < request._frame_paths.size(); ++frame_index)
+	for (size_t frame_index = 0; frame_index < request.frame_paths.size(); ++frame_index)
 	{
-		const std::filesystem::path& frame_path = request._frame_paths[frame_index];
+		const std::filesystem::path& frame_path = request.frame_paths[frame_index];
 		const std::string texture_key =
-			request._atlas_key + "#" + std::to_string(frame_index);
+			request.atlas_key + "#" + std::to_string(frame_index);
 
 		SDL_Texture* texture = texture_manager.find_texture(texture_key);
 		if (!texture)
@@ -77,6 +77,6 @@ bool AtlasManager::load_atlas(
 		}
 	}
 
-	_atlas_pool.emplace(request._atlas_key, std::move(atlas));
+	_atlas_pool.emplace(request.atlas_key, std::move(atlas));
 	return true;
 }

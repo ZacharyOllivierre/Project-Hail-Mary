@@ -251,8 +251,8 @@ bool load_character_animations(
 			const std::string animation_key = character_id + "." + animation_name;
 
 			AtlasLoadRequest atlas_request;
-			atlas_request._atlas_key = animation_key;
-			atlas_request._frame_paths = std::move(frame_paths);
+			atlas_request.atlas_key = animation_key;
+			atlas_request.frame_paths = std::move(frame_paths);
 
 			const Atlas* atlas = build_atlas(atlas_request);
 			if (!atlas)
@@ -265,9 +265,10 @@ bool load_character_animations(
 			const AnimationSettings& settings = animation_settings.at(animation_name);
 
 			AnimationBuildRequest animation_request;
-			animation_request._animation_key = animation_key;
-			animation_request._fps = settings.fps;
-			animation_request._loop = settings.loop;
+			animation_request.animation_key = animation_key;
+			animation_request.atlas_key = animation_key;
+			animation_request.fps = settings.fps;
+			animation_request.loop = settings.loop;
 			if (!AnimationManager::instance()->register_animation(animation_request, atlas))
 			{
 				std::cout << "Register character animation failed: "
@@ -426,8 +427,8 @@ bool load_effects(
 		}
 
 		AtlasLoadRequest atlas_request;
-		atlas_request._atlas_key = effect_config.animation_key;
-		atlas_request._frame_paths = std::move(frame_paths);
+		atlas_request.atlas_key = effect_config.animation_key;
+		atlas_request.frame_paths = std::move(frame_paths);
 
 		const Atlas* atlas = build_atlas(atlas_request);
 		if (!atlas)
@@ -438,9 +439,10 @@ bool load_effects(
 		}
 
 		AnimationBuildRequest animation_request;
-		animation_request._animation_key = effect_config.animation_key;
-		animation_request._fps = effect_config.fps;
-		animation_request._loop = effect_config.loop;
+		animation_request.animation_key = effect_config.animation_key;
+		animation_request.atlas_key = effect_config.animation_key;
+		animation_request.fps = effect_config.fps;
+		animation_request.loop = effect_config.loop;
 		if (!AnimationManager::instance()->register_animation(animation_request, atlas))
 		{
 			std::cout << "Register effect animation failed: "
@@ -449,10 +451,10 @@ bool load_effects(
 		}
 
 		EffectBuildRequest effect_request;
-		effect_request._effect_key = std::move(effect_config.effect_key);
-		effect_request._animation_key = std::move(effect_config.animation_key);
-		effect_request._default_size = effect_config.default_size;
-		effect_request._angle_degrees = effect_config.angle_degrees;
+		effect_request.effect_key = std::move(effect_config.effect_key);
+		effect_request.animation_key = std::move(effect_config.animation_key);
+		effect_request.default_size = effect_config.default_size;
+		effect_request.angle_degrees = effect_config.angle_degrees;
 		effect_requests.push_back(std::move(effect_request));
 	}
 
