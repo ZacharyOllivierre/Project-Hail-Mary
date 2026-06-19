@@ -3,7 +3,7 @@
 #include "../../engine/scene/scene_manager.h"
 #include "../../engine/input/input_state.h"
 
-#include "test_scene.h"
+#include "game_scene.h"
 
 #include <iostream>
 
@@ -73,11 +73,11 @@ void MenuScene::on_input(
 
 	Scene::on_input(input, events);
 
-	// Starts test scene if the confirm input, like Enter, was just pressed.
+	// Starts the gameplay scene if the confirm input, like Enter, was just pressed.
 	if (input.state.is_just_pressed(InputAction::Confirm))
 	{
 		std::cout << "Start pressed from keyboard!" << std::endl;
-		SceneManager::instance()->switch_to<TestScene>();
+		SceneManager::instance()->switch_to<GameScene>();
 	}
 }
 
@@ -109,7 +109,7 @@ void MenuScene::handle_sdl_event(const SDL_Event& event)
 	}
 }
 
-// Creates start button and connects it to the test scene.
+// Creates start button and connects it to the gameplay scene.
 void MenuScene::create_start_button(SDL_Renderer* renderer)
 {
 	// Prevents creating another button if one already exists.
@@ -126,7 +126,7 @@ void MenuScene::create_start_button(SDL_Renderer* renderer)
 	{
 		std::cout << "Start button clicked!" << std::endl;
 
-		// This sends the program from menu_scene to test_scene.
-		SceneManager::instance()->switch_to<TestScene>();
+		// This sends the program from menu_scene to game_scene.
+		SceneManager::instance()->switch_to<GameScene>();
 	});
 }

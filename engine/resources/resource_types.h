@@ -1,7 +1,10 @@
 #pragma once
 
+#include "../core/geometry/vector2.h"
+
 #include <cstddef>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -23,4 +26,6 @@ struct EffectBuildRequest
 {
 	std::string _effect_key;
 	std::string _animation_key;
+	std::optional<Vector2> _default_size;
+	std::optional<double> _angle_degrees;
 };

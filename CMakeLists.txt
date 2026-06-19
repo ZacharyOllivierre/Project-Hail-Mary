@@ -142,4 +142,4 @@ target_include_directories(Hail PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/nlohmann
 )
 
-target_link_libraries(Hail app_lib  engine_lib gameplay_lib imgui_lib ${SDL2_LIBRARIES})
+target_link_libraries(Hail app_lib gameplay_lib engine_lib imgui_lib ${SDL2_LIBRARIES})

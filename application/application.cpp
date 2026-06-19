@@ -5,7 +5,6 @@
 #include "../engine/resources/resource_manager.h"
 
 #include "../gameplay/scene/menu_scene.h"
-#include "../gameplay/scene/test_scene.h"
 
 #include <ctime>
 #include <iostream>

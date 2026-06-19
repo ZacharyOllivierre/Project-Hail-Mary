@@ -2,6 +2,7 @@
   "configs": [
     "audio_list",
     "character_information",
+    "effect_information",
     "fonts_list",
     "textures_list"
   ]

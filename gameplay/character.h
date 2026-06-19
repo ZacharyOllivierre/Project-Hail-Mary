@@ -7,6 +7,7 @@
 #include "../engine/core/interface/moveable.h"
 #include "../engine/input/contracts/input_snapshot_receiver.h"
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -15,6 +16,8 @@ class Character : public GameObject,
 	public InputSnapshotReceiver
 {
 public:
+	using EffectSpawnCallback = std::function<void(const std::string&, const Vector2&)>;
+
 	enum class AnimationState
 	{
 		Idle,
@@ -31,7 +34,9 @@ public:
 	explicit Character(
 		std::string character_id,
 		const Vector2& start_position = Vector2::zero(),
-		const Vector2& start_size = Vector2(100.0f, 100.0f)
+		const Vector2& start_size = Vector2(100.0f, 100.0f),
+		std::string effect_id = {},
+		EffectSpawnCallback effect_spawn_callback = {}
 	);
 	~Character() override;
 
@@ -66,6 +71,8 @@ protected:
 
 private:
 	std::string _character_id;
+	std::string _effect_id;
+	EffectSpawnCallback _effect_spawn_callback;
 	std::unique_ptr<Animation> _animation;
 	AnimationState _animation_state = AnimationState::Idle;
 	FacingDirection _facing_direction = FacingDirection::Right;

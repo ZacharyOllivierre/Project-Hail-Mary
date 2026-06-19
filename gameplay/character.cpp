@@ -54,10 +54,14 @@ namespace
 Character::Character(
 	std::string character_id,
 	const Vector2& start_position,
-	const Vector2& start_size
+	const Vector2& start_size,
+	std::string effect_id,
+	EffectSpawnCallback effect_spawn_callback
 )
 	: GameObject(DepthLayer::Character),
-	_character_id(std::move(character_id))
+	_character_id(std::move(character_id)),
+	_effect_id(std::move(effect_id)),
+	_effect_spawn_callback(std::move(effect_spawn_callback))
 {
 	set_position(start_position);
 	set_character_size(start_size);
@@ -102,6 +106,13 @@ void Character::on_input_snapshot(const InputSnapshot& input)
 		_facing_direction = FacingDirection::Left;
 	else if (_move_input.x > 0.0f)
 		_facing_direction = FacingDirection::Right;
+
+	if (input.state.is_just_pressed(InputAction::Attack) &&
+		!_effect_id.empty() &&
+		_effect_spawn_callback)
+	{
+		_effect_spawn_callback(_effect_id, GameObject::position());
+	}
 
 	apply_animation_state(
 		_character_id,
