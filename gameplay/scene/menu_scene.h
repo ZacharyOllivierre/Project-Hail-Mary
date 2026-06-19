@@ -29,5 +29,6 @@ private:
 
 	std::unique_ptr<Button> _start_button;
 
-	TTF_Font* _menu_font = nullptr; // Added for text
+	// Menu text
+	//TTF_Font* _menu_font = nullptr;
 };
