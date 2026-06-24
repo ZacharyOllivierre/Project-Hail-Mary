@@ -109,6 +109,7 @@ void Character::on_input_snapshot(const InputSnapshot& input)
 		!_effect_id.empty())
 	{
 		EffectSpawnRequest request;
+		request.size = Vector2{ 500,500 };
 		request.effect_key = _effect_id;
 		request.position = center();
 		request.anchor = EffectAnchor::Center;
@@ -136,9 +137,7 @@ void Character::submit_render_commands(std::vector<RenderCommand>& out_commands)
 		world_rect(),
 		0.0,
 		_facing_direction == FacingDirection::Left
-			? SpriteFlip::Horizontal
-			: SpriteFlip::None,
-		command))
+			? SpriteFlip::Horizontal: SpriteFlip::None,command))
 	{
 		out_commands.push_back(std::move(command));
 	}
