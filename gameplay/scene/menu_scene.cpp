@@ -8,6 +8,45 @@
 #include <iostream>
 #include <SDL_ttf.h> // Added for text
 
+// Menu text
+void draw_text(
+	SDL_Renderer* renderer,
+	TTF_Font* font,
+	const char* text,
+	int x,
+	int y,
+	SDL_Color color
+)
+{
+	if (!renderer || !font || !text)
+		return;
+
+	SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
+
+	if (!surface)
+	{
+		std::cout << "Failed to create text surface: " << TTF_GetError() << std::endl;
+		return;
+	}
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+	if (!texture)
+	{
+		std::cout << "Failed to create text texture: " << SDL_GetError() << std::endl;
+		SDL_FreeSurface(surface);
+		return;
+	}
+
+	SDL_Rect dst_rect{ x, y, surface->w, surface->h };
+
+	SDL_RenderCopy(renderer, texture, nullptr, &dst_rect);
+
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+}
+
+
 // Runs when menu scene is active
 void MenuScene::on_enter()
 {
@@ -16,23 +55,23 @@ void MenuScene::on_enter()
 	std::cout << "Entered MenuScene" << std::endl;
 
 	// Added for  menutext
-	// if (TTF_WasInit() == 0)
-	// {
-	// 	if (TTF_Init() == -1)
-	// 	{
-	// 		std::cout << "Failed to initialize SDL_ttf: " << TTF_GetError() << std::endl;
-	// 		return;
-	// 	}
-	// }
+	if (TTF_WasInit() == 0)
+	{
+		if (TTF_Init() == -1)
+		{
+			std::cout << "Failed to initialize SDL_ttf: " << TTF_GetError() << std::endl;
+			return;
+		}
+	}
 
-	// The "assets/../..." Needs to ppoint to an actual font file
-	//_menu_font = TTF_OpenFont("assets/fonts/arial.ttf", 36);
+	//The "assets/../..." Needs to ppoint to an actual font file
+	_menu_font = TTF_OpenFont("../../assets/fonts/IPix.ttf", 36);
 
-	// if (!_menu_font)
-	// {
-	// 	std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
-	// }
-	// Added for menu text
+	if (!_menu_font)
+	{
+		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
+	}
+	//Added for menu text
 }
 
 // Updates menu scene each frame.
@@ -68,9 +107,9 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 	SDL_RenderFillRect(renderer, &title_rect);
 
 	// Draw menu text title
-	//SDL_Color white{ 255, 255, 255, 255 };
-	// Menu text
-	//draw_text(renderer, _menu_font, "MAIN MENU", 510, 140, white);
+	SDL_Color white{ 255, 255, 255, 255 };
+	//Menu text
+	draw_text(renderer, _menu_font, "MAIN MENU", 510, 140, white);
 
 	// Creates start button only once if it does not already exist.
 	if (!_start_button)
@@ -83,7 +122,7 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 	{
 		_start_button->render();
 		// Menu text
-		//draw_text(renderer, _menu_font, "START", 590, 335, white);
+		draw_text(renderer, _menu_font, "START", 590, 335, white);
 	}
 
 	// Restore old draw color
@@ -117,11 +156,11 @@ void MenuScene::on_exit()
 	_start_button.reset();
 
 	// Related to menu text
-	// if (_menu_font) 
-	// {
-	// 	TTF_CloseFont(_menu_font);
-	// 	_menu_font = nullptr;
-	// }
+	if (_menu_font) 
+	{
+		TTF_CloseFont(_menu_font);
+		_menu_font = nullptr;
+	}
 
 	_paused = false;
 }
@@ -165,40 +204,3 @@ void MenuScene::create_start_button(SDL_Renderer* renderer)
 	});
 }
 
-// Menu text
-// void draw_text(
-// 	SDL_Renderer* renderer,
-// 	TTF_Font* font,
-// 	const char* text,
-// 	int x,
-// 	int y,
-// 	SDL_Color color
-// )
-// {
-// 	if (!renderer || !font || !text)
-// 		return;
-
-// 	SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
-
-// 	if (!surface)
-// 	{
-// 		std::cout << "Failed to create text surface: " << TTF_GetError() << std::endl;
-// 		return;
-// 	}
-
-// 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-// 	if (!texture)
-// 	{
-// 		std::cout << "Failed to create text texture: " << SDL_GetError() << std::endl;
-// 		SDL_FreeSurface(surface);
-// 		return;
-// 	}
-
-// 	SDL_Rect dst_rect{ x, y, surface->w, surface->h };
-
-// 	SDL_RenderCopy(renderer, texture, nullptr, &dst_rect);
-
-// 	SDL_DestroyTexture(texture);
-// 	SDL_FreeSurface(surface);
-// }
