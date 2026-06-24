@@ -11,7 +11,7 @@ void Effect::submit_render_commands(std::vector<RenderCommand>& out_commands) co
 		return;
 
 	RenderCommand render_command;
-	if (_animation->build_render_command(world_rect(), _angle_degrees, render_command))
+	if (_animation->build_render_command(world_rect(), _angle_degrees, _flip, render_command))
 		out_commands.push_back(render_command);
 }
 
@@ -35,6 +35,7 @@ std::unique_ptr<Effect> Effect::clone() const
     effect->set_position(position());
     effect->set_size(size());
     effect->_angle_degrees = _angle_degrees;
+    effect->_flip = _flip;
 
     return effect;
 }
@@ -42,4 +43,9 @@ std::unique_ptr<Effect> Effect::clone() const
 void Effect::set_angle(double angle_degrees)
 {
 	_angle_degrees = angle_degrees;
+}
+
+void Effect::set_flip(SpriteFlip flip)
+{
+	_flip = flip;
 }

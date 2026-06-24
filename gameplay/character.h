@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../engine/animation/animation.h"
+#include "../engine/animation/effect_manager.h"
 #include "../engine/core/game_object.h"
 #include "../engine/core/interface/updatable.h"
 #include "../engine/core/interface/collidable.h"
@@ -9,6 +10,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 class Character : public GameObject, 
 	public Updatable, public Collidable,public Movable,
@@ -31,13 +33,15 @@ public:
 	explicit Character(
 		std::string character_id,
 		const Vector2& start_position = Vector2::zero(),
-		const Vector2& start_size = Vector2(100.0f, 100.0f)
+		const Vector2& start_size = Vector2(100.0f, 100.0f),
+		std::string effect_id = {}
 	);
 	~Character() override;
 
 	void update(double delta) override;
 	void on_input_snapshot(const InputSnapshot& input) override;
 	void submit_render_commands(std::vector<RenderCommand>& out_commands) const override;
+	std::vector<EffectSpawnRequest> drain_effect_spawn_requests();
 
 	void set_move_speed(float move_speed) noexcept;
 	void set_hp(float hp) noexcept;
@@ -66,6 +70,8 @@ protected:
 
 private:
 	std::string _character_id;
+	std::string _effect_id;
+	std::vector<EffectSpawnRequest> _pending_effect_requests;
 	std::unique_ptr<Animation> _animation;
 	AnimationState _animation_state = AnimationState::Idle;
 	FacingDirection _facing_direction = FacingDirection::Right;

@@ -3,11 +3,14 @@
 #include "resource_manager.h"
 
 #include "../animation/animation_manager.h"
+#include "../animation/effect_manager.h"
 #include "../io/json_loader.h"
 #include "../io/path_manager.h"
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -21,9 +24,64 @@ struct AnimationSettings
 	bool loop = true;
 };
 
+struct EffectConfig
+{
+	std::string effect_key;
+	std::string animation_key;
+	std::filesystem::path directory_path;
+	double fps = 10.0;
+	bool loop = true;
+	std::optional<Vector2> default_size;
+	std::optional<double> angle_degrees;
+};
+
 bool has_png_extension(const std::filesystem::path& path)
 {
 	return path.has_extension() && path.extension() == ".png";
+}
+
+bool collect_png_frame_paths(
+	const std::filesystem::path& directory_path,
+	std::vector<std::filesystem::path>& out_frame_paths,
+	std::string& out_error
+)
+{
+	out_frame_paths.clear();
+	out_error.clear();
+
+	if (!std::filesystem::exists(directory_path))
+	{
+		out_error = "Directory does not exist: " + directory_path.string();
+		return false;
+	}
+
+	if (!std::filesystem::is_directory(directory_path))
+	{
+		out_error = "Path is not a directory: " + directory_path.string();
+		return false;
+	}
+
+	for (const std::filesystem::directory_entry& entry :
+		std::filesystem::directory_iterator(directory_path))
+	{
+		if (!entry.is_regular_file())
+			continue;
+
+		if (!has_png_extension(entry.path()))
+			continue;
+
+		out_frame_paths.push_back(entry.path());
+	}
+
+	std::sort(out_frame_paths.begin(), out_frame_paths.end());
+	if (out_frame_paths.empty())
+	{
+		out_error = "Directory contains no PNG frames: "
+			+ directory_path.string();
+		return false;
+	}
+
+	return true;
 }
 
 bool collect_animation_frame_paths(
@@ -34,43 +92,11 @@ bool collect_animation_frame_paths(
 	std::string& out_error
 )
 {
-	out_frame_paths.clear();
-	out_error.clear();
-
 	const std::filesystem::path animation_directory =
 		character_root / character_id / animation_name;
 
 	if (std::filesystem::exists(animation_directory))
-	{
-		if (!std::filesystem::is_directory(animation_directory))
-		{
-			out_error = "Animation path is not a directory: "
-				+ animation_directory.string();
-			return false;
-		}
-
-		for (const std::filesystem::directory_entry& entry :
-			std::filesystem::directory_iterator(animation_directory))
-		{
-			if (!entry.is_regular_file())
-				continue;
-
-			if (!has_png_extension(entry.path()))
-				continue;
-
-			out_frame_paths.push_back(entry.path());
-		}
-
-		std::sort(out_frame_paths.begin(), out_frame_paths.end());
-		if (out_frame_paths.empty())
-		{
-			out_error = "Animation directory contains no PNG frames: "
-				+ animation_directory.string();
-			return false;
-		}
-
-		return true;
-	}
+		return collect_png_frame_paths(animation_directory, out_frame_paths, out_error);
 
 	const std::filesystem::path single_frame_path =
 		character_root / character_id / (character_id + "_" + animation_name + ".png");
@@ -87,19 +113,44 @@ bool collect_animation_frame_paths(
 		+ " or file: " + single_frame_path.string() + ")";
 	return false;
 }
-}
 
-bool ResourceBootstrapper::bootstrap(
-	ResourceManager& resource_manager,
-	SDL_Renderer* renderer
+bool read_vector2(
+	const JsonLoader& loader,
+	const json& node,
+	std::string_view key,
+	Vector2& out,
+	std::string& out_error
 )
 {
-	if (!renderer)
+	const json* vector_node = nullptr;
+	const JsonReadResult vector_node_result = loader.get_object(node, key, vector_node);
+	if (!vector_node_result)
 	{
-		std::cout << "Resource bootstrap failed: renderer is empty." << std::endl;
+		out_error = vector_node_result.error;
 		return false;
 	}
 
+	if (!loader.get(*vector_node, "x", out.x))
+	{
+		out_error = "JSON value type mismatch: "
+			+ std::string(key) + ".x";
+		return false;
+	}
+
+	if (!loader.get(*vector_node, "y", out.y))
+	{
+		out_error = "JSON value type mismatch: "
+			+ std::string(key) + ".y";
+		return false;
+	}
+
+	return true;
+}
+
+bool load_character_animations(
+	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
+)
+{
 	JsonLoader loader;
 	const std::filesystem::path config_path =
 		PathManager::instance()->configs() / "character_information.json";
@@ -200,10 +251,10 @@ bool ResourceBootstrapper::bootstrap(
 			const std::string animation_key = character_id + "." + animation_name;
 
 			AtlasLoadRequest atlas_request;
-			atlas_request._atlas_key = animation_key;
-			atlas_request._frame_paths = std::move(frame_paths);
+			atlas_request.atlas_key = animation_key;
+			atlas_request.frame_paths = std::move(frame_paths);
 
-			const Atlas* atlas = resource_manager.build_atlas(renderer, atlas_request);
+			const Atlas* atlas = build_atlas(atlas_request);
 			if (!atlas)
 			{
 				std::cout << "Build atlas failed: "
@@ -214,9 +265,10 @@ bool ResourceBootstrapper::bootstrap(
 			const AnimationSettings& settings = animation_settings.at(animation_name);
 
 			AnimationBuildRequest animation_request;
-			animation_request._animation_key = animation_key;
-			animation_request._fps = settings.fps;
-			animation_request._loop = settings.loop;
+			animation_request.animation_key = animation_key;
+			animation_request.atlas_key = animation_key;
+			animation_request.fps = settings.fps;
+			animation_request.loop = settings.loop;
 			if (!AnimationManager::instance()->register_animation(animation_request, atlas))
 			{
 				std::cout << "Register character animation failed: "
@@ -227,4 +279,212 @@ bool ResourceBootstrapper::bootstrap(
 	}
 
 	return true;
+}
+
+bool load_effects(
+	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
+)
+{
+	JsonLoader loader;
+	const std::filesystem::path config_path =
+		PathManager::instance()->configs() / "effect_information.json";
+	const JsonReadResult open_result = loader.open_file(config_path);
+	if (!open_result)
+	{
+		std::cout << "Load effect config failed:\n"
+			<< open_result.error;
+		return false;
+	}
+
+	const json& root = loader.root();
+	if (!root.is_object())
+	{
+		std::cout << "Read effect config failed:\n"
+			<< "JSON root is not an object." << std::endl;
+		return false;
+	}
+
+	if (!root.contains("effects"))
+	{
+		std::cout << "Read effect config failed:\n"
+			<< "JSON key missing: effects" << std::endl;
+		return false;
+	}
+
+	const json& effects_node = root.at("effects");
+	if (!effects_node.is_array())
+	{
+		std::cout << "Read effect config failed:\n"
+			<< "JSON value is not an array: effects" << std::endl;
+		return false;
+	}
+
+	std::vector<EffectBuildRequest> effect_requests;
+	effect_requests.reserve(effects_node.size());
+
+	for (size_t index = 0; index < effects_node.size(); ++index)
+	{
+		const json& effect_node = effects_node.at(index);
+		if (!effect_node.is_object())
+		{
+			std::cout << "Read effect config failed:\n"
+				<< "Effect entry is not an object at index " << index << std::endl;
+			return false;
+		}
+
+		EffectConfig effect_config;
+
+		const JsonReadResult effect_key_result =
+			loader.get(effect_node, "effect_key", effect_config.effect_key);
+		if (!effect_key_result)
+		{
+			std::cout << "Read effect key failed at index " << index << ":\n"
+				<< effect_key_result.error;
+			return false;
+		}
+
+		const JsonReadResult animation_key_result =
+			loader.get(effect_node, "animation_key", effect_config.animation_key);
+		if (!animation_key_result)
+		{
+			std::cout << "Read effect animation key failed for "
+				<< effect_config.effect_key << ":\n"
+				<< animation_key_result.error;
+			return false;
+		}
+
+		const JsonReadResult directory_result =
+			loader.get(effect_node, "directory_path", effect_config.directory_path);
+		if (!directory_result)
+		{
+			std::cout << "Read effect directory failed for "
+				<< effect_config.effect_key << ":\n"
+				<< directory_result.error;
+			return false;
+		}
+
+		const JsonReadResult fps_result =
+			loader.get(effect_node, "fps", effect_config.fps);
+		if (!fps_result)
+		{
+			std::cout << "Read effect fps failed for "
+				<< effect_config.effect_key << ":\n"
+				<< fps_result.error;
+			return false;
+		}
+
+		const JsonReadResult loop_result =
+			loader.get(effect_node, "loop", effect_config.loop);
+		if (!loop_result)
+		{
+			std::cout << "Read effect loop flag failed for "
+				<< effect_config.effect_key << ":\n"
+				<< loop_result.error;
+			return false;
+		}
+
+		if (effect_node.contains("default_size"))
+		{
+			Vector2 default_size;
+			std::string error;
+			if (!read_vector2(loader, effect_node, "default_size", default_size, error))
+			{
+				std::cout << "Read effect default size failed for "
+					<< effect_config.effect_key << ":\n"
+					<< error << std::endl;
+				return false;
+			}
+
+			effect_config.default_size = default_size;
+		}
+
+		if (effect_node.contains("angle_degrees"))
+		{
+			double angle_degrees = 0.0;
+			const JsonReadResult angle_result =
+				loader.get(effect_node, "angle_degrees", angle_degrees);
+			if (!angle_result)
+			{
+				std::cout << "Read effect angle failed for "
+					<< effect_config.effect_key << ":\n"
+					<< angle_result.error;
+				return false;
+			}
+
+			effect_config.angle_degrees = angle_degrees;
+		}
+
+		std::vector<std::filesystem::path> frame_paths;
+		std::string error;
+		const std::filesystem::path directory_path =
+			PathManager::instance()->resolve_asset_path(effect_config.directory_path);
+		if (!collect_png_frame_paths(directory_path, frame_paths, error))
+		{
+			std::cout << "Collect effect frames failed for "
+				<< effect_config.effect_key << ": "
+				<< error << std::endl;
+			return false;
+		}
+
+		AtlasLoadRequest atlas_request;
+		atlas_request.atlas_key = effect_config.animation_key;
+		atlas_request.frame_paths = std::move(frame_paths);
+
+		const Atlas* atlas = build_atlas(atlas_request);
+		if (!atlas)
+		{
+			std::cout << "Build effect atlas failed: "
+				<< effect_config.animation_key << std::endl;
+			return false;
+		}
+
+		AnimationBuildRequest animation_request;
+		animation_request.animation_key = effect_config.animation_key;
+		animation_request.atlas_key = effect_config.animation_key;
+		animation_request.fps = effect_config.fps;
+		animation_request.loop = effect_config.loop;
+		if (!AnimationManager::instance()->register_animation(animation_request, atlas))
+		{
+			std::cout << "Register effect animation failed: "
+				<< effect_config.animation_key << std::endl;
+			return false;
+		}
+
+		EffectBuildRequest effect_request;
+		effect_request.effect_key = std::move(effect_config.effect_key);
+		effect_request.animation_key = std::move(effect_config.animation_key);
+		effect_request.default_size = effect_config.default_size;
+		effect_request.angle_degrees = effect_config.angle_degrees;
+		effect_requests.push_back(std::move(effect_request));
+	}
+
+	if (!EffectManager::instance()->register_effect(effect_requests))
+	{
+		std::cout << "Register effect definitions failed." << std::endl;
+		return false;
+	}
+
+	return true;
+}
+}
+
+bool ResourceBootstrapper::bootstrap(
+	ResourceManager& resource_manager,
+	SDL_Renderer* renderer
+)
+{
+	if (!renderer)
+	{
+		std::cout << "Resource bootstrap failed: renderer is empty." << std::endl;
+		return false;
+	}
+
+	const std::function<const Atlas*(const AtlasLoadRequest&)> build_atlas =
+		[&resource_manager, renderer](const AtlasLoadRequest& request)
+		{
+			return resource_manager.build_atlas(renderer, request);
+		};
+
+	return load_character_animations(build_atlas)
+		&& load_effects(build_atlas);
 }

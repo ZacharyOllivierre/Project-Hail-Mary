@@ -18,5 +18,15 @@ public:
 	void reset() override;
 
 private:
+	void spawn_player();
+	void spawn_map();
+	void destroy_tracked_objects();
+	void consume_player_effect_requests();
 
+	Character* _player = nullptr;
+
+	GameObject* _map = nullptr;
+
+	Rect _rect{ 460, 180, 360, 360 };
+	bool _contain = false;
 };

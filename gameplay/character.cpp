@@ -54,10 +54,12 @@ namespace
 Character::Character(
 	std::string character_id,
 	const Vector2& start_position,
-	const Vector2& start_size
+	const Vector2& start_size,
+	std::string effect_id
 )
 	: GameObject(DepthLayer::Character),
-	_character_id(std::move(character_id))
+	_character_id(std::move(character_id)),
+	_effect_id(std::move(effect_id))
 {
 	set_position(start_position);
 	set_character_size(start_size);
@@ -103,6 +105,20 @@ void Character::on_input_snapshot(const InputSnapshot& input)
 	else if (_move_input.x > 0.0f)
 		_facing_direction = FacingDirection::Right;
 
+	if (input.state.is_just_pressed(InputAction::Attack) &&
+		!_effect_id.empty())
+	{
+		EffectSpawnRequest request;
+		request.size = Vector2{ 500,500 };
+		request.effect_key = _effect_id;
+		request.position = center();
+		request.anchor = EffectAnchor::Center;
+		request.flip = _facing_direction == FacingDirection::Left
+			? SpriteFlip::Horizontal
+			: SpriteFlip::None;
+		_pending_effect_requests.push_back(std::move(request));
+	}
+
 	apply_animation_state(
 		_character_id,
 		_move_input.is_zero() ? AnimationState::Idle : AnimationState::Move,
@@ -117,13 +133,21 @@ void Character::submit_render_commands(std::vector<RenderCommand>& out_commands)
 		return;
 
 	RenderCommand command;
-	if (_animation->build_render_command(world_rect(), 0.0, command))
+	if (_animation->build_render_command(
+		world_rect(),
+		0.0,
+		_facing_direction == FacingDirection::Left
+			? SpriteFlip::Horizontal: SpriteFlip::None,command))
 	{
-		command.flip = _facing_direction == FacingDirection::Left
-			? SpriteFlip::Horizontal
-			: SpriteFlip::None;
 		out_commands.push_back(std::move(command));
 	}
+}
+
+std::vector<EffectSpawnRequest> Character::drain_effect_spawn_requests()
+{
+	std::vector<EffectSpawnRequest> drained_requests = std::move(_pending_effect_requests);
+	_pending_effect_requests.clear();
+	return drained_requests;
 }
 
 void Character::set_move_speed(float move_speed) noexcept

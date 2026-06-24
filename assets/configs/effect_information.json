@@ -1,0 +1,64 @@
+{
+  "effects": [
+    {
+      "effect_key": "electricity.impact_explosion_right",
+      "animation_key": "effect.electricity.impact_explosion_right",
+      "directory_path": "textures/effects/electricity/impact_explosion_right",
+      "fps": 12.0,
+      "loop": false,
+      "default_size": {
+        "x": 160.0,
+        "y": 160.0
+      },
+      "angle_degrees": 0.0
+    },
+    {
+      "effect_key": "fire.impact_radial",
+      "animation_key": "effect.fire.impact_radial",
+      "directory_path": "textures/effects/fire/impact_radial",
+      "fps": 12.0,
+      "loop": false,
+      "default_size": {
+        "x": 160.0,
+        "y": 160.0
+      },
+      "angle_degrees": 0.0
+    },
+    {
+      "effect_key": "poison.explotion",
+      "animation_key": "effect.poison.explotion",
+      "directory_path": "textures/effects/poison/explotion",
+      "fps": 12.0,
+      "loop": false,
+      "default_size": {
+        "x": 160.0,
+        "y": 140.0
+      },
+      "angle_degrees": 0.0
+    },
+    {
+      "effect_key": "water.slash_right",
+      "animation_key": "effect.water.slash_right",
+      "directory_path": "textures/effects/water/slash_right",
+      "fps": 12.0,
+      "loop": false,
+      "default_size": {
+        "x": 160.0,
+        "y": 160.0
+      },
+      "angle_degrees": 0.0
+    },
+    {
+      "effect_key": "wind.tornado",
+      "animation_key": "effect.wind.tornado",
+      "directory_path": "textures/effects/wind/tornado",
+      "fps": 12.0,
+      "loop": false,
+      "default_size": {
+        "x": 196.0,
+        "y": 196.0
+      },
+      "angle_degrees": 0.0
+    }
+  ]
+}

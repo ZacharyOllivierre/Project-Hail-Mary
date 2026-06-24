@@ -73,6 +73,11 @@ SDL_Texture* ResourceManager::find_texture(const std::string_view& key)
 	return _texture_manager.find_texture(key);
 }
 
+const Atlas* ResourceManager::find_atlas(const std::string_view& key) const
+{
+	return _atlas_manager ? _atlas_manager->find_atlas(key) : nullptr;
+}
+
 const Atlas* ResourceManager::build_atlas(
 	SDL_Renderer* renderer,
 	const AtlasLoadRequest& request
@@ -84,5 +89,5 @@ const Atlas* ResourceManager::build_atlas(
 	if (!_atlas_manager->load_atlas(renderer, request, _texture_manager))
 		return nullptr;
 
-	return _atlas_manager->find_atlas(request._atlas_key);
+	return _atlas_manager->find_atlas(request.atlas_key);
 }
