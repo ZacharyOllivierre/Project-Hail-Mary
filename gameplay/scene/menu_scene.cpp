@@ -65,7 +65,7 @@ void MenuScene::on_enter()
 	}
 
 	//The "assets/../..." Needs to ppoint to an actual font file
-	_menu_font = TTF_OpenFont("../../assets/fonts/IPix.ttf", 36);
+	_menu_font = TTF_OpenFont("../../assets/fonts/fusion-pixel-10px-proportional-ja.ttf", 36);
 
 	if (!_menu_font)
 	{
