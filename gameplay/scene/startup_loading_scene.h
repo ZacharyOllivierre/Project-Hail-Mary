@@ -1,11 +1,9 @@
 #pragma once
 
 #include "../../engine/scene/scene.h"
-#include "../../engine/ui/button.h"
 
 #include <SDL.h>
-#include <memory>
-#include <vector>
+#include <string>
 
 class StartUpLoadingScene final : public Scene
 {
@@ -21,5 +19,21 @@ public:
 	void reset() override;
 
 private:
+	enum class LoadingState
+	{
+		WaitingForPreloadTexture,
+		ReadyToStartFullLoad,
+		Loading,
+		Failed
+	};
 
+	void release_preload_texture();
+	bool ensure_preload_texture(SDL_Renderer* renderer);
+	void render_preload_texture(SDL_Renderer* renderer) const;
+
+private:
+	SDL_Texture* _preload_texture = nullptr;
+	SDL_Renderer* _renderer = nullptr;
+	LoadingState _state = LoadingState::WaitingForPreloadTexture;
+	std::string _error_message;
 };

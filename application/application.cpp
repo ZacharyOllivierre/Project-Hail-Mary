@@ -1,9 +1,9 @@
 #include "application.h"
 
+#include "../engine/io/path_manager.h"
 #include "../engine/scene/scene_manager.h"
-#include "../engine/resources/resource_bootstrapper.h"
-#include "../engine/resources/resource_manager.h"
 
+#include "../gameplay/scene/menu_scene.h"
 #include "../gameplay/scene/startup_loading_scene.h"
 
 #include <ctime>
@@ -62,7 +62,8 @@ bool Application::init(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	init_assert(ResourceManager::instance()->init(_renderer), "ResourceManager init fail");
+	init_assert(PathManager::instance()->init(), "PathManager init fail");
+	init_assert(PathManager::instance()->ensure_runtime_dirs(), "Runtime dir init fail");
 
 	return true;
 }

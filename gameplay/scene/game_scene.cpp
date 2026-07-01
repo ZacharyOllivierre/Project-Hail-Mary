@@ -18,7 +18,7 @@ public:
 	GameplayMap()
 		: GameObject(DepthLayer::Item)
 	{
-		_texture = ResourceManager::instance()->find_texture("test2");
+		_texture = ResourceManager::instance()->find_texture("test");
 		set_position({ 10.0f, 10.0f });
 		set_size({ 3344.0f, 1882.0f });
 	}

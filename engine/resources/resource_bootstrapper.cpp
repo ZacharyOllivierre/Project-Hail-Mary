@@ -4,6 +4,10 @@
 
 #include "../animation/animation_manager.h"
 #include "../animation/effect_manager.h"
+#include "../io/loaders/audio_manifest_loader.h"
+#include "../io/loaders/configs_list_loader.h"
+#include "../io/loaders/fonts_manifest_loader.h"
+#include "../io/loaders/texture_manifest_loader.h"
 #include "../io/json_loader.h"
 #include "../io/path_manager.h"
 
@@ -34,6 +38,35 @@ struct EffectConfig
 	std::optional<Vector2> default_size;
 	std::optional<double> angle_degrees;
 };
+
+bool resolve_required_config_path(
+	const ConfigRegistry& registry,
+	const std::string_view& config_key,
+	std::filesystem::path& out_path
+)
+{
+	const std::filesystem::path* config_path = registry.find(config_key);
+	if (!config_path)
+	{
+		std::cout << "Resource bootstrap failed: config is missing from configs_list.json: "
+			<< config_key << std::endl;
+		return false;
+	}
+
+	out_path = *config_path;
+	return true;
+}
+
+std::filesystem::path resolve_resource_path(
+	const std::filesystem::path& root_path,
+	const std::filesystem::path& relative_path
+)
+{
+	if (relative_path.is_absolute())
+		return relative_path.lexically_normal();
+
+	return (root_path / relative_path).lexically_normal();
+}
 
 bool has_png_extension(const std::filesystem::path& path)
 {
@@ -147,13 +180,106 @@ bool read_vector2(
 	return true;
 }
 
+bool load_fonts(
+	ResourceManager& resource_manager,
+	const std::filesystem::path& config_path
+)
+{
+	FontsManifestLoader loader;
+	FontManifest manifest;
+	if (!loader.load(config_path, manifest))
+		return false;
+
+	const std::filesystem::path font_root = PathManager::instance()->fonts();
+	for (const FontManifestEntry& entry : manifest.fonts)
+	{
+		const std::filesystem::path file_path =
+			resolve_resource_path(font_root, entry.file_path);
+		if (!resource_manager.load_font(
+			entry.key,
+			file_path,
+			entry.point_size))
+		{
+			std::cout << "Load font failed during bootstrap: "
+				<< entry.key << std::endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool load_audio(
+	ResourceManager& resource_manager,
+	const std::filesystem::path& config_path
+)
+{
+	AudioManifestLoader loader;
+	AudioManifest manifest;
+	if (!loader.load(config_path, manifest))
+		return false;
+
+	const std::filesystem::path audio_root = PathManager::instance()->audio();
+	for (const AudioManifestEntry& entry : manifest.sounds)
+	{
+		const std::filesystem::path file_path =
+			resolve_resource_path(audio_root, entry.file_path);
+		if (!resource_manager.load_sound(entry.key, file_path))
+		{
+			std::cout << "Load sound failed during bootstrap: "
+				<< entry.key << std::endl;
+			return false;
+		}
+	}
+
+	for (const AudioManifestEntry& entry : manifest.music)
+	{
+		const std::filesystem::path file_path =
+			resolve_resource_path(audio_root, entry.file_path);
+		if (!resource_manager.load_music(entry.key, file_path))
+		{
+			std::cout << "Load music failed during bootstrap: "
+				<< entry.key << std::endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool load_textures(
+	ResourceManager& resource_manager,
+	SDL_Renderer* renderer,
+	const std::filesystem::path& config_path
+)
+{
+	TextureManifestLoader loader;
+	TextureManifest manifest;
+	if (!loader.load(config_path, manifest))
+		return false;
+
+	const std::filesystem::path texture_root = PathManager::instance()->textures();
+	for (const TextureManifestEntry& entry : manifest.textures)
+	{
+		const std::filesystem::path file_path =
+			resolve_resource_path(texture_root, entry.file_path);
+		if (!resource_manager.load_texture(renderer, entry.key, file_path))
+		{
+			std::cout << "Load texture failed during bootstrap: "
+				<< entry.key << std::endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool load_character_animations(
+	const std::filesystem::path& config_path,
 	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
 )
 {
 	JsonLoader loader;
-	const std::filesystem::path config_path =
-		PathManager::instance()->configs() / "character_information.json";
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
@@ -282,12 +408,11 @@ bool load_character_animations(
 }
 
 bool load_effects(
+	const std::filesystem::path& config_path,
 	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
 )
 {
 	JsonLoader loader;
-	const std::filesystem::path config_path =
-		PathManager::instance()->configs() / "effect_information.json";
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
@@ -485,6 +610,25 @@ bool ResourceBootstrapper::bootstrap(
 			return resource_manager.build_atlas(renderer, request);
 		};
 
-	return load_character_animations(build_atlas)
-		&& load_effects(build_atlas);
+	ConfigsListLoader configs_list_loader;
+	ConfigRegistry config_registry;
+	if (!configs_list_loader.load(PathManager::instance()->configs_list(), config_registry))
+		return false;
+
+	std::filesystem::path fonts_config_path;
+	std::filesystem::path audio_config_path;
+	std::filesystem::path textures_config_path;
+	std::filesystem::path characters_config_path;
+	std::filesystem::path effects_config_path;
+
+	return resolve_required_config_path(config_registry, "fonts_list", fonts_config_path)
+		&& resolve_required_config_path(config_registry, "audio_list", audio_config_path)
+		&& resolve_required_config_path(config_registry, "textures_list", textures_config_path)
+		&& resolve_required_config_path(config_registry, "character_information", characters_config_path)
+		&& resolve_required_config_path(config_registry, "effect_information", effects_config_path)
+		&& load_fonts(resource_manager, fonts_config_path)
+		&& load_audio(resource_manager, audio_config_path)
+		&& load_textures(resource_manager, renderer, textures_config_path)
+		&& load_character_animations(characters_config_path, build_atlas)
+		&& load_effects(effects_config_path, build_atlas);
 }
