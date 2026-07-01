@@ -4,7 +4,7 @@
 #include "../engine/resources/resource_bootstrapper.h"
 #include "../engine/resources/resource_manager.h"
 
-#include "../gameplay/scene/menu_scene.h"
+#include "../gameplay/scene/startup_loading_scene.h"
 
 #include <ctime>
 #include <iostream>
@@ -63,9 +63,6 @@ bool Application::init(int argc, char **argv)
 	(void)argv;
 
 	init_assert(ResourceManager::instance()->init(_renderer), "ResourceManager init fail");
-	init_assert(
-		ResourceBootstrapper::bootstrap(*ResourceManager::instance(), _renderer),
-		"ResourceBootstrapper init fail");
 
 	return true;
 }
@@ -80,7 +77,7 @@ int Application::run(int argc, char **argv)
 	_counter_freq = SDL_GetPerformanceFrequency();
 	_last_counter = SDL_GetPerformanceCounter();
 
-	SceneManager::instance()->switch_to<MenuScene>();
+	SceneManager::instance()->switch_to<StartUpLoadingScene>();
 
 	while (_active)
 	{

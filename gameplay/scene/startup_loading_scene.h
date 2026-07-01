@@ -1,4 +1,4 @@
-/*#pragma once
+#pragma once
 
 #include "../../engine/scene/scene.h"
 #include "../../engine/ui/button.h"
@@ -22,4 +22,4 @@ public:
 
 private:
 
-};*/
+};
