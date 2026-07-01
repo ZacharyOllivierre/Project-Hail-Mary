@@ -1,6 +1,7 @@
 #include "menu_scene.h"
 
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/resources/resource_manager.h"
 #include "../../engine/input/input_state.h"
 
 #include "game_scene.h"
@@ -65,7 +66,7 @@ void MenuScene::on_enter()
 	}
 
 	//The "assets/../..." Needs to ppoint to an actual font file
-	_menu_font = TTF_OpenFont("../../assets/fonts/IPix.ttf", 36);
+	_menu_font = ResourceManager::instance()->find_font("latin.16");
 
 	if (!_menu_font)
 	{
