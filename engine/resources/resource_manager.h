@@ -5,6 +5,7 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 #include "audio/audio_manager.h"
@@ -26,6 +27,25 @@ public:
 	~ResourceManager();
 
 	bool init(SDL_Renderer* renderer);
+
+	bool load_font(
+		const std::string& key,
+		const std::filesystem::path& file_path,
+		int point_size
+	);
+	bool load_sound(
+		const std::string& key,
+		const std::filesystem::path& file_path
+	);
+	bool load_music(
+		const std::string& key,
+		const std::filesystem::path& file_path
+	);
+	bool load_texture(
+		SDL_Renderer* renderer,
+		const std::string& key,
+		const std::filesystem::path& file_path
+	);
 
 	TTF_Font* find_font(const std::string_view& key) const;
 	Mix_Chunk* find_sound(const std::string_view& key) const;

@@ -1,6 +1,10 @@
 {
-  "textures": [
-    "map",
-    "test"
-  ]
+  "textures": {
+    "map": {
+      "path": "map.png"
+    },
+    "test": {
+      "path": "test.png"
+    }
+  }
 }

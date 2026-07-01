@@ -1,5 +1,8 @@
 {
-  "audio": [
-    "test.wav"
-  ]
+  "sounds": {
+    "test": {
+      "path": "test.wav"
+    }
+  },
+  "music": {}
 }
