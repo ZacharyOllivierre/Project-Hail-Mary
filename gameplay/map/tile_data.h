@@ -28,8 +28,11 @@ enum class TileType
 
 struct Tile
 {
+    // generation data
     Vector2 position = {0, 0};
     bool solid = false;
     TileType type = TileType::Void;
-    int tileId = 0;
+
+    // physics data
+    bool collidable;
 };

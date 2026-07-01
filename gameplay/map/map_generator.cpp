@@ -190,6 +190,7 @@ void MapGenerator::classifyRecs()
         for (int x = 0; x < (int)tiles[y].size(); x++)
         {
             Tile *tile = &tiles[y][x];
+            bool collidable = true;
 
             if (tile->solid == false)
             {
@@ -231,7 +232,11 @@ void MapGenerator::classifyRecs()
             else if (!E)
                 tile->type = TileType::RightWall;
             else
+            {
+                collidable = false;
                 tile->type = TileType::Floor;
+            }
+            tile->collidable = collidable;
         }
     }
 }
@@ -251,5 +256,4 @@ void MapGenerator::resetTile(Tile &tile)
 {
     tile.solid = false;
     tile.type = TileType::Void;
-    tile.tileId = 0;
 }
