@@ -1,27 +1,28 @@
 #include "menu_scene.h"
 
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/resources/resource_manager.h"
 #include "../../engine/input/input_state.h"
 
 #include "game_scene.h"
+#include "room_scene.h"
 
 #include <iostream>
 #include <SDL_ttf.h> // Added for text
 
 // Menu text
 void draw_text(
-	SDL_Renderer* renderer,
-	TTF_Font* font,
-	const char* text,
+	SDL_Renderer *renderer,
+	TTF_Font *font,
+	const char *text,
 	int x,
 	int y,
-	SDL_Color color
-)
+	SDL_Color color)
 {
 	if (!renderer || !font || !text)
 		return;
 
-	SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
+	SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
 
 	if (!surface)
 	{
@@ -29,7 +30,7 @@ void draw_text(
 		return;
 	}
 
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
 	if (!texture)
 	{
@@ -38,14 +39,13 @@ void draw_text(
 		return;
 	}
 
-	SDL_Rect dst_rect{ x, y, surface->w, surface->h };
+	SDL_Rect dst_rect{x, y, surface->w, surface->h};
 
 	SDL_RenderCopy(renderer, texture, nullptr, &dst_rect);
 
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 }
-
 
 // Runs when menu scene is active
 void MenuScene::on_enter()
@@ -64,14 +64,14 @@ void MenuScene::on_enter()
 		}
 	}
 
-	//The "assets/../..." Needs to ppoint to an actual font file
-	_menu_font = TTF_OpenFont("../../assets/fonts/fusion-pixel-10px-proportional-ja.ttf", 36);
+	// The "assets/../..." Needs to ppoint to an actual font file
+	_menu_font = ResourceManager::instance()->find_font("latin.16");
 
 	if (!_menu_font)
 	{
 		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
 	}
-	//Added for menu text
+	// Added for menu text
 }
 
 // Updates menu scene each frame.
@@ -81,7 +81,7 @@ void MenuScene::on_update(double delta)
 }
 
 // Renders menu background, title area, and start button every frame.
-void MenuScene::on_render(SDL_Renderer* renderer)
+void MenuScene::on_render(SDL_Renderer *renderer)
 {
 	Scene::on_render(renderer);
 
@@ -98,17 +98,17 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 
 	// Simple menu background
 	SDL_SetRenderDrawColor(renderer, 20, 20, 35, 255);
-	SDL_Rect background{ 0, 0, 1280, 720 };
+	SDL_Rect background{0, 0, 1280, 720};
 	SDL_RenderFillRect(renderer, &background);
 
 	// Simple title box
 	SDL_SetRenderDrawColor(renderer, 80, 80, 140, 255);
-	SDL_Rect title_rect{ 440, 120, 400, 80 };
+	SDL_Rect title_rect{440, 120, 400, 80};
 	SDL_RenderFillRect(renderer, &title_rect);
 
 	// Draw menu text title
-	SDL_Color white{ 255, 255, 255, 255 };
-	//Menu text
+	SDL_Color white{255, 255, 255, 255};
+	// Menu text
 	draw_text(renderer, _menu_font, "MAIN MENU", 510, 140, white);
 
 	// Creates start button only once if it does not already exist.
@@ -131,9 +131,8 @@ void MenuScene::on_render(SDL_Renderer* renderer)
 
 // Handles menu input, including keyboard input for starting the game.
 void MenuScene::on_input(
-	const InputSnapshot& input,
-	const std::vector<InputEvent>& events
-)
+	const InputSnapshot &input,
+	const std::vector<InputEvent> &events)
 {
 	(void)events;
 
@@ -156,7 +155,7 @@ void MenuScene::on_exit()
 	_start_button.reset();
 
 	// Related to menu text
-	if (_menu_font) 
+	if (_menu_font)
 	{
 		TTF_CloseFont(_menu_font);
 		_menu_font = nullptr;
@@ -173,7 +172,7 @@ void MenuScene::reset()
 }
 
 // Sends raw SDL events, like mouse clicks, to the start button.
-void MenuScene::handle_sdl_event(const SDL_Event& event)
+void MenuScene::handle_sdl_event(const SDL_Event &event)
 {
 	// Lets button handle the SDL event only if button exists.
 	if (_start_button)
@@ -183,23 +182,22 @@ void MenuScene::handle_sdl_event(const SDL_Event& event)
 }
 
 // Creates start button and connects it to the gameplay scene.
-void MenuScene::create_start_button(SDL_Renderer* renderer)
+void MenuScene::create_start_button(SDL_Renderer *renderer)
 {
 	// Prevents creating another button if one already exists.
 	if (_start_button)
 		return;
 
 	// x, y, width, height
-	SDL_Rect button_rect{ 540, 320, 200, 70 };
+	SDL_Rect button_rect{540, 320, 200, 70};
 
 	_start_button = std::make_unique<Button>(renderer, button_rect);
 
 	// Runs when start button is clicked.
 	_start_button->set_on_click([]()
-	{
+								{
 		std::cout << "Start button clicked!" << std::endl;
 
 		// This sends the program from menu_scene to game_scene.
-		SceneManager::instance()->switch_to<GameScene>();
-	});
+		SceneManager::instance()->switch_to<RoomScene>(); });
 }

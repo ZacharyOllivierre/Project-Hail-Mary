@@ -1,6 +1,13 @@
 {
-  "textures": [
-    "map",
-    "test"
-  ]
+  "textures": {
+    "map": {
+      "path": "map.png"
+    },
+    "test": {
+      "path": "test.png"
+    },
+    "room_tiles": {
+      "path": "floor_tile_sheet.png"
+    }
+  }
 }

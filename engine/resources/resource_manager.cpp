@@ -1,6 +1,7 @@
 #include "resource_manager.h"
 
 #include "atlas/atlas_manager.h"
+#include "resource_bootstrapper.h"
 #include "../io/path_manager.h"
 
 #include <iostream>
@@ -26,31 +27,41 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 		return false;
 	}
 
-	if (!_texture_manager.load_texture(
-		renderer,
-		"test",
-		PathManager::instance()->assets() / "textures/map.png"))
-	{
-		std::cout << "Load texture failed." << std::endl;
-	}
-	else
-	{
-		std::cout << "Texture loaded." << std::endl;
-	}
+	return ResourceBootstrapper::bootstrap(*this, renderer);
+}
 
-	if (!_texture_manager.load_texture(
-		renderer,
-		"test2",
-		PathManager::instance()->assets() / "textures/test.png"))
-	{
-		std::cout << "Load texture failed." << std::endl;
-	}
-	else
-	{
-		std::cout << "Texture loaded." << std::endl;
-	}
+bool ResourceManager::load_font(
+	const std::string& key,
+	const std::filesystem::path& file_path,
+	int point_size
+)
+{
+	return _font_manager.load_font(key, file_path, point_size);
+}
 
-	return true;
+bool ResourceManager::load_sound(
+	const std::string& key,
+	const std::filesystem::path& file_path
+)
+{
+	return _audio_manager.load_sound(key, file_path);
+}
+
+bool ResourceManager::load_music(
+	const std::string& key,
+	const std::filesystem::path& file_path
+)
+{
+	return _audio_manager.load_music(key, file_path);
+}
+
+bool ResourceManager::load_texture(
+	SDL_Renderer* renderer,
+	const std::string& key,
+	const std::filesystem::path& file_path
+)
+{
+	return _texture_manager.load_texture(renderer, key, file_path);
 }
 
 TTF_Font* ResourceManager::find_font(const std::string_view& key) const

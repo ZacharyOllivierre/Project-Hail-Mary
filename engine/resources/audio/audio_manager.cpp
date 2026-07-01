@@ -1,12 +1,120 @@
 #include "audio_manager.h"
 
-bool AudioManager::load_music()
+#include <iostream>
+
+bool AudioManager::load_sound(
+	const std::string& key,
+	const std::filesystem::path& file_path
+)
 {
+	if (key.empty())
+	{
+		std::cout << "Load sound failed: key is empty." << std::endl;
+		return false;
+	}
+
+	if (file_path.empty())
+	{
+		std::cout << "Load sound failed: file path is empty: " << key << std::endl;
+		return false;
+	}
+
+	Mix_Chunk* sound = Mix_LoadWAV(file_path.string().c_str());
+	if (!sound)
+	{
+		std::cout << "Load sound failed: " << file_path
+			<< " error: " << Mix_GetError() << std::endl;
+		return false;
+	}
+
+	return store_sound(key, sound);
+}
+
+bool AudioManager::load_music(
+	const std::string& key,
+	const std::filesystem::path& file_path
+)
+{
+	if (key.empty())
+	{
+		std::cout << "Load music failed: key is empty." << std::endl;
+		return false;
+	}
+
+	if (file_path.empty())
+	{
+		std::cout << "Load music failed: file path is empty: " << key << std::endl;
+		return false;
+	}
+
+	Mix_Music* music = Mix_LoadMUS(file_path.string().c_str());
+	if (!music)
+	{
+		std::cout << "Load music failed: " << file_path
+			<< " error: " << Mix_GetError() << std::endl;
+		return false;
+	}
+
+	return store_music(key, music);
+}
+
+bool AudioManager::store_sound(const std::string& key, Mix_Chunk* sound)
+{
+	if (key.empty())
+	{
+		std::cout << "Store sound failed: key is empty." << std::endl;
+		if (sound)
+			Mix_FreeChunk(sound);
+		return false;
+	}
+
+	if (!sound)
+	{
+		std::cout << "Store sound failed: sound is null: " << key << std::endl;
+		return false;
+	}
+
+	SoundPool::iterator iterator = _sound_pool.find(key);
+	if (iterator != _sound_pool.end())
+	{
+		if (iterator->second)
+			Mix_FreeChunk(iterator->second);
+
+		iterator->second = sound;
+		return true;
+	}
+
+	_sound_pool.emplace(key, sound);
 	return true;
 }
 
-bool AudioManager::load_sound()
+bool AudioManager::store_music(const std::string& key, Mix_Music* music)
 {
+	if (key.empty())
+	{
+		std::cout << "Store music failed: key is empty." << std::endl;
+		if (music)
+			Mix_FreeMusic(music);
+		return false;
+	}
+
+	if (!music)
+	{
+		std::cout << "Store music failed: music is null: " << key << std::endl;
+		return false;
+	}
+
+	MusicPool::iterator iterator = _music_pool.find(key);
+	if (iterator != _music_pool.end())
+	{
+		if (iterator->second)
+			Mix_FreeMusic(iterator->second);
+
+		iterator->second = music;
+		return true;
+	}
+
+	_music_pool.emplace(key, music);
 	return true;
 }
 

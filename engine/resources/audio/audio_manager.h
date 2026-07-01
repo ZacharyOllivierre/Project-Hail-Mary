@@ -2,6 +2,7 @@
 
 #include <SDL_mixer.h>
 
+#include <filesystem>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -12,8 +13,11 @@ using MusicPool = std::unordered_map<std::string, Mix_Music*>;
 class AudioManager
 {
 public:
-	bool load_music();
-	bool load_sound();
+	bool load_sound(const std::string& key, const std::filesystem::path& file_path);
+	bool load_music(const std::string& key, const std::filesystem::path& file_path);
+
+	bool store_sound(const std::string& key, Mix_Chunk* sound);
+	bool store_music(const std::string& key, Mix_Music* music);
 
 	Mix_Chunk* find_sound(const std::string_view& key) const;
 	Mix_Music* find_music(const std::string_view& key) const;

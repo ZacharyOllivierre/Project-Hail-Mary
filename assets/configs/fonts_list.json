@@ -1,5 +1,29 @@
 {
   "fonts": [
-    "IPix.tff"
+    {
+      "key": "latin.16",
+      "file": "fusion-pixel-10px-proportional-latin.ttf",
+      "size": 16
+    },
+    {
+      "key": "zh_hans.16",
+      "file": "fusion-pixel-10px-proportional-zh_hans.ttf",
+      "size": 16
+    },
+    {
+      "key": "zh_hant.16",
+      "file": "fusion-pixel-10px-proportional-zh_hant.ttf",
+      "size": 16
+    },
+    {
+      "key": "ja.16",
+      "file": "fusion-pixel-10px-proportional-ja.ttf",
+      "size": 16
+    },
+    {
+      "key": "ko.16",
+      "file": "fusion-pixel-10px-proportional-ko.ttf",
+      "size": 16
+    }
   ]
 }

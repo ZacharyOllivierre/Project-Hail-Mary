@@ -12,28 +12,28 @@
 
 namespace
 {
-class GameplayMap final : public GameObject
-{
-public:
-	GameplayMap()
-		: GameObject(DepthLayer::Item)
+	class GameplayMap final : public GameObject
 	{
-		_texture = ResourceManager::instance()->find_texture("test2");
-		set_position({ 10.0f, 10.0f });
-		set_size({ 3344.0f, 1882.0f });
-	}
+	public:
+		GameplayMap()
+			: GameObject(DepthLayer::Item)
+		{
+			_texture = ResourceManager::instance()->find_texture("room_tiles");
+			set_position({10.0f, 10.0f});
+			set_size({3344.0f, 1882.0f});
+		}
 
-	void submit_render_commands(std::vector<RenderCommand>& out_commands) const override
-	{
-		RenderCommand command;
-		command.command_rect = world_rect();
-		command.texture = _texture;
-		out_commands.push_back(std::move(command));
-	}
+		void submit_render_commands(std::vector<RenderCommand> &out_commands) const override
+		{
+			RenderCommand command;
+			command.command_rect = world_rect();
+			command.texture = _texture;
+			out_commands.push_back(std::move(command));
+		}
 
-private:
-	SDL_Texture* _texture = nullptr;
-};
+	private:
+		SDL_Texture *_texture = nullptr;
+	};
 }
 
 void GameScene::on_enter()
@@ -58,7 +58,7 @@ void GameScene::on_update(double delta)
 	camera.follow(_player->center().x, _player->center().y, 1);
 }
 
-void GameScene::on_render(SDL_Renderer* renderer)
+void GameScene::on_render(SDL_Renderer *renderer)
 {
 	Scene::on_render(renderer);
 
@@ -83,7 +83,7 @@ void GameScene::on_render(SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor(renderer, draw_r, draw_g, draw_b, draw_a);
 }
 
-void GameScene::on_input(const InputSnapshot& input, const std::vector<InputEvent>& events)
+void GameScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
 {
 	Scene::on_input(input, events);
 	consume_player_effect_requests();
@@ -123,8 +123,7 @@ void GameScene::spawn_player()
 		"elves",
 		Vector2(200.0f, 200.0f),
 		Vector2(100.0f, 100.0f),
-		"fire.impact_radial"
-	);
+		"fire.impact_radial");
 }
 
 void GameScene::spawn_map()
@@ -134,7 +133,6 @@ void GameScene::spawn_map()
 
 	_map = add_object(std::make_unique<GameplayMap>());
 }
-
 
 void GameScene::destroy_tracked_objects()
 {
@@ -151,7 +149,7 @@ void GameScene::consume_player_effect_requests()
 	std::vector<EffectSpawnRequest> effect_requests =
 		_player->drain_effect_spawn_requests();
 
-	for (const EffectSpawnRequest& request : effect_requests)
+	for (const EffectSpawnRequest &request : effect_requests)
 	{
 		std::unique_ptr<Effect> effect =
 			EffectManager::instance()->create_effect(request);
