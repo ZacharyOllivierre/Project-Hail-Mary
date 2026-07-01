@@ -142,7 +142,7 @@ void MenuScene::on_input(
 	if (input.state.is_just_pressed(InputAction::Confirm))
 	{
 		std::cout << "Start pressed from keyboard!" << std::endl;
-		SceneManager::instance()->switch_to<GameScene>();
+		SceneManager::instance()->switch_to<RoomScene>();
 	}
 }
 
