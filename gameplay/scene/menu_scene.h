@@ -4,6 +4,7 @@
 #include "../../engine/ui/button.h"
 
 #include <SDL.h>
+#include <SDL_ttf.h> // Text
 #include <memory>
 #include <vector>
 
@@ -27,4 +28,7 @@ private:
 	void create_start_button(SDL_Renderer* renderer);
 
 	std::unique_ptr<Button> _start_button;
+
+	// Menu text
+	TTF_Font* _menu_font = nullptr;
 };
