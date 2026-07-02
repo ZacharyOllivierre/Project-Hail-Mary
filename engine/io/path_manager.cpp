@@ -1,5 +1,6 @@
 #include "path_manager.h"
 
+#include <iostream>
 #include <string>
 
 bool PathManager::init()
@@ -8,7 +9,11 @@ bool PathManager::init()
         find_project_root(std::filesystem::current_path());
 
     if (!root_path.has_value())
+    {
+        std::cout << "PathManager init failed: project root not found from "
+            << std::filesystem::current_path() << std::endl;
         return false;
+    }
 
     _root = root_path.value();
     return true;

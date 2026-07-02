@@ -17,17 +17,28 @@ ResourceManager::~ResourceManager() = default;
 bool ResourceManager::init(SDL_Renderer* renderer)
 {
 	if (!renderer)
+	{
+		std::cout << "ResourceManager init failed: renderer is null." << std::endl;
 		return false;
+	}
 
 	_renderer = renderer;
 
 	if (!PathManager::instance()->init())
 	{
+		std::cout << "ResourceManager init failed: PathManager init fail." << std::endl;
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "PathManager init fail");
 		return false;
 	}
 
-	return ResourceBootstrapper::bootstrap(*this, renderer);
+	if (!ResourceBootstrapper::bootstrap(*this, renderer))
+	{
+		std::cout << "ResourceManager init failed: resource bootstrap failed."
+			<< std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 bool ResourceManager::load_font(
