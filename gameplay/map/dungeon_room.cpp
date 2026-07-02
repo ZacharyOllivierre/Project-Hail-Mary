@@ -98,8 +98,6 @@ void DungeonRoom::submit_render_commands(std::vector<RenderCommand> &commands) c
         for (int x = 0; x < _tile_map.width(); ++x)
         {
             const Tile &tile = tiles[y][x];
-            if (!tile.solid)
-                continue;
 
             RenderCommand command;
             command.texture = _tile_sheet_texture;
