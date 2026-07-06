@@ -170,7 +170,7 @@ void Character::set_mana(float mana) noexcept
 void Character::set_character_size(const Vector2& size)
 {
 	GameObject::set_size(size);
-	_collision_rect.set_size(size);
+	_collision_rect.set_size(size-Vector2{10,10});
 }
 
 void Character::set_position(const Vector2& position)

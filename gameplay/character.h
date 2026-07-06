@@ -32,7 +32,7 @@ public:
 
 	explicit Character(
 		std::string character_id,
-		const Vector2& start_position = Vector2::zero(),
+		const Vector2& start_position = Vector2(300.0f,300.0f),
 		const Vector2& start_size = Vector2(100.0f, 100.0f),
 		std::string effect_id = {}
 	);
