@@ -10,6 +10,20 @@
 
 namespace
 {
+	constexpr float kCollisionWidthScale = 0.65f;
+	constexpr float kCollisionHeightScale = 0.38f;
+
+	[[nodiscard]] Rect make_collision_rect(const Rect& render_rect) noexcept
+	{
+		Rect collision = Rect::zero();
+		collision.set_size(Vector2(
+			render_rect.width() * kCollisionWidthScale,
+			render_rect.height() * kCollisionHeightScale
+		));
+		collision.set_bottom_center(render_rect.bottom_center());
+		return collision;
+	}
+
 	void apply_animation_state(
 		const std::string& character_id,
 		Character::AnimationState new_state,
@@ -170,13 +184,13 @@ void Character::set_mana(float mana) noexcept
 void Character::set_character_size(const Vector2& size)
 {
 	GameObject::set_size(size);
-	_collision_rect.set_size(size-Vector2{10,10});
+	_collision_rect = make_collision_rect(world_rect());
 }
 
 void Character::set_position(const Vector2& position)
 {
 	GameObject::set_position(position);
-	_collision_rect.set_position(position);
+	_collision_rect = make_collision_rect(world_rect());
 }
 
 Vector2 Character::desired_velocity() const noexcept
