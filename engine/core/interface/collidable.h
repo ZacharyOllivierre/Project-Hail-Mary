@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../geometry/rect.h"
 
 class Collidable
@@ -10,5 +12,10 @@ public:
     [[nodiscard]] virtual bool is_trigger() const noexcept
     {
         return false;
+    }
+
+    [[nodiscard]] virtual bool collision_enabled() const noexcept
+    {
+        return true;
     }
 };

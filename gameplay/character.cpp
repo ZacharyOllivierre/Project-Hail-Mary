@@ -73,13 +73,6 @@ void Character::update(double delta)
 	const double frame_delta = scaled_delta(delta);
 	if (_animation)
 		_animation->update(frame_delta);
-
-	if (_is_dead || _move_input.is_zero())
-		return;
-
-	const Vector2 frame_move =
-		_move_input.normalized() * (_move_speed * static_cast<float>(frame_delta));
-	set_position(position() + frame_move);
 }
 
 void Character::on_input_snapshot(const InputSnapshot& input)
@@ -100,6 +93,10 @@ void Character::on_input_snapshot(const InputSnapshot& input)
 		move_y += 1.0f;
 
 	_move_input = { move_x, move_y };
+	_desired_velocity = _move_input.is_zero()
+		? Vector2::zero()
+		: _move_input.normalized() * _move_speed;
+
 	if (_move_input.x < 0.0f)
 		_facing_direction = FacingDirection::Left;
 	else if (_move_input.x > 0.0f)
@@ -153,6 +150,9 @@ std::vector<EffectSpawnRequest> Character::drain_effect_spawn_requests()
 void Character::set_move_speed(float move_speed) noexcept
 {
 	_move_speed = std::max(0.0f, move_speed);
+	_desired_velocity = _move_input.is_zero()
+		? Vector2::zero()
+		: _move_input.normalized() * _move_speed;
 }
 
 void Character::set_hp(float hp) noexcept
@@ -179,10 +179,15 @@ void Character::set_position(const Vector2& position)
 	_collision_rect.set_position(position);
 }
 
-void Character::move_by(const Vector2& offset) noexcept
+Vector2 Character::desired_velocity() const noexcept
 {
-	GameObject::set_position(position() + offset);
-	_collision_rect.set_position(_collision_rect.position() + offset);
+	return _desired_velocity;
+}
+
+void Character::apply_translation(const Vector2& delta) noexcept
+{
+	GameObject::set_position(position() + delta);
+	_collision_rect.set_position(_collision_rect.position() + delta);
 }
 
 void Character::die()
@@ -192,6 +197,7 @@ void Character::die()
 
 	_is_dead = true;
 	_move_input = Vector2::zero();
+	_desired_velocity = Vector2::zero();
 	apply_animation_state(_character_id, AnimationState::Die, _animation, _animation_state);
 }
 

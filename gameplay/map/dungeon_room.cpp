@@ -12,7 +12,6 @@
 namespace
 {
     constexpr int kTileSpriteSize = 32;
-    constexpr float kTileRenderSize = 64.0f;
     constexpr float kRoomOriginX = 0.0f;
     constexpr float kRoomOriginY = 0.0f;
 
@@ -60,7 +59,7 @@ DungeonRoom::DungeonRoom()
       _generator(std::make_unique<MapGenerator>(_grid_size, _config, _tile_map))
 {
     set_position({kRoomOriginX, kRoomOriginY});
-    set_size({_grid_size.x * kTileRenderSize, _grid_size.y * kTileRenderSize});
+    set_size({_grid_size.x * k_tile_render_size, _grid_size.y * k_tile_render_size});
     if (ResourceManager::instance())
     {
         _tile_sheet_texture = ResourceManager::instance()->find_texture("room_tiles");
@@ -86,6 +85,16 @@ void DungeonRoom::generate()
     _generator->generateRoom();
 }
 
+Vector2 DungeonRoom::tile_render_size() const noexcept
+{
+    return Vector2(k_tile_render_size, k_tile_render_size);
+}
+
+const TileMap& DungeonRoom::tile_map() const noexcept
+{
+    return _tile_map;
+}
+
 void DungeonRoom::submit_render_commands(std::vector<RenderCommand> &commands) const
 {
     if (!_tile_sheet_texture)
@@ -102,10 +111,10 @@ void DungeonRoom::submit_render_commands(std::vector<RenderCommand> &commands) c
             RenderCommand command;
             command.texture = _tile_sheet_texture;
             command.command_rect = Rect{
-                position().x + static_cast<float>(x) * kTileRenderSize,
-                position().y + static_cast<float>(y) * kTileRenderSize,
-                kTileRenderSize,
-                kTileRenderSize};
+                position().x + static_cast<float>(x) * k_tile_render_size,
+                position().y + static_cast<float>(y) * k_tile_render_size,
+                k_tile_render_size,
+                k_tile_render_size};
             command.use_src_rect = true;
             command.src_rect = Rect{
                 static_cast<float>(sprite_index_for_tile(tile.type) * kTileSpriteSize),

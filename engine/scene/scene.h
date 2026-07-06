@@ -12,6 +12,7 @@
 
 #include "../core/depth_layer.h"
 #include "../core/game_object.h"
+#include "../core/physics_manager.h"
 #include "../ui/core/ui_element.h"
 
 struct InputEvent;
@@ -91,6 +92,8 @@ private:
 
 protected:
 	bool _paused = false;
+	[[nodiscard]] PhysicsManager& physics_manager() noexcept { return _physics_manager; }
+	[[nodiscard]] const PhysicsManager& physics_manager() const noexcept { return _physics_manager; }
 
 private:
 	void remove_destroyed_objects();
@@ -127,4 +130,5 @@ private:
 	std::vector<UpdatableEntry> _updatables;
 	std::vector<InputSnapshotReceiverEntry> _snapshot_receivers;
 	std::vector<InputEventReceiverEntry> _event_receivers;
+	PhysicsManager _physics_manager;
 };

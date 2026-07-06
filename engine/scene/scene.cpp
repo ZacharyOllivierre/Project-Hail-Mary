@@ -117,6 +117,9 @@ void Scene::on_update(double delta)
 		entry.updatable->update(delta);
 	}
 
+	if (!_paused)
+		_physics_manager.step(delta);
+
 	remove_destroyed_objects();
 }
 
@@ -180,6 +183,9 @@ void Scene::destroy_all_scene_objects()
 		if (ui_root)
 			ui_root->destroy();
 	}
+
+	_physics_manager.clear_collision_world();
+	_physics_manager.clear_bodies();
 
 	remove_destroyed_objects();
 }
