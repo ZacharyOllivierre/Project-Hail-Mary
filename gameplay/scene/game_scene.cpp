@@ -124,6 +124,11 @@ void GameScene::spawn_player()
 		Vector2(200.0f, 200.0f),
 		Vector2(100.0f, 100.0f),
 		"fire.impact_radial");
+
+	if (_player)
+	{
+		physics_manager().register_body(_player, _player, _player);
+	}
 }
 
 void GameScene::spawn_map()

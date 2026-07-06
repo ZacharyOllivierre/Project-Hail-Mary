@@ -5,7 +5,7 @@
 #include "../engine/core/game_object.h"
 #include "../engine/core/interface/updatable.h"
 #include "../engine/core/interface/collidable.h"
-#include "../engine/core/interface/moveable.h"
+#include "../engine/core/interface/kinematic_body.h"
 #include "../engine/input/contracts/input_snapshot_receiver.h"
 
 #include <memory>
@@ -13,7 +13,7 @@
 #include <vector>
 
 class Character : public GameObject, 
-	public Updatable, public Collidable,public Movable,
+	public Updatable, public Collidable, public KinematicBody,
 	public InputSnapshotReceiver
 {
 public:
@@ -32,7 +32,7 @@ public:
 
 	explicit Character(
 		std::string character_id,
-		const Vector2& start_position = Vector2::zero(),
+		const Vector2& start_position = Vector2(300.0f,300.0f),
 		const Vector2& start_size = Vector2(100.0f, 100.0f),
 		std::string effect_id = {}
 	);
@@ -49,7 +49,8 @@ public:
 	void set_character_size(const Vector2& size);
 	void set_position(const Vector2& position);
 
-	void move_by(const Vector2& offset)noexcept override;
+	[[nodiscard]] Vector2 desired_velocity() const noexcept override;
+	void apply_translation(const Vector2& delta) noexcept override;
 
 	void die();
 	void take_damage(float damage) noexcept;
@@ -76,7 +77,7 @@ private:
 	AnimationState _animation_state = AnimationState::Idle;
 	FacingDirection _facing_direction = FacingDirection::Right;
 	Vector2 _move_input = Vector2::zero();
-
+	Vector2 _desired_velocity = Vector2::zero();
 
 	float _move_speed = 240.0f;
 	float _hp = 100;

@@ -4,6 +4,7 @@
 #include "../../engine/core/geometry/vector2.h"
 #include "../character.h"
 #include "../map/dungeon_room.h"
+#include "room_tile_collision_world.h"
 
 #include <SDL.h>
 
@@ -27,4 +28,5 @@ private:
 
     Character *_player = nullptr;
     DungeonRoom *_room = nullptr;
+    RoomTileCollisionWorld _collision_world;
 };

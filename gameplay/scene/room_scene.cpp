@@ -36,6 +36,7 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 void RoomScene::on_exit()
 {
     this->destroy_all_scene_objects();
+    _collision_world.set_room(nullptr);
     _player = nullptr;
     _paused = false;
     _room = nullptr;
@@ -44,6 +45,7 @@ void RoomScene::on_exit()
 void RoomScene::reset()
 {
     this->destroy_all_scene_objects();
+    _collision_world.set_room(nullptr);
     _player = nullptr;
     _paused = false;
     _room = nullptr;
@@ -57,6 +59,11 @@ void RoomScene::build_room()
         return;
 
     _room = add_object(std::make_unique<DungeonRoom>());
+    if (_room)
+    {
+        _collision_world.set_room(_room);
+        physics_manager().set_collision_world(&_collision_world);
+    }
 }
 
 void RoomScene::spawn_player()
@@ -66,13 +73,14 @@ void RoomScene::spawn_player()
 
     _player = create_and_add_object<Character>(
         "elves",
-        Vector2(220.0f, 180.0f),
+        Vector2(520.0f, 580.0f),
         Vector2(64.0f, 64.0f),
         "fire.impact_radial");
 
     if (_player)
     {
         _player->set_move_speed(240.0f);
+        physics_manager().register_body(_player, _player, _player);
     }
 }
 

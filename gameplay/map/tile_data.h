@@ -34,5 +34,5 @@ struct Tile
     TileType type = TileType::Void;
 
     // physics data
-    bool collidable;
+    bool collidable = false;
 };

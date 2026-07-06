@@ -256,4 +256,5 @@ void MapGenerator::resetTile(Tile &tile)
 {
     tile.solid = false;
     tile.type = TileType::Void;
+    tile.collidable = false;
 }
