@@ -8,13 +8,18 @@
 #include "../engine/core/interface/kinematic_body.h"
 #include "../engine/input/contracts/input_snapshot_receiver.h"
 
+#include "projectile.h"
+#include "wand.h"
+
 #include <memory>
 #include <string>
 #include <vector>
 
-class Character : public GameObject, 
-	public Updatable, public Collidable, public KinematicBody,
-	public InputSnapshotReceiver
+class Character : public GameObject,
+				  public Updatable,
+				  public Collidable,
+				  public KinematicBody,
+				  public InputSnapshotReceiver
 {
 public:
 	enum class AnimationState
@@ -32,33 +37,35 @@ public:
 
 	explicit Character(
 		std::string character_id,
-		const Vector2& start_position = Vector2(300.0f,300.0f),
-		const Vector2& start_size = Vector2(100.0f, 100.0f),
-		std::string effect_id = {}
-	);
+		const Vector2 &start_position = Vector2(300.0f, 300.0f),
+		const Vector2 &start_size = Vector2(100.0f, 100.0f),
+		std::string effect_id = {});
 	~Character() override;
 
 	void update(double delta) override;
-	void on_input_snapshot(const InputSnapshot& input) override;
-	void submit_render_commands(std::vector<RenderCommand>& out_commands) const override;
+	void on_input_snapshot(const InputSnapshot &input) override;
+	void submit_render_commands(std::vector<RenderCommand> &out_commands) const override;
 	std::vector<EffectSpawnRequest> drain_effect_spawn_requests();
+
+	// Wand
+	std::unique_ptr<Projectile> create_projectile(const Vector2 &direction) const;
 
 	void set_move_speed(float move_speed) noexcept;
 	void set_hp(float hp) noexcept;
 	void set_mana(float mana) noexcept;
-	void set_character_size(const Vector2& size);
-	void set_position(const Vector2& position);
+	void set_character_size(const Vector2 &size);
+	void set_position(const Vector2 &position);
 
 	[[nodiscard]] Vector2 desired_velocity() const noexcept override;
-	void apply_translation(const Vector2& delta) noexcept override;
+	void apply_translation(const Vector2 &delta) noexcept override;
 
 	void die();
 	void take_damage(float damage) noexcept;
 	bool use_mana(float mana_cost) noexcept;
 
-	//getter
+	// getter
 	[[nodiscard]] virtual Rect collision_rect() const noexcept;
-	[[nodiscard]] const std::string& character_id() const noexcept;
+	[[nodiscard]] const std::string &character_id() const noexcept;
 	[[nodiscard]] float move_speed() const noexcept;
 	[[nodiscard]] float hp() const noexcept;
 	[[nodiscard]] float mana() const noexcept;
@@ -72,6 +79,7 @@ protected:
 private:
 	std::string _character_id;
 	std::string _effect_id;
+	Wand _wand;
 	std::vector<EffectSpawnRequest> _pending_effect_requests;
 	std::unique_ptr<Animation> _animation;
 	AnimationState _animation_state = AnimationState::Idle;

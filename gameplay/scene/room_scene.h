@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../engine/animation/effect_manager.h"
 #include "../../engine/scene/scene.h"
 #include "../../engine/core/geometry/vector2.h"
 #include "../character.h"
@@ -21,6 +22,8 @@ public:
     void on_update(double delta) override;
     void on_render(SDL_Renderer *renderer) override;
     void on_input(const InputSnapshot &input, const std::vector<InputEvent> &events) override;
+
+    void spawn_effect(const EffectSpawnRequest &request);
 
 private:
     void build_room();
