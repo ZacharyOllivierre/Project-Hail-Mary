@@ -21,6 +21,8 @@ enum class InputAction
     End,
     Tab,
 
+    DebugCollision,
+
     Exit,
 
     Count
