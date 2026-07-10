@@ -24,10 +24,9 @@ namespace
     }
 
     [[nodiscard]] Rect tile_rect(
-        const TileCollisionWorld& world,
+        const TileCollisionWorld &world,
         int tile_x,
-        int tile_y
-    ) noexcept
+        int tile_y) noexcept
     {
         const Vector2 origin = world.world_origin();
         const Vector2 size = world.tile_size();
@@ -36,15 +35,13 @@ namespace
             origin.x + static_cast<float>(tile_x) * size.x,
             origin.y + static_cast<float>(tile_y) * size.y,
             size.x,
-            size.y
-        );
+            size.y);
     }
 
     [[nodiscard]] bool is_blocking_tile(
-        const TileCollisionWorld& world,
+        const TileCollisionWorld &world,
         int tile_x,
-        int tile_y
-    ) noexcept
+        int tile_y) noexcept
     {
         if (tile_x < 0 || tile_x >= world.tile_columns())
             return true;
@@ -58,8 +55,7 @@ namespace
     [[nodiscard]] int tile_index_min(
         float value,
         float origin,
-        float tile_extent
-    ) noexcept
+        float tile_extent) noexcept
     {
         return static_cast<int>(std::floor((value - origin) / tile_extent));
     }
@@ -67,8 +63,7 @@ namespace
     [[nodiscard]] int tile_index_max(
         float value,
         float origin,
-        float tile_extent
-    ) noexcept
+        float tile_extent) noexcept
     {
         return static_cast<int>(std::floor((value - origin - Rect::k_epsilon) / tile_extent));
     }
@@ -178,7 +173,7 @@ namespace
     }
 }
 
-void PhysicsManager::set_collision_world(const TileCollisionWorld* world) noexcept
+void PhysicsManager::set_collision_world(const TileCollisionWorld *world) noexcept
 {
     _collision_world = world;
 }
@@ -208,19 +203,18 @@ const std::vector<PhysicsManager::DebugRect>& PhysicsManager::debug_snapshot() c
 }
 
 void PhysicsManager::register_body(
-    SceneObject* owner,
-    KinematicBody* body,
-    Collidable* collider
-) noexcept
+    SceneObject *owner,
+    KinematicBody *body,
+    Collidable *collider) noexcept
 {
     if (!owner || !body || !collider)
         return;
 
     auto existing = std::find_if(_bodies.begin(), _bodies.end(),
-        [owner](const BodyEntry& entry)
-        {
-            return entry.owner == owner;
-        });
+                                 [owner](const BodyEntry &entry)
+                                 {
+                                     return entry.owner == owner;
+                                 });
 
     if (existing != _bodies.end())
     {
@@ -229,18 +223,16 @@ void PhysicsManager::register_body(
         return;
     }
 
-    _bodies.push_back(BodyEntry{ owner, body, collider });
+    _bodies.push_back(BodyEntry{owner, body, collider});
 }
 
-void PhysicsManager::unregister_body(const SceneObject* owner) noexcept
+void PhysicsManager::unregister_body(const SceneObject *owner) noexcept
 {
     if (!owner)
         return;
 
-    std::erase_if(_bodies, [owner](const BodyEntry& entry)
-        {
-            return entry.owner == owner;
-        });
+    std::erase_if(_bodies, [owner](const BodyEntry &entry)
+                  { return entry.owner == owner; });
 }
 
 void PhysicsManager::clear_bodies() noexcept
@@ -253,7 +245,7 @@ void PhysicsManager::step(double delta) noexcept
     _debug_snapshot.clear();
     remove_invalid_entries();
 
-    for (const BodyEntry& entry : _bodies)
+    for (const BodyEntry &entry : _bodies)
     {
         if (!entry.owner || !entry.body || !entry.collider)
             continue;
@@ -271,7 +263,7 @@ void PhysicsManager::step(double delta) noexcept
         }
 
         double effective_delta = delta;
-        if (const GameObject* game_object = dynamic_cast<const GameObject*>(entry.owner))
+        if (const GameObject *game_object = dynamic_cast<const GameObject *>(entry.owner))
         {
             effective_delta = game_object->scaled_delta(delta);
         }
@@ -290,13 +282,26 @@ void PhysicsManager::step(double delta) noexcept
         }
 
         const Vector2 world_tile_size = _collision_world->tile_size();
-        if (world_tile_size.x <= Vector2::k_epsilon
-            || world_tile_size.y <= Vector2::k_epsilon)
+        if (world_tile_size.x <= Vector2::k_epsilon || world_tile_size.y <= Vector2::k_epsilon)
         {
             entry.body->apply_translation(desired_move);
             continue;
         }
 
+        const float allowed_x = resolve_horizontal_move(
+            *_collision_world,
+            entry.collider->collision_rect(),
+            desired_move.x);
+        if (std::fabs(allowed_x) > Vector2::k_epsilon)
+        {
+            entry.body->apply_translation(Vector2(allowed_x, 0.0f));
+        }
+
+        const float allowed_y = resolve_vertical_move(
+            *_collision_world,
+            entry.collider->collision_rect(),
+            desired_move.y);
+        if (std::fabs(allowed_y) > Vector2::k_epsilon)
         constexpr int kMaxSubsteps = 128;
         const float max_step_distance =
             std::min(world_tile_size.x, world_tile_size.y) * 0.5f;
@@ -342,6 +347,32 @@ void PhysicsManager::step(double delta) noexcept
                 );
             }
         }
+
+        // Added for wand
+        bool collided_x = std::fabs(allowed_x - desired_move.x) > Vector2::k_epsilon;
+        bool collided_y = std::fabs(allowed_y - desired_move.y) > Vector2::k_epsilon;
+
+        // Calc collision direction
+        Vector2 collision_direction = Vector2::zero();
+        if (collided_x && std::fabs(desired_move.x) > Vector2::k_epsilon)
+        {
+            if (desired_move.x > 0.0f)
+                collision_direction.x = -1.0f;
+            else
+                collision_direction.x = 1.0f;
+        }
+
+        if (collided_y && std::fabs(desired_move.y) > Vector2::k_epsilon)
+        {
+            if (desired_move.y > 0.0f)
+                collision_direction.y = -1.0f;
+            else
+                collision_direction.y = 1.0f;
+        }
+
+        if (collided_x || collided_y)
+            entry.collider->on_collision(collision_direction);
+        // End of added for wand
     }
 
     remove_invalid_entries();
@@ -349,11 +380,6 @@ void PhysicsManager::step(double delta) noexcept
 
 void PhysicsManager::remove_invalid_entries() noexcept
 {
-    std::erase_if(_bodies, [](const BodyEntry& entry)
-        {
-            return !entry.owner
-                || !entry.body
-                || !entry.collider
-                || entry.owner->is_destroyed();
-        });
+    std::erase_if(_bodies, [](const BodyEntry &entry)
+                  { return !entry.owner || !entry.body || !entry.collider || entry.owner->is_destroyed(); });
 }

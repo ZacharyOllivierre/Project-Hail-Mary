@@ -8,6 +8,9 @@
     },
     "room_tiles": {
       "path": "floor_tile_sheet.png"
+    },
+    "bullet": {
+      "path": "bullet.png"
     }
   }
 }

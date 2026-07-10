@@ -1,0 +1,101 @@
+#include "bullet.h"
+
+#include "../engine/animation/effect_manager.h"
+#include "../engine/core/render/render_command.h"
+#include "../engine/scene/scene_manager.h"
+#include "../engine/resources/resource_manager.h"
+#include "scene/room_scene.h"
+
+#include <cmath>
+
+// Used to rotate texture by bullet velocity
+constexpr double kRadiansToDegrees = 57.29577951308232;
+
+Bullet::Bullet(const Bullet_Attributes &bullet_attributes, const Vector2 &start_position) noexcept
+    : Projectile(
+          // Set as item so spawns below the character to avoid overlap
+          DepthLayer::Item,
+          start_position,
+          bullet_attributes.bullet_size,
+          bullet_attributes.bullet_velocity)
+{
+    _texture = ResourceManager::instance()->find_texture("bullet");
+
+    _bullet_attributes = bullet_attributes;
+}
+
+void Bullet::submit_render_commands(std::vector<RenderCommand> &out_commands) const
+{
+    if (!_texture)
+        return;
+
+    RenderCommand command;
+    command.texture = _texture;
+    command.command_rect = world_rect();
+    const Vector2 shot_velocity = desired_velocity();
+    if (!shot_velocity.is_zero())
+        command.rotation_degrees = std::atan2(shot_velocity.y, shot_velocity.x) * kRadiansToDegrees;
+    out_commands.push_back(std::move(command));
+}
+
+// Collision direction represented as {-1 -> 1 , -1 -> 1}
+void Bullet::on_collision(const Vector2 &collision_direction) noexcept
+{
+    // Get scene
+    RoomScene *room_scene = SceneManager::instance()->try_find_scene<RoomScene>();
+
+    // Spawn effect
+    if (room_scene)
+    {
+        EffectSpawnRequest request;
+        request.effect_key = "fire.impact_radial";
+        request.position = GameObject::center();
+        request.anchor = EffectAnchor::Center;
+        room_scene->spawn_effect(request);
+    }
+
+    // Wall bounce
+    if (_bullet_attributes.bounces > 0)
+    {
+        _bullet_attributes.bounces--;
+
+        Vector2 reflected_velocity = Projectile::desired_velocity();
+        if (std::fabs(collision_direction.x) > Vector2::k_epsilon)
+        {
+            reflected_velocity.x = -reflected_velocity.x;
+        }
+        if (std::fabs(collision_direction.y) > Vector2::k_epsilon)
+        {
+            reflected_velocity.y = -reflected_velocity.y;
+        }
+
+        _bullet_attributes.bullet_velocity = reflected_velocity;
+        Projectile::set_velocity(_bullet_attributes.bullet_velocity);
+        return;
+    }
+
+    // Destroy projectile
+    Projectile::on_collision(collision_direction);
+}
+
+void Bullet::update(double delta)
+{
+    // Update age
+    double age = Projectile::age_seconds();
+    Projectile::set_age(age + delta);
+
+    // Apply curve
+    if (_bullet_attributes.curve != 0)
+    {
+        Vector2 velocity = desired_velocity();
+
+        Vector2 forward = velocity.normalized();
+
+        // Local left/right relative to travel direction.
+        Vector2 left = {-forward.y, forward.x};
+
+        velocity += left * (_bullet_attributes.curve * static_cast<float>(delta));
+
+        set_velocity(velocity);
+    }
+}
