@@ -301,13 +301,11 @@ void PhysicsManager::step(double delta) noexcept
             std::min(world_tile_size.x, world_tile_size.y) * 0.5f;
         const int substep_count = std::min(
             kMaxSubsteps,
-            std::max(
-                1,
-                static_cast<int>(std::ceil(desired_move.length() / max_step_distance))
-            )
+            std::max( 1, static_cast<int>(std::ceil(desired_move.length() / max_step_distance)))
         );
         const Vector2 substep_move = desired_move / static_cast<float>(substep_count);
-        Vector2 applied_move = Vector2::zero();
+        bool collided_x = false;
+        bool collided_y = false;
 
         for (int substep = 0; substep < substep_count; ++substep)
         {
@@ -317,10 +315,11 @@ void PhysicsManager::step(double delta) noexcept
                 substep_move.x,
                 _debug_enabled ? &_debug_snapshot : nullptr
             );
+            collided_x = collided_x
+                || std::fabs(allowed_x - substep_move.x) > Vector2::k_epsilon;
             if (std::fabs(allowed_x) > Vector2::k_epsilon)
             {
                 entry.body->apply_translation(Vector2(allowed_x, 0.0f));
-                applied_move.x += allowed_x;
             }
 
             const float allowed_y = resolve_vertical_move(
@@ -329,10 +328,11 @@ void PhysicsManager::step(double delta) noexcept
                 substep_move.y,
                 _debug_enabled ? &_debug_snapshot : nullptr
             );
+            collided_y = collided_y
+                || std::fabs(allowed_y - substep_move.y) > Vector2::k_epsilon;
             if (std::fabs(allowed_y) > Vector2::k_epsilon)
             {
                 entry.body->apply_translation(Vector2(0.0f, allowed_y));
-                applied_move.y += allowed_y;
             }
 
             // phys debug
@@ -347,9 +347,6 @@ void PhysicsManager::step(double delta) noexcept
         }
 
         // Added for wand
-        const bool collided_x = std::fabs(applied_move.x - desired_move.x) > Vector2::k_epsilon;
-        const bool collided_y = std::fabs(applied_move.y - desired_move.y) > Vector2::k_epsilon;
-
         // Calc collision direction
         Vector2 collision_direction = Vector2::zero();
         if (collided_x && std::fabs(desired_move.x) > Vector2::k_epsilon)

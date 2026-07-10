@@ -8,12 +8,12 @@ struct Bullet_Attributes
 {
     float damage = 100.0f;
 
-    float bullet_speed = 600.0f;
+    float bullet_speed = 10000.0f;
     Vector2 bullet_velocity;
 
     Vector2 bullet_size = {24.0f, 24.0f};
 
-    float curve = 1000.0f;
+    float curve = 0.0f;
     int bounces = 3;
 
     // More damage based on bullet age

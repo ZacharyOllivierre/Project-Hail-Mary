@@ -5,6 +5,8 @@
 #include "../../engine/core/render/sdl_render_command_executor.h"
 #include "../map/dungeon_room.h"
 
+#include<Windows.h>
+
 #include <memory>
 #include <vector>
 
@@ -82,6 +84,8 @@ void RoomScene::on_enter()
 
 void RoomScene::on_update(double delta)
 {
+    //Sleep(100);
+
     this->Scene::on_update(delta);
 
     if (_player && !_player->is_destroyed() && !_player->is_dead())
