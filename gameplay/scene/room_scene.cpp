@@ -79,7 +79,7 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 
     for (const InputEvent& event : events)
     {
-        if (event.action == InputAction::Attack
+        if (event.action == InputAction::Tab
             && event.type == InputEventType::Pressed)
         {
             physics_manager().set_debug_enabled(!physics_manager().debug_enabled());
@@ -133,7 +133,7 @@ void RoomScene::spawn_player()
 
     if (_player)
     {
-        _player->set_move_speed(100000.0f);
+        _player->set_move_speed(1000.0f);
         physics_manager().register_body(_player, _player, _player);
     }
 }
