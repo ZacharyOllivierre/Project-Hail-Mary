@@ -11,6 +11,7 @@
 class PhysicsManager
 {
 public:
+    // phys debug
     enum class DebugRectType
     {
         Collider,
@@ -29,6 +30,7 @@ public:
     void set_collision_world(const TileCollisionWorld* world) noexcept;
     void clear_collision_world() noexcept;
 
+    // phys debug
     void set_debug_enabled(bool enabled) noexcept;
     [[nodiscard]] bool debug_enabled() const noexcept;
     [[nodiscard]] const std::vector<DebugRect>& debug_snapshot() const noexcept;
@@ -56,6 +58,7 @@ private:
 private:
     const TileCollisionWorld* _collision_world = nullptr;
     std::vector<BodyEntry> _bodies;
+    // phys debug
     bool _debug_enabled = false;
     std::vector<DebugRect> _debug_snapshot;
 };

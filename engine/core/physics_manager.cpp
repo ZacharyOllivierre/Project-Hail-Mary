@@ -8,6 +8,7 @@
 
 namespace
 {
+    // phys debug
     using DebugRect = PhysicsManager::DebugRect;
     using DebugRectType = PhysicsManager::DebugRectType;
 
@@ -79,6 +80,7 @@ namespace
             return 0.0f;
 
         const Rect candidate = current_rect.translated(Vector2(delta_x, 0.0f));
+        // phys debug
         add_debug_rect(debug_snapshot, candidate, DebugRectType::HorizontalCandidate);
 
         const Vector2 origin = world.world_origin();
@@ -102,6 +104,7 @@ namespace
                 if (!candidate.intersects(blocking_tile))
                     continue;
 
+                // phys debug
                 add_debug_rect(debug_snapshot, blocking_tile, DebugRectType::BlockingTile);
 
                 if (delta_x > 0.0f)
@@ -131,6 +134,7 @@ namespace
             return 0.0f;
 
         const Rect candidate = current_rect.translated(Vector2(0.0f, delta_y));
+        // phys debug
         add_debug_rect(debug_snapshot, candidate, DebugRectType::VerticalCandidate);
 
         const Vector2 origin = world.world_origin();
@@ -154,6 +158,7 @@ namespace
                 if (!candidate.intersects(blocking_tile))
                     continue;
 
+                // phys debug
                 add_debug_rect(debug_snapshot, blocking_tile, DebugRectType::BlockingTile);
 
                 if (delta_y > 0.0f)
@@ -183,6 +188,7 @@ void PhysicsManager::clear_collision_world() noexcept
     _collision_world = nullptr;
 }
 
+// phys debug
 void PhysicsManager::set_debug_enabled(bool enabled) noexcept
 {
     _debug_enabled = enabled;
@@ -242,6 +248,7 @@ void PhysicsManager::clear_bodies() noexcept
 
 void PhysicsManager::step(double delta) noexcept
 {
+    // phys debug
     _debug_snapshot.clear();
     remove_invalid_entries();
 
@@ -253,6 +260,7 @@ void PhysicsManager::step(double delta) noexcept
         if (entry.owner->is_destroyed() || !entry.owner->is_active())
             continue;
 
+        // phys debug
         if (_debug_enabled)
         {
             add_debug_rect(
@@ -288,20 +296,6 @@ void PhysicsManager::step(double delta) noexcept
             continue;
         }
 
-        const float allowed_x = resolve_horizontal_move(
-            *_collision_world,
-            entry.collider->collision_rect(),
-            desired_move.x);
-        if (std::fabs(allowed_x) > Vector2::k_epsilon)
-        {
-            entry.body->apply_translation(Vector2(allowed_x, 0.0f));
-        }
-
-        const float allowed_y = resolve_vertical_move(
-            *_collision_world,
-            entry.collider->collision_rect(),
-            desired_move.y);
-        if (std::fabs(allowed_y) > Vector2::k_epsilon)
         constexpr int kMaxSubsteps = 128;
         const float max_step_distance =
             std::min(world_tile_size.x, world_tile_size.y) * 0.5f;
@@ -313,6 +307,7 @@ void PhysicsManager::step(double delta) noexcept
             )
         );
         const Vector2 substep_move = desired_move / static_cast<float>(substep_count);
+        Vector2 applied_move = Vector2::zero();
 
         for (int substep = 0; substep < substep_count; ++substep)
         {
@@ -325,6 +320,7 @@ void PhysicsManager::step(double delta) noexcept
             if (std::fabs(allowed_x) > Vector2::k_epsilon)
             {
                 entry.body->apply_translation(Vector2(allowed_x, 0.0f));
+                applied_move.x += allowed_x;
             }
 
             const float allowed_y = resolve_vertical_move(
@@ -336,8 +332,10 @@ void PhysicsManager::step(double delta) noexcept
             if (std::fabs(allowed_y) > Vector2::k_epsilon)
             {
                 entry.body->apply_translation(Vector2(0.0f, allowed_y));
+                applied_move.y += allowed_y;
             }
 
+            // phys debug
             if (_debug_enabled)
             {
                 add_debug_rect(
@@ -349,8 +347,8 @@ void PhysicsManager::step(double delta) noexcept
         }
 
         // Added for wand
-        bool collided_x = std::fabs(allowed_x - desired_move.x) > Vector2::k_epsilon;
-        bool collided_y = std::fabs(allowed_y - desired_move.y) > Vector2::k_epsilon;
+        const bool collided_x = std::fabs(applied_move.x - desired_move.x) > Vector2::k_epsilon;
+        const bool collided_y = std::fabs(applied_move.y - desired_move.y) > Vector2::k_epsilon;
 
         // Calc collision direction
         Vector2 collision_direction = Vector2::zero();

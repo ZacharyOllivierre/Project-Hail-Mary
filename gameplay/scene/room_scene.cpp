@@ -10,6 +10,7 @@
 
 namespace
 {
+    // phys debug
     [[nodiscard]] SDL_Color debug_color_for(PhysicsManager::DebugRectType type) noexcept
     {
         switch (type)
@@ -93,6 +94,7 @@ void RoomScene::on_render(SDL_Renderer *renderer)
 {
     this->Scene::on_render(renderer);
 
+    // phys debug
     if (!renderer || !physics_manager().debug_enabled())
         return;
 
@@ -118,6 +120,16 @@ void RoomScene::on_render(SDL_Renderer *renderer)
 void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
 {
     this->Scene::on_input(input, events);
+
+    // phys debug
+    for (const InputEvent& event : events)
+    {
+        if (event.action == InputAction::Tab
+            && event.type == InputEventType::Pressed)
+        {
+            physics_manager().set_debug_enabled(!physics_manager().debug_enabled());
+        }
+    }
 
     if (!_player || _player->is_destroyed() || _player->is_dead())
         return;
@@ -162,14 +174,6 @@ void RoomScene::spawn_effect(const EffectSpawnRequest &request)
         return;
 
     add_object(std::move(effect));
-    for (const InputEvent& event : events)
-    {
-        if (event.action == InputAction::Tab
-            && event.type == InputEventType::Pressed)
-        {
-            physics_manager().set_debug_enabled(!physics_manager().debug_enabled());
-        }
-    }
 }
 
 void RoomScene::on_exit()
