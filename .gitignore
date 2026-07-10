@@ -5,3 +5,4 @@ build-web/
 out/
 site/
 build-vs-x64/
+.DS_Store

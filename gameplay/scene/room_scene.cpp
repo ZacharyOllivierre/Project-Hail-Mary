@@ -77,38 +77,37 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
     if (!_player || _player->is_destroyed() || _player->is_dead())
         return;
 
-    if (!input.state.is_just_pressed(InputAction::Attack))
-        return;
+    if (input.state.is_just_pressed(InputAction::Attack))
+    {
+        int mouse_x = 0;
+        int mouse_y = 0;
+        SDL_GetMouseState(&mouse_x, &mouse_y);
+        const SDL_FPoint logical_mouse = to_logical_mouse_position(mouse_x, mouse_y);
 
-    int mouse_x = 0;
-    int mouse_y = 0;
-    SDL_GetMouseState(&mouse_x, &mouse_y);
-    const SDL_FPoint logical_mouse = to_logical_mouse_position(mouse_x, mouse_y);
+        const SDL_FPoint mouse_world = camera.screen_to_world(
+            logical_mouse.x,
+            logical_mouse.y);
 
-    const SDL_FPoint mouse_world = camera.screen_to_world(
-        logical_mouse.x,
-        logical_mouse.y);
+        Vector2 aim_direction = Vector2(mouse_world.x, mouse_world.y) - _player->center();
+        if (aim_direction.is_zero())
+            aim_direction = Vector2(1.0f, 0.0f);
 
-    Vector2 aim_direction = Vector2(mouse_world.x, mouse_world.y) - _player->center();
-    if (aim_direction.is_zero())
-        aim_direction = Vector2(1.0f, 0.0f);
+        const Vector2 shot_direction = aim_direction.normalized();
 
-    const Vector2 shot_direction = aim_direction.normalized();
+        std::unique_ptr<Projectile> projectile = _player->create_projectile(shot_direction);
 
-    std::unique_ptr<Projectile> projectile = _player->create_projectile(
-        shot_direction);
+        if (!projectile)
+            return;
 
-    if (!projectile)
-        return;
+        Projectile *added_projectile = add_object(std::move(projectile));
+        if (!added_projectile)
+            return;
 
-    Projectile *added_projectile = add_object(std::move(projectile));
-    if (!added_projectile)
-        return;
-
-    physics_manager().register_body(
-        added_projectile,
-        added_projectile,
-        added_projectile);
+        physics_manager().register_body(
+            added_projectile,
+            added_projectile,
+            added_projectile);
+    }
 }
 
 void RoomScene::spawn_effect(const EffectSpawnRequest &request)

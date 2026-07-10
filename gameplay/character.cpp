@@ -159,7 +159,7 @@ std::vector<EffectSpawnRequest> Character::drain_effect_spawn_requests()
 	return drained_requests;
 }
 
-std::unique_ptr<Projectile> Character::create_projectile(const Vector2 &direction) const
+std::unique_ptr<Projectile> Character::create_projectile(const Vector2 &direction)
 {
 	return _wand.attack(center(), direction);
 }

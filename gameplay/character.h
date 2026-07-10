@@ -48,7 +48,7 @@ public:
 	std::vector<EffectSpawnRequest> drain_effect_spawn_requests();
 
 	// Wand
-	std::unique_ptr<Projectile> create_projectile(const Vector2 &direction) const;
+	std::unique_ptr<Projectile> create_projectile(const Vector2 &direction);
 
 	void set_move_speed(float move_speed) noexcept;
 	void set_hp(float hp) noexcept;

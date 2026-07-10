@@ -251,18 +251,29 @@ void PhysicsManager::step(double delta) noexcept
         }
 
         // Added for wand
-        bool collided = std::fabs(allowed_x - desired_move.x) > Vector2::k_epsilon;
-        if (std::fabs(allowed_x) > Vector2::k_epsilon)
+        bool collided_x = std::fabs(allowed_x - desired_move.x) > Vector2::k_epsilon;
+        bool collided_y = std::fabs(allowed_y - desired_move.y) > Vector2::k_epsilon;
+
+        // Calc collision direction
+        Vector2 collision_direction = Vector2::zero();
+        if (collided_x && std::fabs(desired_move.x) > Vector2::k_epsilon)
         {
-            entry.body->apply_translation(Vector2(allowed_x, 0.0f));
+            if (desired_move.x > 0.0f)
+                collision_direction.x = -1.0f;
+            else
+                collision_direction.x = 1.0f;
         }
-        collided = collided || std::fabs(allowed_y - desired_move.y) > Vector2::k_epsilon;
-        if (std::fabs(allowed_y) > Vector2::k_epsilon)
+
+        if (collided_y && std::fabs(desired_move.y) > Vector2::k_epsilon)
         {
-            entry.body->apply_translation(Vector2(0.0f, allowed_y));
+            if (desired_move.y > 0.0f)
+                collision_direction.y = -1.0f;
+            else
+                collision_direction.y = 1.0f;
         }
-        if (collided)
-            entry.collider->on_collision();
+
+        if (collided_x || collided_y)
+            entry.collider->on_collision(collision_direction);
         // End of added for wand
     }
 

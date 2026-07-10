@@ -1,15 +1,8 @@
 #include "wand.h"
 
-#include "bullet.h"
-
-#include <utility>
-
-std::unique_ptr<Projectile> Wand::attack(const Vector2 &origin, const Vector2 &direction) const
+std::unique_ptr<Projectile> Wand::attack(const Vector2 &origin, const Vector2 &direction)
 {
-    if (direction.is_zero())
-        return std::make_unique<Bullet>(origin, Vector2(_bullet_speed, 0.0f));
+    bullet_attributes.bullet_velocity = direction * bullet_attributes.bullet_speed;
 
-    return std::make_unique<Bullet>(
-        origin,
-        direction * _bullet_speed);
+    return std::make_unique<Bullet>(bullet_attributes, origin);
 }

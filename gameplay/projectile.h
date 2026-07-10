@@ -33,11 +33,6 @@ public:
         return _velocity;
     }
 
-    [[nodiscard]] Vector2 velocity() const noexcept
-    {
-        return _velocity;
-    }
-
     void apply_translation(const Vector2 &delta) noexcept override
     {
         GameObject::set_position(position() + delta);
@@ -49,7 +44,7 @@ public:
         return _collision_rect;
     }
 
-    void on_collision() noexcept override
+    void on_collision(const Vector2 &collision_direction) noexcept override
     {
         destroy();
     }
@@ -83,9 +78,14 @@ public:
         _collision_rect.set_size(size);
     }
 
+    void set_age(const double &age)
+    {
+        _age_seconds = age;
+    }
+
     double age_seconds() const noexcept
     {
-        return 0.0;
+        return _age_seconds;
     }
 
 protected:
@@ -97,4 +97,5 @@ protected:
 private:
     Vector2 _velocity = Vector2::zero();
     Rect _collision_rect{};
+    double _age_seconds = 0.0;
 };
