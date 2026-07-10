@@ -2,9 +2,33 @@
 
 #include "../../engine/input/input_state.h"
 #include "../projectile.h"
+#include "../../engine/core/render/sdl_render_command_executor.h"
 #include "../map/dungeon_room.h"
 
 #include <memory>
+#include <vector>
+
+namespace
+{
+    [[nodiscard]] SDL_Color debug_color_for(PhysicsManager::DebugRectType type) noexcept
+    {
+        switch (type)
+        {
+        case PhysicsManager::DebugRectType::Collider:
+            return SDL_Color{ 0, 255, 80, 255 };
+        case PhysicsManager::DebugRectType::SubstepCollider:
+            return SDL_Color{ 140, 255, 180, 255 };
+        case PhysicsManager::DebugRectType::HorizontalCandidate:
+            return SDL_Color{ 255, 220, 0, 255 };
+        case PhysicsManager::DebugRectType::VerticalCandidate:
+            return SDL_Color{ 0, 220, 255, 255 };
+        case PhysicsManager::DebugRectType::BlockingTile:
+            return SDL_Color{ 255, 40, 40, 255 };
+        default:
+            return SDL_Color{ 255, 255, 255, 255 };
+        }
+    }
+}
 
 // Gotten from application.h, shouldnt be re defined but vals are private in application class
 static constexpr int kLogicalWidth = 1280;
@@ -68,6 +92,27 @@ void RoomScene::on_update(double delta)
 void RoomScene::on_render(SDL_Renderer *renderer)
 {
     this->Scene::on_render(renderer);
+
+    if (!renderer || !physics_manager().debug_enabled())
+        return;
+
+    const std::vector<PhysicsManager::DebugRect>& debug_snapshot =
+        physics_manager().debug_snapshot();
+    if (debug_snapshot.empty())
+        return;
+
+    std::vector<UiRenderCommand> debug_commands;
+    debug_commands.reserve(debug_snapshot.size());
+
+    for (const PhysicsManager::DebugRect& debug_rect : debug_snapshot)
+    {
+        debug_commands.push_back(make_ui_draw_rect_command(
+            camera.world_to_screen(debug_rect.rect),
+            debug_color_for(debug_rect.type)
+        ));
+    }
+
+    execute_render_commands(renderer, debug_commands);
 }
 
 void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
@@ -117,6 +162,14 @@ void RoomScene::spawn_effect(const EffectSpawnRequest &request)
         return;
 
     add_object(std::move(effect));
+    for (const InputEvent& event : events)
+    {
+        if (event.action == InputAction::Tab
+            && event.type == InputEventType::Pressed)
+        {
+            physics_manager().set_debug_enabled(!physics_manager().debug_enabled());
+        }
+    }
 }
 
 void RoomScene::on_exit()
@@ -159,7 +212,7 @@ void RoomScene::spawn_player()
 
     _player = create_and_add_object<Character>(
         "elves",
-        Vector2(520.0f, 580.0f),
+        Vector2(540.0f, 540.0f),
         Vector2(64.0f, 64.0f),
         "fire.impact_radial");
 

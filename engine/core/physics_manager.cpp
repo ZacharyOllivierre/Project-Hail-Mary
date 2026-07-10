@@ -8,6 +8,21 @@
 
 namespace
 {
+    using DebugRect = PhysicsManager::DebugRect;
+    using DebugRectType = PhysicsManager::DebugRectType;
+
+    void add_debug_rect(
+        std::vector<DebugRect>* debug_snapshot,
+        const Rect& rect,
+        DebugRectType type
+    ) noexcept
+    {
+        if (!debug_snapshot)
+            return;
+
+        debug_snapshot->push_back(DebugRect{ rect, type });
+    }
+
     [[nodiscard]] Rect tile_rect(
         const TileCollisionWorld &world,
         int tile_x,
@@ -54,14 +69,18 @@ namespace
     }
 
     [[nodiscard]] float resolve_horizontal_move(
-        const TileCollisionWorld &world,
-        const Rect &current_rect,
-        float delta_x) noexcept
+        const TileCollisionWorld& world,
+        const Rect& current_rect,
+        float delta_x,
+        std::vector<DebugRect>* debug_snapshot
+    ) noexcept
     {
         if (std::fabs(delta_x) <= Vector2::k_epsilon)
             return 0.0f;
 
         const Rect candidate = current_rect.translated(Vector2(delta_x, 0.0f));
+        add_debug_rect(debug_snapshot, candidate, DebugRectType::HorizontalCandidate);
+
         const Vector2 origin = world.world_origin();
         const Vector2 size = world.tile_size();
 
@@ -83,6 +102,8 @@ namespace
                 if (!candidate.intersects(blocking_tile))
                     continue;
 
+                add_debug_rect(debug_snapshot, blocking_tile, DebugRectType::BlockingTile);
+
                 if (delta_x > 0.0f)
                 {
                     const float boundary_delta = blocking_tile.left() - current_rect.right();
@@ -100,14 +121,18 @@ namespace
     }
 
     [[nodiscard]] float resolve_vertical_move(
-        const TileCollisionWorld &world,
-        const Rect &current_rect,
-        float delta_y) noexcept
+        const TileCollisionWorld& world,
+        const Rect& current_rect,
+        float delta_y,
+        std::vector<DebugRect>* debug_snapshot
+    ) noexcept
     {
         if (std::fabs(delta_y) <= Vector2::k_epsilon)
             return 0.0f;
 
         const Rect candidate = current_rect.translated(Vector2(0.0f, delta_y));
+        add_debug_rect(debug_snapshot, candidate, DebugRectType::VerticalCandidate);
+
         const Vector2 origin = world.world_origin();
         const Vector2 size = world.tile_size();
 
@@ -128,6 +153,8 @@ namespace
                 const Rect blocking_tile = tile_rect(world, tile_x, tile_y);
                 if (!candidate.intersects(blocking_tile))
                     continue;
+
+                add_debug_rect(debug_snapshot, blocking_tile, DebugRectType::BlockingTile);
 
                 if (delta_y > 0.0f)
                 {
@@ -154,6 +181,25 @@ void PhysicsManager::set_collision_world(const TileCollisionWorld *world) noexce
 void PhysicsManager::clear_collision_world() noexcept
 {
     _collision_world = nullptr;
+}
+
+void PhysicsManager::set_debug_enabled(bool enabled) noexcept
+{
+    _debug_enabled = enabled;
+    if (!_debug_enabled)
+    {
+        _debug_snapshot.clear();
+    }
+}
+
+bool PhysicsManager::debug_enabled() const noexcept
+{
+    return _debug_enabled;
+}
+
+const std::vector<PhysicsManager::DebugRect>& PhysicsManager::debug_snapshot() const noexcept
+{
+    return _debug_snapshot;
 }
 
 void PhysicsManager::register_body(
@@ -196,6 +242,7 @@ void PhysicsManager::clear_bodies() noexcept
 
 void PhysicsManager::step(double delta) noexcept
 {
+    _debug_snapshot.clear();
     remove_invalid_entries();
 
     for (const BodyEntry &entry : _bodies)
@@ -205,6 +252,15 @@ void PhysicsManager::step(double delta) noexcept
 
         if (entry.owner->is_destroyed() || !entry.owner->is_active())
             continue;
+
+        if (_debug_enabled)
+        {
+            add_debug_rect(
+                &_debug_snapshot,
+                entry.collider->collision_rect(),
+                DebugRectType::Collider
+            );
+        }
 
         double effective_delta = delta;
         if (const GameObject *game_object = dynamic_cast<const GameObject *>(entry.owner))
@@ -246,8 +302,50 @@ void PhysicsManager::step(double delta) noexcept
             entry.collider->collision_rect(),
             desired_move.y);
         if (std::fabs(allowed_y) > Vector2::k_epsilon)
+        constexpr int kMaxSubsteps = 128;
+        const float max_step_distance =
+            std::min(world_tile_size.x, world_tile_size.y) * 0.5f;
+        const int substep_count = std::min(
+            kMaxSubsteps,
+            std::max(
+                1,
+                static_cast<int>(std::ceil(desired_move.length() / max_step_distance))
+            )
+        );
+        const Vector2 substep_move = desired_move / static_cast<float>(substep_count);
+
+        for (int substep = 0; substep < substep_count; ++substep)
         {
-            entry.body->apply_translation(Vector2(0.0f, allowed_y));
+            const float allowed_x = resolve_horizontal_move(
+                *_collision_world,
+                entry.collider->collision_rect(),
+                substep_move.x,
+                _debug_enabled ? &_debug_snapshot : nullptr
+            );
+            if (std::fabs(allowed_x) > Vector2::k_epsilon)
+            {
+                entry.body->apply_translation(Vector2(allowed_x, 0.0f));
+            }
+
+            const float allowed_y = resolve_vertical_move(
+                *_collision_world,
+                entry.collider->collision_rect(),
+                substep_move.y,
+                _debug_enabled ? &_debug_snapshot : nullptr
+            );
+            if (std::fabs(allowed_y) > Vector2::k_epsilon)
+            {
+                entry.body->apply_translation(Vector2(0.0f, allowed_y));
+            }
+
+            if (_debug_enabled)
+            {
+                add_debug_rect(
+                    &_debug_snapshot,
+                    entry.collider->collision_rect(),
+                    DebugRectType::SubstepCollider
+                );
+            }
         }
 
         // Added for wand

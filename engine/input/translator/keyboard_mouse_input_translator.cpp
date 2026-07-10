@@ -122,6 +122,8 @@ std::optional<InputAction> KeyboardMouseInputTranslator::action_from_key(SDL_Key
         return InputAction::End;
     case SDLK_TAB:
         return InputAction::Tab;
+    case SDLK_F3:
+        return InputAction::DebugCollision;
     default:
         return std::nullopt;
     }
