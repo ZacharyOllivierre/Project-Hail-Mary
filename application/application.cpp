@@ -5,6 +5,9 @@
 
 #include "../gameplay/scene/menu_scene.h"
 #include "../gameplay/scene/startup_loading_scene.h"
+#include "../thirdparty/imgui/imgui.h"
+#include "../thirdparty/imgui/imgui_impl_sdl2.h"
+#include "../thirdparty/imgui/imgui_impl_sdlrenderer2.h"
 
 #include <ctime>
 #include <iostream>
@@ -44,10 +47,24 @@ Application::Application()
 	init_assert(_renderer, "SDL_CreateRenderer Error");
 
 	init_assert(SDL_RenderSetLogicalSize(_renderer, _logical_width, _logical_height) == 0, "SDL_RenderSetLogicalSize Error");
+
+	//imgui debug
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	init_assert(
+		ImGui_ImplSDL2_InitForSDLRenderer(_window, _renderer)
+		&& ImGui_ImplSDLRenderer2_Init(_renderer),
+		"ImGui init error");
 }
 
 Application::~Application()
 {
+	//imgui debug
+	ImGui_ImplSDLRenderer2_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
 	SDL_DestroyRenderer(_renderer);
 	SDL_DestroyWindow(_window);
 
@@ -87,6 +104,8 @@ int Application::run(int argc, char **argv)
 		{
 			if (_event.type == SDL_QUIT)
 				_active = false;
+			//imgui debug
+			ImGui_ImplSDL2_ProcessEvent(&_event);
 			_input_system.process_event(_event);
 
 			// Added for main menu
@@ -114,7 +133,16 @@ int Application::run(int argc, char **argv)
 		SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0);
 		SDL_RenderClear(_renderer);
 
+		//imgui debug
+		ImGui_ImplSDLRenderer2_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
 		SceneManager::instance()->on_render(_renderer);
+		//imgui debug
+		SceneManager::instance()->on_imgui();
+		ImGui::Render();
+		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), _renderer);
 
 		SDL_RenderPresent(_renderer);
 	}

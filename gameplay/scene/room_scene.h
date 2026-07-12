@@ -21,6 +21,8 @@ public:
 
     void on_update(double delta) override;
     void on_render(SDL_Renderer *renderer) override;
+	//imgui debug
+    void on_imgui() override;
     void on_input(const InputSnapshot &input, const std::vector<InputEvent> &events) override;
 
     void spawn_effect(const EffectSpawnRequest &request);

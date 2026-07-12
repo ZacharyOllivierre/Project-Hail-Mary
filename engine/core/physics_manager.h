@@ -11,29 +11,8 @@
 class PhysicsManager
 {
 public:
-    // phys debug
-    enum class DebugRectType
-    {
-        Collider,
-        SubstepCollider,
-        HorizontalCandidate,
-        VerticalCandidate,
-        BlockingTile
-    };
-
-    struct DebugRect
-    {
-        Rect rect{};
-        DebugRectType type = DebugRectType::Collider;
-    };
-
     void set_collision_world(const TileCollisionWorld* world) noexcept;
     void clear_collision_world() noexcept;
-
-    // phys debug
-    void set_debug_enabled(bool enabled) noexcept;
-    [[nodiscard]] bool debug_enabled() const noexcept;
-    [[nodiscard]] const std::vector<DebugRect>& debug_snapshot() const noexcept;
 
     void register_body(
         SceneObject* owner,
@@ -58,7 +37,4 @@ private:
 private:
     const TileCollisionWorld* _collision_world = nullptr;
     std::vector<BodyEntry> _bodies;
-    // phys debug
-    bool _debug_enabled = false;
-    std::vector<DebugRect> _debug_snapshot;
 };

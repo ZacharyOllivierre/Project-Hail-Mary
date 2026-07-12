@@ -37,6 +37,9 @@ public:
 
 	virtual void on_render(SDL_Renderer* renderer);
 
+	//imgui debug
+	virtual void on_imgui() {}
+
 	virtual void on_input(const InputSnapshot& input,const std::vector<InputEvent>& events);
 
 	void destroy_all_scene_objects();
