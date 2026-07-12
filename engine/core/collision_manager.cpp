@@ -1,8 +1,33 @@
 #include "collision_manager.h"
 
 #include "game_object.h"
+#include "render/debug_draw.h"
 
 #include <algorithm>
+
+namespace
+{
+    [[nodiscard]] DebugDrawCategory collision_debug_category(
+        CollisionLayer layer) noexcept
+    {
+        switch (layer)
+        {
+        case CollisionLayer::World:
+            return DebugDrawCategory::CollisionWorld;
+        case CollisionLayer::Player:
+            return DebugDrawCategory::CollisionPlayer;
+        case CollisionLayer::Enemy:
+            return DebugDrawCategory::CollisionEnemy;
+        case CollisionLayer::PlayerProjectile:
+            return DebugDrawCategory::CollisionPlayerProjectile;
+        case CollisionLayer::EnemyProjectile:
+            return DebugDrawCategory::CollisionEnemyProjectile;
+        case CollisionLayer::None:
+        default:
+            return DebugDrawCategory::CollisionWorld;
+        }
+    }
+}
 
 CollisionBox* CollisionManager::create_box(GameObject* owner,CollisionLayer layer,
     CollisionTarget targets,CollisionCallback on_collided)
@@ -60,6 +85,16 @@ void CollisionManager::update()
     remove_invalid_boxes();
     _is_updating = true;
 
+    for (const std::unique_ptr<CollisionBox>& collision_box : _collision_boxes)
+    {
+        if (!is_box_valid(collision_box.get()))
+            continue;
+
+        DebugDraw::instance()->add_world_rect(
+            collision_box->rect(),
+            collision_debug_category(collision_box->layer()));
+    }
+
     for (size_t left_index = 0; left_index < _collision_boxes.size(); ++left_index)
     {
         CollisionBox* left = _collision_boxes[left_index].get();
@@ -80,6 +115,12 @@ void CollisionManager::update()
                 continue;
             }
 
+            DebugDraw::instance()->add_world_rect(
+                left->rect(),
+                DebugDrawCategory::CollisionHit);
+            DebugDraw::instance()->add_world_rect(
+                right->rect(),
+                DebugDrawCategory::CollisionHit);
             left->invoke_on_collided(*right);
             right->invoke_on_collided(*left);
         }

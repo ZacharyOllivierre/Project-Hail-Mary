@@ -2,10 +2,12 @@
 
 #include "../core/collision_manager.h"
 #include "../core/interface/updatable.h"
+#include "../core/render/debug_draw.h"
 #include "../core/render/sdl_render_command_executor.h"
 
 #include "../input/contracts/input_event_receiver.h"
 #include "../input/contracts/input_snapshot_receiver.h"
+#include "../input/input_types.h"
 
 #include <algorithm>
 #include <functional>
@@ -85,7 +87,7 @@ void Scene::on_input(const InputSnapshot& input,const std::vector<InputEvent>& e
 		entry.receiver->on_input_snapshot(input);
 	}
 
-	for (const InputEvent& input_event : events)
+    for (const InputEvent& input_event : events)
 	{
 		for (const InputEventReceiverEntry& entry : _event_receivers)
 		{
@@ -99,8 +101,20 @@ void Scene::on_input(const InputSnapshot& input,const std::vector<InputEvent>& e
 
 			if (entry.receiver->on_input_event(input_event))
 				break;
-		}
-	}
+        }
+    }
+
+    for (const InputEvent& input_event : events)
+    {
+        if (input_event.action != InputAction::Tab
+            || input_event.type != InputEventType::Pressed)
+        {
+            continue;
+        }
+
+        DebugDraw* debug_draw = DebugDraw::instance();
+        debug_draw->set_enabled(!debug_draw->enabled());
+    }
 }
 
 void Scene::on_update(double delta)
@@ -120,6 +134,7 @@ void Scene::on_update(double delta)
 
 	if (!_paused)
 	{
+		DebugDraw::instance()->begin_frame();
 		_physics_manager.step(delta);
 		CollisionManager::instance()->update();
 	}
@@ -169,6 +184,7 @@ void Scene::on_render(SDL_Renderer* renderer)
 	}
 
 	execute_render_commands(renderer, ui_render_commands);
+	DebugDraw::instance()->render(renderer, camera);
 }
 
 void Scene::destroy_all_scene_objects()
@@ -191,6 +207,7 @@ void Scene::destroy_all_scene_objects()
 	_physics_manager.clear_collision_world();
 	_physics_manager.clear_bodies();
 	CollisionManager::instance()->clear();
+	DebugDraw::instance()->clear();
 
 	remove_destroyed_objects();
 }
