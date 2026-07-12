@@ -6,32 +6,49 @@
 
 #include <memory>
 #include <utility>
+#include <cstdlib>
 
-// Should probably be in character - not going to implement it yet
-struct Wand_Attributes
+using std::unique_ptr;
+using std::vector;
+
+enum class SpreadStyle
 {
-    float mana_cost = 10.0f;
-    float attack_interval = 1.0f;
-    // More like mana recharge rate, recharge amount..
-    // Will need to be exposed to wand if wand "peices are going to affect it"
+    Uniform,
+    Circular,
+    Random
 };
 
-// Attributes
-// Bouncing
-// Multiply - Multiple projectiles for one attack
+struct WandAttributes
+{
+    // Number of bullets in one attack
+    int bullet_count = 2;
+
+    SpreadStyle spread_style = SpreadStyle::Random;
+    float spread_degrees = 80.0;
+};
 
 // Implement later
 // Homing - pulls towards nearest enemy
 // Pull - pulls enemies towards bullet
-// Divide - Sets minimum multiply to 2 // Spread shots by 2, 4, 8
 
 class Wand
 {
 public:
     Wand() = default;
 
-    std::unique_ptr<Projectile> attack(const Vector2 &origin, const Vector2 &direction);
+    vector<unique_ptr<Projectile>> attack(const Vector2 &origin, const Vector2 &direction);
 
 private:
-    Bullet_Attributes bullet_attributes;
+    void make_bullets(vector<unique_ptr<Projectile>> &projectiles, const Vector2 &direction);
+
+    float calculate_bullet_angle(int index);
+    float calc_uniform_spread_angle(int num);
+    float calc_circular_spread_angle(int num);
+    float calc_random_spread_angle(int num);
+
+private:
+    WandAttributes _wand_attributes;
+    Bullet_Attributes _bullet_attributes;
+
+    Vector2 _origin;
 };

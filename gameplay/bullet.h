@@ -1,20 +1,23 @@
 #pragma once
 
 #include "projectile.h"
+#include "../engine/animation/effect_manager.h"
 
 #include <SDL.h>
+#include <string>
 
 struct Bullet_Attributes
 {
     float damage = 100.0f;
 
-    float bullet_speed = 600.0f;
+    float bullet_speed = 400.0f;
     Vector2 bullet_velocity;
 
+    Vector2 start_position;
     Vector2 bullet_size = {24.0f, 24.0f};
 
-    float curve = 1000.0f;
-    int bounces = 3;
+    float curve = 0.0f;
+    int bounces = 0;
 
     // More damage based on bullet age
     float growth = 0.0f;
@@ -27,7 +30,7 @@ struct Bullet_Attributes
 class Bullet final : public Projectile
 {
 public:
-    Bullet(const Bullet_Attributes &bullet_attributes, const Vector2 &start_position) noexcept;
+    Bullet(const Bullet_Attributes &bullet_attributes) noexcept;
 
     void submit_render_commands(std::vector<RenderCommand> &out_commands) const override;
     void on_collision(const Vector2 &collision_direction) noexcept override;
@@ -35,6 +38,10 @@ public:
     void update(double delta) override;
 
     inline float get_damage() { return _bullet_attributes.damage; }
+
+private:
+    bool handle_wall_bounce(const Vector2 &collision_direction);
+    EffectSpawnRequest create_effect_request(const std::string &effect_key);
 
 private:
     SDL_Texture *_texture = nullptr;

@@ -16,17 +16,17 @@ namespace
         switch (type)
         {
         case PhysicsManager::DebugRectType::Collider:
-            return SDL_Color{ 0, 255, 80, 255 };
+            return SDL_Color{0, 255, 80, 255};
         case PhysicsManager::DebugRectType::SubstepCollider:
-            return SDL_Color{ 140, 255, 180, 255 };
+            return SDL_Color{140, 255, 180, 255};
         case PhysicsManager::DebugRectType::HorizontalCandidate:
-            return SDL_Color{ 255, 220, 0, 255 };
+            return SDL_Color{255, 220, 0, 255};
         case PhysicsManager::DebugRectType::VerticalCandidate:
-            return SDL_Color{ 0, 220, 255, 255 };
+            return SDL_Color{0, 220, 255, 255};
         case PhysicsManager::DebugRectType::BlockingTile:
-            return SDL_Color{ 255, 40, 40, 255 };
+            return SDL_Color{255, 40, 40, 255};
         default:
-            return SDL_Color{ 255, 255, 255, 255 };
+            return SDL_Color{255, 255, 255, 255};
         }
     }
 }
@@ -98,7 +98,7 @@ void RoomScene::on_render(SDL_Renderer *renderer)
     if (!renderer || !physics_manager().debug_enabled())
         return;
 
-    const std::vector<PhysicsManager::DebugRect>& debug_snapshot =
+    const std::vector<PhysicsManager::DebugRect> &debug_snapshot =
         physics_manager().debug_snapshot();
     if (debug_snapshot.empty())
         return;
@@ -106,12 +106,11 @@ void RoomScene::on_render(SDL_Renderer *renderer)
     std::vector<UiRenderCommand> debug_commands;
     debug_commands.reserve(debug_snapshot.size());
 
-    for (const PhysicsManager::DebugRect& debug_rect : debug_snapshot)
+    for (const PhysicsManager::DebugRect &debug_rect : debug_snapshot)
     {
         debug_commands.push_back(make_ui_draw_rect_command(
             camera.world_to_screen(debug_rect.rect),
-            debug_color_for(debug_rect.type)
-        ));
+            debug_color_for(debug_rect.type)));
     }
 
     execute_render_commands(renderer, debug_commands);
@@ -122,10 +121,9 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
     this->Scene::on_input(input, events);
 
     // phys debug
-    for (const InputEvent& event : events)
+    for (const InputEvent &event : events)
     {
-        if (event.action == InputAction::Tab
-            && event.type == InputEventType::Pressed)
+        if (event.action == InputAction::Tab && event.type == InputEventType::Pressed)
         {
             physics_manager().set_debug_enabled(!physics_manager().debug_enabled());
         }
@@ -151,19 +149,25 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 
         const Vector2 shot_direction = aim_direction.normalized();
 
-        std::unique_ptr<Projectile> projectile = _player->create_projectile(shot_direction);
+        std::vector<std::unique_ptr<Projectile>> projectile = _player->create_projectile(shot_direction);
 
-        if (!projectile)
+        if (projectile.empty())
+        {
             return;
+        }
 
-        Projectile *added_projectile = add_object(std::move(projectile));
-        if (!added_projectile)
-            return;
+        for (int i = 0; i < projectile.size(); i++)
+        {
+            Projectile *added_projectile = add_object(std::move(projectile[i]));
 
-        physics_manager().register_body(
-            added_projectile,
-            added_projectile,
-            added_projectile);
+            if (added_projectile)
+            {
+                physics_manager().register_body(
+                    added_projectile,
+                    added_projectile,
+                    added_projectile);
+            }
+        }
     }
 }
 

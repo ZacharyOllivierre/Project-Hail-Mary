@@ -1,9 +1,9 @@
 #include "bullet.h"
 
-#include "../engine/animation/effect_manager.h"
 #include "../engine/core/render/render_command.h"
-#include "../engine/scene/scene_manager.h"
+
 #include "../engine/resources/resource_manager.h"
+#include "../engine/scene/scene_manager.h"
 #include "scene/room_scene.h"
 
 #include <cmath>
@@ -11,11 +11,11 @@
 // Used to rotate texture by bullet velocity
 constexpr double kRadiansToDegrees = 57.29577951308232;
 
-Bullet::Bullet(const Bullet_Attributes &bullet_attributes, const Vector2 &start_position) noexcept
+Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     : Projectile(
           // Set as item so spawns below the character to avoid overlap
           DepthLayer::Item,
-          start_position,
+          bullet_attributes.start_position,
           bullet_attributes.bullet_size,
           bullet_attributes.bullet_velocity)
 {
@@ -41,20 +41,49 @@ void Bullet::submit_render_commands(std::vector<RenderCommand> &out_commands) co
 // Collision direction represented as {-1 -> 1 , -1 -> 1}
 void Bullet::on_collision(const Vector2 &collision_direction) noexcept
 {
-    // Get scene
+    // Get scene and request collision effect
     RoomScene *room_scene = SceneManager::instance()->try_find_scene<RoomScene>();
-
-    // Spawn effect
     if (room_scene)
     {
-        EffectSpawnRequest request;
-        request.effect_key = "fire.impact_radial";
-        request.position = GameObject::center();
-        request.anchor = EffectAnchor::Center;
+        EffectSpawnRequest request = create_effect_request("poison.explotion");
         room_scene->spawn_effect(request);
     }
 
     // Wall bounce
+    bool bounced = handle_wall_bounce(collision_direction);
+
+    // Destroy projectile if not bounced
+    if (!bounced)
+    {
+        Projectile::on_collision(collision_direction);
+    }
+}
+
+void Bullet::update(double delta)
+{
+    // Update age
+    double age = Projectile::age_seconds();
+    Projectile::set_age(age + delta);
+
+    // Apply curve
+    if (_bullet_attributes.curve != 0)
+    {
+        Vector2 velocity = _bullet_attributes.bullet_velocity;
+        Vector2 forward = velocity.normalized();
+
+        // Local left/right relative to travel direction.
+        Vector2 left = {-forward.y, forward.x};
+
+        velocity += left * (_bullet_attributes.curve * static_cast<float>(delta));
+
+        set_velocity(velocity);
+        _bullet_attributes.bullet_velocity = velocity;
+    }
+}
+
+// Returns true if ball has been bounces otherwise false
+bool Bullet::handle_wall_bounce(const Vector2 &collision_direction)
+{
     if (_bullet_attributes.bounces > 0)
     {
         _bullet_attributes.bounces--;
@@ -71,31 +100,21 @@ void Bullet::on_collision(const Vector2 &collision_direction) noexcept
 
         _bullet_attributes.bullet_velocity = reflected_velocity;
         Projectile::set_velocity(_bullet_attributes.bullet_velocity);
-        return;
+        return true;
     }
-
-    // Destroy projectile
-    Projectile::on_collision(collision_direction);
+    return false;
 }
 
-void Bullet::update(double delta)
+EffectSpawnRequest Bullet::create_effect_request(const std::string &effect_key)
 {
-    // Update age
-    double age = Projectile::age_seconds();
-    Projectile::set_age(age + delta);
+    EffectSpawnRequest request;
+    request.effect_key = effect_key;
+    request.position = GameObject::center();
+    request.anchor = EffectAnchor::Center;
 
-    // Apply curve
-    if (_bullet_attributes.curve != 0)
-    {
-        Vector2 velocity = desired_velocity();
+    // Angle effect opposite bullet degrees
+    Vector2 v = _bullet_attributes.bullet_velocity;
+    request.angle_degrees = std::atan2(v.y, v.x) * kRadiansToDegrees + 180;
 
-        Vector2 forward = velocity.normalized();
-
-        // Local left/right relative to travel direction.
-        Vector2 left = {-forward.y, forward.x};
-
-        velocity += left * (_bullet_attributes.curve * static_cast<float>(delta));
-
-        set_velocity(velocity);
-    }
+    return request;
 }
