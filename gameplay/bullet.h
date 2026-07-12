@@ -1,33 +1,39 @@
 #pragma once
 
 #include "projectile.h"
+#include "../engine/animation/effect_manager.h"
 
 #include <SDL.h>
+#include <string>
 
 struct Bullet_Attributes
 {
-    float damage = 100.0f;
-
-    float bullet_speed = 300.0f;
+    float bullet_speed = 400.0f;
     Vector2 bullet_velocity;
 
+    float max_age = 20.0f;
+
+    Vector2 start_position;
     Vector2 bullet_size = {24.0f, 24.0f};
+    bool damage_based_size = false;
 
     float curve = 0.0f;
-    int bounces = 3;
+    int bounces = 5;
+    float homing_strength = 750;
+    bool homing_maintains_speed = true;
 
     // More damage based on bullet age
-    float growth = 0.0f;
+    float growth = 40.0f;
+    float damage = 100.0f;
 };
 
 // Need to seperate entity and map collisison in collidable interface
-// ^ implement damage
-// All collision treated as entity collisison right now
+// All collision treated as wall collisison right now
 
 class Bullet final : public Projectile
 {
 public:
-    Bullet(const Bullet_Attributes &bullet_attributes, const Vector2 &start_position) noexcept;
+    Bullet(const Bullet_Attributes &bullet_attributes) noexcept;
 
     void submit_render_commands(std::vector<RenderCommand> &out_commands) const override;
     void on_collision(const Vector2 &collision_direction) noexcept override;
@@ -37,7 +43,17 @@ public:
     inline float get_damage() { return _bullet_attributes.damage; }
 
 private:
+    bool handle_wall_bounce(const Vector2 &collision_direction);
+    EffectSpawnRequest create_collision_effect(const std::string &effect_key);
+
+    void apply_curve(double &delta);
+    void apply_growth();
+    void apply_damage_sizing();
+    void apply_homing(double &delta);
+
+private:
     SDL_Texture *_texture = nullptr;
 
     Bullet_Attributes _bullet_attributes;
+    float _base_damage;
 };

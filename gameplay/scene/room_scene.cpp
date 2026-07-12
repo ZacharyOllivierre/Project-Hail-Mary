@@ -56,6 +56,7 @@ void RoomScene::on_enter()
 
     build_room();
     spawn_player();
+    spawn_enemies();
 }
 
 void RoomScene::on_update(double delta)
@@ -107,14 +108,12 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 
         const Vector2 shot_direction = aim_direction.normalized();
 
-        std::unique_ptr<Projectile> projectile = _player->create_projectile(shot_direction);
+        std::vector<std::unique_ptr<Projectile>> projectile = _player->create_projectile(shot_direction);
 
-        if (!projectile)
+        if (projectile.empty())
+        {
             return;
-
-        Projectile *added_projectile = add_object(std::move(projectile));
-        if (!added_projectile)
-            return;
+        }
 
         physics_manager().register_body(
             added_projectile,
@@ -138,6 +137,30 @@ void RoomScene::spawn_effect(const EffectSpawnRequest &request)
         return;
 
     add_object(std::move(effect));
+}
+
+Vector2 RoomScene::closest_enemy_to_point(Vector2 &point)
+{
+    if (_enemies.empty())
+    {
+        return Vector2(0, 0);
+    }
+
+    Vector2 closest = _enemies[0]->center();
+    float closest_dist_sq = (closest - point).length_squared();
+
+    for (int i = 1; i < _enemies.size(); i++)
+    {
+        float dist_sq = (_enemies[i]->center() - point).length_squared();
+
+        if (dist_sq < closest_dist_sq)
+        {
+            closest = _enemies[i]->position();
+            closest_dist_sq = dist_sq;
+        }
+    }
+
+    return closest;
 }
 
 void RoomScene::on_exit()
@@ -188,5 +211,27 @@ void RoomScene::spawn_player()
     {
         _player->set_move_speed(200.0f);
         physics_manager().register_body(_player, _player, _player);
+    }
+}
+
+void RoomScene::spawn_enemies()
+{
+    int num = 2;
+    int distance = 200;
+
+    for (int i = 0; i < num; i++)
+    {
+        Character *enemy = create_and_add_object<Character>(
+            "elves",
+            Vector2(540.0f + distance * i, 540.0f + distance * i),
+            Vector2(64.0f, 64.0f),
+            "fire.impact_radial");
+
+        if (enemy)
+        {
+            enemy->set_move_speed(0);
+            _enemies.push_back(enemy);
+            physics_manager().register_body(enemy, enemy, enemy);
+        }
     }
 }

@@ -13,7 +13,7 @@ public:
 public:
 	constexpr Vector2() noexcept = default;
 	constexpr Vector2(float x, float y) noexcept
-		: x(x), y(y) { }
+		: x(x), y(y) {}
 
 	~Vector2() = default;
 
@@ -37,31 +37,31 @@ public:
 		return Vector2(-x, -y);
 	}
 
-	[[nodiscard]] constexpr Vector2 operator+(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr Vector2 operator+(const Vector2 &vec) const noexcept
 	{
 		return Vector2(x + vec.x, y + vec.y);
 	}
 
-	Vector2& operator+=(const Vector2& vec) noexcept
+	Vector2 &operator+=(const Vector2 &vec) noexcept
 	{
 		x += vec.x;
 		y += vec.y;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr Vector2 operator-(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr Vector2 operator-(const Vector2 &vec) const noexcept
 	{
 		return Vector2(x - vec.x, y - vec.y);
 	}
 
-	Vector2& operator-=(const Vector2& vec) noexcept
+	Vector2 &operator-=(const Vector2 &vec) noexcept
 	{
 		x -= vec.x;
 		y -= vec.y;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr float operator*(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr float operator*(const Vector2 &vec) const noexcept
 	{
 		return dot(vec);
 	}
@@ -71,7 +71,7 @@ public:
 		return Vector2(x * val, y * val);
 	}
 
-	Vector2& operator*=(float val) noexcept
+	Vector2 &operator*=(float val) noexcept
 	{
 		x *= val;
 		y *= val;
@@ -83,29 +83,29 @@ public:
 		return Vector2(x / val, y / val);
 	}
 
-	Vector2& operator/=(float val) noexcept
+	Vector2 &operator/=(float val) noexcept
 	{
 		x /= val;
 		y /= val;
 		return *this;
 	}
 
-	[[nodiscard]] constexpr bool operator==(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr bool operator==(const Vector2 &vec) const noexcept
 	{
 		return x == vec.x && y == vec.y;
 	}
 
-	[[nodiscard]] constexpr bool operator!=(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr bool operator!=(const Vector2 &vec) const noexcept
 	{
 		return !(*this == vec);
 	}
 
-	[[nodiscard]] constexpr float dot(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr float dot(const Vector2 &vec) const noexcept
 	{
 		return x * vec.x + y * vec.y;
 	}
 
-	[[nodiscard]] constexpr float cross(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr float cross(const Vector2 &vec) const noexcept
 	{
 		return x * vec.y - y * vec.x;
 	}
@@ -120,12 +120,12 @@ public:
 		return std::sqrt(length_squared());
 	}
 
-	[[nodiscard]] constexpr float distance_squared_to(const Vector2& vec) const noexcept
+	[[nodiscard]] constexpr float distance_squared_to(const Vector2 &vec) const noexcept
 	{
 		return (*this - vec).length_squared();
 	}
 
-	[[nodiscard]] float distance_to(const Vector2& vec) const noexcept
+	[[nodiscard]] float distance_to(const Vector2 &vec) const noexcept
 	{
 		return (*this - vec).length();
 	}
@@ -135,7 +135,7 @@ public:
 		return std::fabs(x) <= epsilon && std::fabs(y) <= epsilon;
 	}
 
-	[[nodiscard]] bool nearly_equals(const Vector2& vec, float epsilon = k_epsilon) const noexcept
+	[[nodiscard]] bool nearly_equals(const Vector2 &vec, float epsilon = k_epsilon) const noexcept
 	{
 		return std::fabs(x - vec.x) <= epsilon && std::fabs(y - vec.y) <= epsilon;
 	}
@@ -170,12 +170,22 @@ public:
 		return true;
 	}
 
-	[[nodiscard]] Vector2 direction_to(const Vector2& vec, float epsilon = k_epsilon) const noexcept
+	[[nodiscard]] Vector2 direction_to(const Vector2 &vec, float epsilon = k_epsilon) const noexcept
 	{
 		return (vec - *this).normalized(epsilon);
 	}
 
-	friend constexpr Vector2 operator*(float val, const Vector2& vec) noexcept
+	[[nodiscard]] Vector2 rotated(float degrees) const noexcept
+	{
+		float radians = degrees * (3.14159265358979323846f / 180.0f);
+
+		float c = std::cos(radians);
+		float s = std::sin(radians);
+
+		return {x * c - y * s, x * s + y * c};
+	}
+
+	friend constexpr Vector2 operator*(float val, const Vector2 &vec) noexcept
 	{
 		return vec * val;
 	}
