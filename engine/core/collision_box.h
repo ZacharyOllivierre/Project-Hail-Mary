@@ -7,6 +7,7 @@
 #include <utility>
 
 class GameObject;
+class CollisionManager;
 
 enum class CollisionLayer : std::uint32_t
 {
@@ -74,39 +75,9 @@ using CollisionCallback = std::function<void(const CollisionInfo&)>;
 class CollisionBox
 {
 public:
-    explicit CollisionBox(
-        GameObject* owner = nullptr,
-        CollisionLayer layer = CollisionLayer::None,
-        CollisionTarget targets = CollisionTarget::None) noexcept
-        : _owner(owner),
-          _layer(layer),
-          _targets(targets)
-    {
-    }
-
-    void set_owner(GameObject* owner) noexcept
-    {
-        _owner = owner;
-    }
-
     void set_rect(const Rect& rect) noexcept
     {
         _rect = rect;
-    }
-
-    void set_layer(CollisionLayer layer) noexcept
-    {
-        _layer = layer;
-    }
-
-    void set_targets(CollisionTarget targets) noexcept
-    {
-        _targets = targets;
-    }
-
-    void set_on_collided(CollisionCallback on_collided)
-    {
-        _on_collided = std::move(on_collided);
     }
 
     [[nodiscard]] GameObject* owner() const noexcept
@@ -129,6 +100,21 @@ public:
         return _targets;
     }
 
+private:
+    friend class CollisionManager;
+
+    CollisionBox(
+        GameObject* owner,
+        CollisionLayer layer,
+        CollisionTarget targets,
+        CollisionCallback on_collided) noexcept
+        : _owner(owner),
+          _layer(layer),
+          _targets(targets),
+          _on_collided(std::move(on_collided))
+    {
+    }
+
     [[nodiscard]] bool can_collide_with(const CollisionBox& other) const noexcept
     {
         return has_collision_target(_targets, other._layer)
@@ -137,13 +123,10 @@ public:
 
     void invoke_on_collided(CollisionBox& other)
     {
-        if (!_on_collided)
-            return;
-
-        _on_collided(CollisionInfo{ *this, other });
+        if (_on_collided)
+            _on_collided(CollisionInfo{ *this, other });
     }
 
-private:
     Rect _rect{};
     GameObject* _owner = nullptr;
     CollisionLayer _layer = CollisionLayer::None;

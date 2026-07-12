@@ -1,5 +1,6 @@
 #include "scene.h"
 
+#include "../core/collision_manager.h"
 #include "../core/interface/updatable.h"
 #include "../core/render/sdl_render_command_executor.h"
 
@@ -118,7 +119,10 @@ void Scene::on_update(double delta)
 	}
 
 	if (!_paused)
+	{
 		_physics_manager.step(delta);
+		CollisionManager::instance()->update();
+	}
 
 	remove_destroyed_objects();
 }
@@ -186,6 +190,7 @@ void Scene::destroy_all_scene_objects()
 
 	_physics_manager.clear_collision_world();
 	_physics_manager.clear_bodies();
+	CollisionManager::instance()->clear();
 
 	remove_destroyed_objects();
 }
