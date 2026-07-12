@@ -8,9 +8,10 @@
 
 class GameObject;
 
-enum class CollisionSource : std::uint32_t
+enum class CollisionLayer : std::uint32_t
 {
     None = 0,
+    World,
     Player,
     Enemy,
     PlayerProjectile,
@@ -20,27 +21,30 @@ enum class CollisionSource : std::uint32_t
 enum class CollisionTarget : std::uint32_t
 {
     None = 0,
-    Player = 1U << 0,
-    Enemy = 1U << 1,
-    PlayerProjectile = 1U << 2,
-    EnemyProjectile = 1U << 3,
-    All = (1U << 0) | (1U << 1) | (1U << 2) | (1U << 3)
+    World = 1U << 0,
+    Player = 1U << 1,
+    Enemy = 1U << 2,
+    PlayerProjectile = 1U << 3,
+    EnemyProjectile = 1U << 4,
+    All = (1U << 0) | (1U << 1) | (1U << 2) | (1U << 3) | (1U << 4)
 };
 
 [[nodiscard]] constexpr CollisionTarget to_collision_target(
-    CollisionSource source) noexcept
+    CollisionLayer layer) noexcept
 {
-    switch (source)
+    switch (layer)
     {
-    case CollisionSource::Player:
+    case CollisionLayer::World:
+        return CollisionTarget::World;
+    case CollisionLayer::Player:
         return CollisionTarget::Player;
-    case CollisionSource::Enemy:
+    case CollisionLayer::Enemy:
         return CollisionTarget::Enemy;
-    case CollisionSource::PlayerProjectile:
+    case CollisionLayer::PlayerProjectile:
         return CollisionTarget::PlayerProjectile;
-    case CollisionSource::EnemyProjectile:
+    case CollisionLayer::EnemyProjectile:
         return CollisionTarget::EnemyProjectile;
-    case CollisionSource::None:
+    case CollisionLayer::None:
     default:
         return CollisionTarget::None;
     }
@@ -48,13 +52,13 @@ enum class CollisionTarget : std::uint32_t
 
 [[nodiscard]] constexpr bool has_collision_target(
     CollisionTarget targets,
-    CollisionSource source) noexcept
+    CollisionLayer layer) noexcept
 {
     const std::uint32_t target_bits = static_cast<std::uint32_t>(targets);
-    const std::uint32_t source_bit = static_cast<std::uint32_t>(
-        to_collision_target(source));
+    const std::uint32_t layer_bit = static_cast<std::uint32_t>(
+        to_collision_target(layer));
 
-    return (target_bits & source_bit) != 0U;
+    return (target_bits & layer_bit) != 0U;
 }
 
 class CollisionBox;
@@ -72,10 +76,10 @@ class CollisionBox
 public:
     explicit CollisionBox(
         GameObject* owner = nullptr,
-        CollisionSource source = CollisionSource::None,
+        CollisionLayer layer = CollisionLayer::None,
         CollisionTarget targets = CollisionTarget::None) noexcept
         : _owner(owner),
-          _source(source),
+          _layer(layer),
           _targets(targets)
     {
     }
@@ -90,9 +94,9 @@ public:
         _rect = rect;
     }
 
-    void set_source(CollisionSource source) noexcept
+    void set_layer(CollisionLayer layer) noexcept
     {
-        _source = source;
+        _layer = layer;
     }
 
     void set_targets(CollisionTarget targets) noexcept
@@ -115,9 +119,9 @@ public:
         return _rect;
     }
 
-    [[nodiscard]] CollisionSource source() const noexcept
+    [[nodiscard]] CollisionLayer layer() const noexcept
     {
-        return _source;
+        return _layer;
     }
 
     [[nodiscard]] CollisionTarget targets() const noexcept
@@ -127,8 +131,8 @@ public:
 
     [[nodiscard]] bool can_collide_with(const CollisionBox& other) const noexcept
     {
-        return has_collision_target(_targets, other._source)
-            && has_collision_target(other._targets, _source);
+        return has_collision_target(_targets, other._layer)
+            && has_collision_target(other._targets, _layer);
     }
 
     void invoke_on_collided(CollisionBox& other)
@@ -142,7 +146,7 @@ public:
 private:
     Rect _rect{};
     GameObject* _owner = nullptr;
-    CollisionSource _source = CollisionSource::None;
+    CollisionLayer _layer = CollisionLayer::None;
     CollisionTarget _targets = CollisionTarget::None;
     CollisionCallback _on_collided;
 };
