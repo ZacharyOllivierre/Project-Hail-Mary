@@ -1,7 +1,6 @@
 #include "bullet.h"
 
 #include "../engine/core/render/render_command.h"
-
 #include "../engine/resources/resource_manager.h"
 #include "../engine/scene/scene_manager.h"
 #include "scene/room_scene.h"
@@ -46,6 +45,7 @@ void Bullet::submit_render_commands(std::vector<RenderCommand> &out_commands) co
 void Bullet::on_collision(const Vector2 &collision_direction) noexcept
 {
     // Get scene and request collision effect
+    // Todo save a pointer so dont have to search for scene each time
     RoomScene *room_scene = SceneManager::instance()->try_find_scene<RoomScene>();
     if (room_scene)
     {
@@ -69,36 +69,33 @@ void Bullet::update(double delta)
     double age = Projectile::age_seconds();
     Projectile::set_age(age + delta);
 
+    // Enforce max age
+    if (age > _bullet_attributes.max_age)
+    {
+        Projectile::destroy();
+    }
+
     // Apply curve
     if (_bullet_attributes.curve != 0)
     {
-        Vector2 velocity = _bullet_attributes.bullet_velocity;
-        Vector2 forward = velocity.normalized();
-
-        // Local left/right relative to travel direction.
-        Vector2 left = {-forward.y, forward.x};
-
-        velocity += left * (_bullet_attributes.curve * static_cast<float>(delta));
-
-        set_velocity(velocity);
-        _bullet_attributes.bullet_velocity = velocity;
+        apply_curve(delta);
     }
 
     // Appy growth
     if (_bullet_attributes.growth != 0)
     {
-        _bullet_attributes.damage = _base_damage +
-                                    _bullet_attributes.growth * Projectile::age_seconds();
+        apply_growth();
     }
 
     // Apply damage based sizing
     if (_bullet_attributes.damage_based_size)
     {
-        Vector2 new_size = _bullet_attributes.damage / _base_damage * _bullet_attributes.bullet_size;
-        Vector2 extra(1, 1);
-        new_size += extra;
+        apply_damage_sizing();
+    }
 
-        Projectile::set_size(new_size);
+    if (_bullet_attributes.homing_strength != 0)
+    {
+        apply_homing(delta);
     }
 }
 
@@ -138,4 +135,76 @@ EffectSpawnRequest Bullet::create_collision_effect(const std::string &effect_key
     request.angle_degrees = std::atan2(v.y, v.x) * kRadiansToDegrees + 180;
 
     return request;
+}
+
+void Bullet::apply_curve(double &delta)
+{
+    Vector2 velocity = _bullet_attributes.bullet_velocity;
+    Vector2 forward = velocity.normalized();
+
+    // Local left/right relative to travel direction.
+    Vector2 left = {-forward.y, forward.x};
+
+    velocity += left * (_bullet_attributes.curve * static_cast<float>(delta));
+
+    set_velocity(velocity);
+    _bullet_attributes.bullet_velocity = velocity;
+}
+
+void Bullet::apply_growth()
+{
+    _bullet_attributes.damage =
+        _base_damage + _bullet_attributes.growth * Projectile::age_seconds();
+}
+
+void Bullet::apply_damage_sizing()
+{
+    Vector2 new_size =
+        _bullet_attributes.damage / _base_damage * _bullet_attributes.bullet_size;
+    new_size += Vector2(2, 2);
+
+    Projectile::set_size(new_size);
+}
+
+// Todo bullets dont seem to be homing as strong when moving away from target
+void Bullet::apply_homing(double &delta)
+{
+    // Todo save a pointer so dont have to search for scene each time
+    // Cant in header; circular dependency; add forward declaration
+    RoomScene *room_scene = SceneManager::instance()->try_find_scene<RoomScene>();
+    if (!room_scene)
+    {
+        return;
+    }
+
+    Vector2 pos = center();
+    Vector2 target = room_scene->closest_enemy_to_point(pos);
+    if (target.is_zero())
+    {
+        return;
+    }
+
+    // Represents desired velocity if perfectly pointing at enemy
+    Vector2 desired = (target - pos).normalized();
+    desired *= _bullet_attributes.bullet_speed;
+
+    Vector2 velocity = Projectile::desired_velocity();
+
+    // Steering force required to point at target
+    Vector2 steering = desired - velocity;
+
+    // Preform turn proportional to homing strength
+    float maxTurn = _bullet_attributes.homing_strength * delta;
+    if (steering.length() > maxTurn)
+    {
+        steering = steering.normalized() * maxTurn;
+    }
+    velocity += steering;
+
+    // Maintain speed
+    if (_bullet_attributes.homing_maintains_speed)
+        velocity = velocity.normalized() * _bullet_attributes.bullet_speed;
+
+    Projectile::set_velocity(velocity);
+    _bullet_attributes.bullet_velocity = velocity;
 }

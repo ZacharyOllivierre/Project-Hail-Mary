@@ -25,11 +25,16 @@ public:
 
     void spawn_effect(const EffectSpawnRequest &request);
 
+    Vector2 closest_enemy_to_point(Vector2 &point);
+
 private:
     void build_room();
     void spawn_player();
+    void spawn_enemies();
 
     Character *_player = nullptr;
     DungeonRoom *_room = nullptr;
     RoomTileCollisionWorld _collision_world;
+
+    vector<Character *> _enemies;
 };
