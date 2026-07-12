@@ -110,23 +110,33 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
 
         std::vector<std::unique_ptr<Projectile>> projectile = _player->create_projectile(shot_direction);
 
+        std::vector<std::unique_ptr<Projectile>> projectiles =_player->create_projectile(shot_direction);
+
         if (projectile.empty())
-        {
             return;
+
+        for (std::unique_ptr<Projectile>& projectile : projectiles)
+        {
+            Projectile* added_projectile = add_object(std::move(projectile));
+            if (!added_projectile)
+                continue;
+
+            physics_manager().register_body(
+                added_projectile,
+                added_projectile,
+                added_projectile);
+
+            CollisionBox* collision_box = CollisionManager::instance()->create_box(
+                added_projectile,
+                CollisionLayer::PlayerProjectile,
+                CollisionTarget::Enemy,
+                [added_projectile](const CollisionInfo&)
+                {
+                    added_projectile->destroy();
+                });
+
+            added_projectile->set_collision_box(collision_box);
         }
-
-        physics_manager().register_body(
-            added_projectile,
-            added_projectile,
-            added_projectile);
-
-        CollisionBox *collision_box = CollisionManager::instance()->create_box(
-            added_projectile,CollisionLayer::PlayerProjectile,CollisionTarget::PlayerProjectile,
-            [added_projectile](const CollisionInfo &)
-            {
-                added_projectile->destroy();
-            });
-        added_projectile->set_collision_box(collision_box);
     }
 }
 
