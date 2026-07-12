@@ -8,7 +8,7 @@ struct Bullet_Attributes
 {
     float damage = 100.0f;
 
-    float bullet_speed = 10000.0f;
+    float bullet_speed = 300.0f;
     Vector2 bullet_velocity;
 
     Vector2 bullet_size = {24.0f, 24.0f};

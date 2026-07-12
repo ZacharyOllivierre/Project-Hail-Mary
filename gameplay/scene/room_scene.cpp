@@ -1,10 +1,9 @@
 #include "room_scene.h"
 
+#include "../../engine/core/collision_manager.h"
 #include "../../engine/input/input_state.h"
 #include "../projectile.h"
 #include "../map/dungeon_room.h"
-
-#include<Windows.h>
 
 #include <memory>
 #include <vector>
@@ -60,7 +59,6 @@ void RoomScene::on_enter()
 
 void RoomScene::on_update(double delta)
 {
-    //Sleep(100);
 
     this->Scene::on_update(delta);
 
@@ -112,6 +110,16 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
             added_projectile,
             added_projectile,
             added_projectile);
+
+        CollisionBox *collision_box = CollisionManager::instance()->create_box(
+            added_projectile,
+            CollisionLayer::PlayerProjectile,
+            CollisionTarget::PlayerProjectile,
+            [added_projectile](const CollisionInfo &)
+            {
+                added_projectile->destroy();
+            });
+        added_projectile->set_collision_box(collision_box);
     }
 }
 

@@ -14,7 +14,7 @@ namespace
         DebugDrawCategory category
     ) noexcept
     {
-        DebugDraw::instance()->add_world_rect(rect, category);
+        DebugDraw::instance()->add_world_rect(rect, category);  
     }
 
     [[nodiscard]] Rect tile_rect(
@@ -28,8 +28,7 @@ namespace
         return Rect(
             origin.x + static_cast<float>(tile_x) * size.x,
             origin.y + static_cast<float>(tile_y) * size.y,
-            size.x,
-            size.y);
+            size.x,size.y);
     }
 
     [[nodiscard]] bool is_blocking_tile(
