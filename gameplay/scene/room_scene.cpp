@@ -4,6 +4,7 @@
 #include "../../engine/input/input_state.h"
 #include "../projectile.h"
 #include "../map/dungeon_room.h"
+#include "../../thirdparty/imgui/imgui.h"
 
 #include <memory>
 #include <vector>
@@ -73,6 +74,15 @@ void RoomScene::on_render(SDL_Renderer *renderer)
     this->Scene::on_render(renderer);
 }
 
+//imgui debug
+void RoomScene::on_imgui()
+{
+    ImGui::Begin("Room Debug");
+    ImGui::Text("Player HP: %.1f", _player ? _player->hp() : 0.0f);
+
+    ImGui::End();
+}
+
 void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
 {
     this->Scene::on_input(input, events);
@@ -112,9 +122,7 @@ void RoomScene::on_input(const InputSnapshot &input, const std::vector<InputEven
             added_projectile);
 
         CollisionBox *collision_box = CollisionManager::instance()->create_box(
-            added_projectile,
-            CollisionLayer::PlayerProjectile,
-            CollisionTarget::PlayerProjectile,
+            added_projectile,CollisionLayer::PlayerProjectile,CollisionTarget::PlayerProjectile,
             [added_projectile](const CollisionInfo &)
             {
                 added_projectile->destroy();

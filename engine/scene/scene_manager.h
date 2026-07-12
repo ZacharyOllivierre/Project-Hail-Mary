@@ -20,6 +20,8 @@ private:
 public:
 	void on_update(double delta);
 	void on_render(SDL_Renderer* renderer);
+	//imgui debug
+	void on_imgui();
 	void on_input(
 		const InputSnapshot& input,
 		const std::vector<InputEvent>& events

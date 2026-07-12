@@ -21,6 +21,13 @@ void SceneManager::on_render(SDL_Renderer* renderer)
         _current_scene->on_render(renderer);
 }
 
+//imgui debug
+void SceneManager::on_imgui()
+{
+    if (_current_scene)
+        _current_scene->on_imgui();
+}
+
 void SceneManager::on_input(
     const InputSnapshot& input,
     const std::vector<InputEvent>& events
