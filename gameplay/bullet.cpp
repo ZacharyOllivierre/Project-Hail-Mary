@@ -22,8 +22,12 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     _texture = ResourceManager::instance()->find_texture("bullet");
 
     _bullet_attributes = bullet_attributes;
+
+    // Original damage of bullet before flight
+    _base_damage = _bullet_attributes.damage;
 }
 
+// Todo collision box doesnt align with texture rotation
 void Bullet::submit_render_commands(std::vector<RenderCommand> &out_commands) const
 {
     if (!_texture)
@@ -45,7 +49,7 @@ void Bullet::on_collision(const Vector2 &collision_direction) noexcept
     RoomScene *room_scene = SceneManager::instance()->try_find_scene<RoomScene>();
     if (room_scene)
     {
-        EffectSpawnRequest request = create_effect_request("poison.explotion");
+        EffectSpawnRequest request = create_collision_effect("poison.explotion");
         room_scene->spawn_effect(request);
     }
 
@@ -79,6 +83,23 @@ void Bullet::update(double delta)
         set_velocity(velocity);
         _bullet_attributes.bullet_velocity = velocity;
     }
+
+    // Appy growth
+    if (_bullet_attributes.growth != 0)
+    {
+        _bullet_attributes.damage = _base_damage +
+                                    _bullet_attributes.growth * Projectile::age_seconds();
+    }
+
+    // Apply damage based sizing
+    if (_bullet_attributes.damage_based_size)
+    {
+        Vector2 new_size = _bullet_attributes.damage / _base_damage * _bullet_attributes.bullet_size;
+        Vector2 extra(1, 1);
+        new_size += extra;
+
+        Projectile::set_size(new_size);
+    }
 }
 
 // Returns true if ball has been bounces otherwise false
@@ -105,7 +126,7 @@ bool Bullet::handle_wall_bounce(const Vector2 &collision_direction)
     return false;
 }
 
-EffectSpawnRequest Bullet::create_effect_request(const std::string &effect_key)
+EffectSpawnRequest Bullet::create_collision_effect(const std::string &effect_key)
 {
     EffectSpawnRequest request;
     request.effect_key = effect_key;

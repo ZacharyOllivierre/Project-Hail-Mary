@@ -8,19 +8,19 @@
 
 struct Bullet_Attributes
 {
-    float damage = 100.0f;
-
     float bullet_speed = 400.0f;
     Vector2 bullet_velocity;
 
     Vector2 start_position;
     Vector2 bullet_size = {24.0f, 24.0f};
+    bool damage_based_size = false;
 
     float curve = 0.0f;
-    int bounces = 0;
+    int bounces = 5;
 
     // More damage based on bullet age
-    float growth = 0.0f;
+    float growth = 40.0f;
+    float damage = 100.0f;
 };
 
 // Need to seperate entity and map collisison in collidable interface
@@ -41,10 +41,13 @@ public:
 
 private:
     bool handle_wall_bounce(const Vector2 &collision_direction);
-    EffectSpawnRequest create_effect_request(const std::string &effect_key);
+    EffectSpawnRequest create_collision_effect(const std::string &effect_key);
+
+    void apply_curve();
 
 private:
     SDL_Texture *_texture = nullptr;
 
     Bullet_Attributes _bullet_attributes;
+    float _base_damage;
 };
