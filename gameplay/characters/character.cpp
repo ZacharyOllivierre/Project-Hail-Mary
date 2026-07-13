@@ -1,8 +1,8 @@
 #include "character.h"
 
-#include "../engine/animation/animation_manager.h"
-#include "../engine/core/render/render_command.h"
-#include "../engine/input/input_state.h"
+#include "../../engine/animation/animation_manager.h"
+#include "../../engine/core/render/render_command.h"
+#include "../../engine/input/input_state.h"
 
 #include <algorithm>
 #include <iostream>
@@ -64,17 +64,12 @@ namespace
 }
 
 Character::Character(
-	std::string character_id,
 	const engine::core::Vector2 &start_position,
-	const engine::core::Vector2 &start_size,
-	std::string effect_id)
+	const engine::core::Vector2 &start_size)
 	: engine::core::GameObject(engine::core::DepthLayer::Character),
-	  _character_id(std::move(character_id)),
-	  _effect_id(std::move(effect_id))
 {
 	set_position(start_position);
 	set_character_size(start_size);
-	apply_animation_state(_character_id, AnimationState::Idle, _animation, _animation_state);
 }
 
 Character::~Character() = default;
