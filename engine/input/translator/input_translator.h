@@ -20,7 +20,10 @@ protected:
         std::vector<InputEvent>& events,
         InputAction action,
         InputEventType type,
-        InputDevice device
+        InputDevice device,
+        int pointer_x = 0,
+        int pointer_y = 0,
+        bool has_pointer_position = false
     ) const;
 };
 }

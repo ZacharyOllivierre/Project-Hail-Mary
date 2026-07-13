@@ -5,11 +5,7 @@
 #include "../../core/scene_object.h"
 #include "../../core/geometry/vector2.h"
 #include "../../core/geometry/rect.h"
-
-namespace engine::core
-{
-struct UiRenderCommand;
-}
+#include "../../core/render/render_command.h"
 
 namespace engine::ui
 {
