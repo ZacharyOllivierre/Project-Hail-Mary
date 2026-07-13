@@ -1,27 +1,27 @@
 #pragma once
 
 #include "projectile.h"
-#include "../engine/animation/effect_manager.h"
+#include "../../engine/animation/effect_manager.h"
 
 #include <SDL.h>
 #include <string>
 
 struct Bullet_Attributes
 {
-    float bullet_speed = 1200.0f;
+    float bullet_speed = 900.0f;
     engine::core::Vector2 bullet_velocity;
 
     float acceleration = 100.0f;
 
-    float max_age = 0.08f;
+    float max_age = 20.0f;
 
     engine::core::Vector2 start_position;
     engine::core::Vector2 bullet_size = {24.0f, 24.0f};
     bool damage_based_size = false;
 
     float curve = 0.0f;
-    int bounces = 1;
-    float homing_strength = 0;
+    int bounces = 3;
+    float homing_strength = 900;
     bool homing_maintains_speed = true;
 
     // More damage based on bullet age

@@ -1,9 +1,9 @@
 #include "bullet.h"
 
-#include "../engine/core/render/render_command.h"
-#include "../engine/resources/resource_manager.h"
-#include "../engine/scene/scene_manager.h"
-#include "scene/room_scene.h"
+#include "../../engine/core/render/render_command.h"
+#include "../../engine/resources/resource_manager.h"
+#include "../../engine/scene/scene_manager.h"
+#include "../scene/room_scene.h"
 
 #include <cmath>
 
@@ -74,35 +74,30 @@ void Bullet::update(double delta)
     {
         Projectile::destroy();
     }
-
-    // Apply accelleration
-    if (_bullet_attributes.acceleration != 0)
-    {
-        apply_acceleration(delta);
-    }
-
     // Apply curve
     if (_bullet_attributes.curve != 0)
     {
         apply_curve(delta);
     }
-
     // Appy growth
     if (_bullet_attributes.growth != 0)
     {
         apply_growth();
     }
-
     // Apply damage based sizing
     if (_bullet_attributes.damage_based_size)
     {
         apply_damage_sizing();
     }
-
     // Apply homing
     if (_bullet_attributes.homing_strength != 0)
     {
         apply_homing(delta);
+    }
+    // Apply accelleration
+    if (_bullet_attributes.acceleration != 0)
+    {
+        apply_acceleration(delta);
     }
 }
 

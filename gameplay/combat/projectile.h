@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../engine/core/game_object.h"
-#include "../engine/physics/collision_box.h"
-#include "../engine/core/interface/collidable.h"
-#include "../engine/core/interface/kinematic_body.h"
-#include "../engine/core/interface/updatable.h"
+#include "../../engine/core/game_object.h"
+#include "../../engine/physics/collision_box.h"
+#include "../../engine/core/interface/collidable.h"
+#include "../../engine/core/interface/kinematic_body.h"
+#include "../../engine/core/interface/updatable.h"
 
 class Projectile : public engine::core::GameObject,
                    public engine::core::Updatable,

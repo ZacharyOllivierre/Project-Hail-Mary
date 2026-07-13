@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../engine/core/geometry/vector2.h"
+#include "../../engine/core/geometry/vector2.h"
 #include "projectile.h"
 #include "bullet.h"
 
@@ -45,20 +45,19 @@ struct WandAttributes
     float cooldown_seconds;
     float mana_cost;
 
-    int bullet_count = 3;
+    int bullet_count = 10;
 
-    SpreadStyle spread_style = SpreadStyle::Uniform;
+    SpreadStyle spread_style = SpreadStyle::Circular;
     float spread_degrees = 30.0;
 
-    ShotStyle shot_style = ShotStyle::Simultaneous;
+    ShotStyle shot_style = ShotStyle::Sequential;
     float first_shot_delay = 0.0f;
-    float shot_delay_sec = 0.00f;
+    float shot_delay_sec = 0.09f;
 
     float spawn_distance = 32.0f;
 };
 
 // Implement later
-// Homing - pulls towards nearest enemy
 // Pull - pulls enemies towards bullet
 
 class Wand

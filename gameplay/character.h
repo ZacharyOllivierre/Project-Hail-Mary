@@ -8,8 +8,8 @@
 #include "../engine/core/interface/kinematic_body.h"
 #include "../engine/input/contracts/input_snapshot_receiver.h"
 
-#include "projectile.h"
-#include "wand.h"
+#include "combat/projectile.h"
+#include "combat/wand.h"
 
 #include <memory>
 #include <string>

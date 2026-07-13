@@ -2,7 +2,7 @@
 
 #include "../../engine/physics/collision_manager.h"
 #include "../../engine/input/input_state.h"
-#include "../projectile.h"
+#include "../combat/projectile.h"
 #include "../map/dungeon_room.h"
 #include "../../thirdparty/imgui/imgui.h"
 
