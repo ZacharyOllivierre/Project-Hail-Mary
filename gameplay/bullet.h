@@ -18,8 +18,8 @@ struct Bullet_Attributes
     bool damage_based_size = false;
 
     float curve = 0.0f;
-    int bounces = 5;
-    float homing_strength = 750;
+    int bounces = 0;
+    float homing_strength = 0;
     bool homing_maintains_speed = true;
 
     // More damage based on bullet age

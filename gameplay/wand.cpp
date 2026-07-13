@@ -1,37 +1,34 @@
 #include "wand.h"
 
-vector<unique_ptr<Projectile>> Wand::attack(const engine::core::Vector2 &origin, const engine::core::Vector2 &direction)
-{
-    _origin = origin;
-    vector<unique_ptr<Projectile>> projectiles;
-
-    make_bullets(projectiles, direction);
-
-    return projectiles;
-}
-
-void Wand::make_bullets(vector<unique_ptr<Projectile>> &projectiles, const engine::core::Vector2 &direction)
+vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
 {
     const int count = std::max(1, _wand_attributes.bullet_count);
-    engine::core::Vector2 aim = direction.normalized();
+    std::vector<ShotDescriptor> shots;
+    shots.reserve(count);
 
     for (int i = 0; i < count; i++)
     {
-        // Get angle for current
-        float angle = calculate_bullet_angle(i);
-
-        // Calculate shot direction
-        engine::core::Vector2 shot_direction = aim.rotated(angle);
-
-        // Update bullet velocity via shot direction
-        _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;
-
-        // Todo update start position (origin) for each spread type and count
-        // For now all starting from given origin
-        _bullet_attributes.start_position = _origin;
-
-        projectiles.push_back(std::make_unique<Bullet>(_bullet_attributes));
+        shots.push_back(make_shot(direction, i));
     }
+
+    return shots;
+}
+
+ShotDescriptor Wand::make_shot(const engine::core::Vector2 &direction, int index)
+{
+
+    engine::core::Vector2 aim = direction.normalized();
+
+    // Get angle for current
+    const float angle = calculate_bullet_angle(index);
+    const engine::core::Vector2 shot_direction = aim.rotated(angle);
+
+    // Update bullet velocity via shot direction
+    _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;
+
+    return ShotDescriptor({_bullet_attributes,
+                           shot_direction * _wand_attributes.spawn_distance,
+                           get_shot_delay(index)});
 }
 
 float Wand::calculate_bullet_angle(int index)
@@ -49,7 +46,7 @@ float Wand::calculate_bullet_angle(int index)
         break;
 
     case SpreadStyle::Random:
-        angle = calc_random_spread_angle(index);
+        angle = calc_random_spread_angle();
         break;
     default:
     }
@@ -79,10 +76,23 @@ float Wand::calc_circular_spread_angle(int num)
     return num * (360.0 / static_cast<float>(_wand_attributes.bullet_count));
 }
 
-float Wand::calc_random_spread_angle(int num)
+float Wand::calc_random_spread_angle()
 {
     float r = static_cast<float>(std::rand()) / RAND_MAX;
 
     float &sd = _wand_attributes.spread_degrees;
     return -sd * 0.5f + r * sd;
+}
+
+float Wand::get_shot_delay(int index)
+{
+    switch (_wand_attributes.shot_style)
+    {
+    case ShotStyle::Instant:
+        return 0.0f;
+    case ShotStyle::Sequential:
+        return _wand_attributes.first_shot_delay + index * _wand_attributes.shot_delay_sec;
+    default:
+    }
+    return 0.0f;
 }

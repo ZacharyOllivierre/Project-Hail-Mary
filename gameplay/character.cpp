@@ -159,9 +159,9 @@ std::vector<engine::animation::EffectSpawnRequest> Character::drain_effect_spawn
 	return drained_requests;
 }
 
-std::vector<std::unique_ptr<Projectile>> Character::create_projectile(const engine::core::Vector2 &direction)
+vector<ShotDescriptor> Character::create_projectile(const engine::core::Vector2 &direction)
 {
-	return _wand.attack(center(), direction);
+	return _wand.attack(direction);
 }
 
 void Character::set_move_speed(float move_speed) noexcept
