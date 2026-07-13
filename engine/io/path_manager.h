@@ -7,9 +7,9 @@
 namespace engine::io
 {
 
-class PathManager : public ::engine::tools::Singleton<PathManager>
+class PathManager : public engine::tools::Singleton<PathManager>
 {
-    friend ::engine::tools::Singleton<PathManager>;
+    friend engine::tools::Singleton<PathManager>;
 
 public:
     bool init();

@@ -56,7 +56,7 @@ public:
 	//imgui debug
 	virtual void on_imgui() {}
 
-	virtual void on_input(const ::engine::input::InputSnapshot& input,const std::vector<::engine::input::InputEvent>& events);
+	virtual void on_input(const engine::input::InputSnapshot& input,const std::vector<engine::input::InputEvent>& events);
 
 	void destroy_all_scene_objects();
 
@@ -68,8 +68,8 @@ public:
 	T* create_and_add_object(Args&&... args)
 	{
 		static_assert(
-			std::is_base_of_v<::engine::core::GameObject, T> || std::is_base_of_v<::engine::ui::UiElement, T>,
-			"T must derive from ::engine::core::GameObject or ::engine::ui::UiElement.");
+			std::is_base_of_v<engine::core::GameObject, T> || std::is_base_of_v<engine::ui::UiElement, T>,
+			"T must derive from engine::core::GameObject or engine::ui::UiElement.");
 
 		return add_object(
 			std::make_unique<T>(std::forward<Args>(args)...)
@@ -80,12 +80,12 @@ public:
 	T* add_object(std::unique_ptr<T> object)
 	{
 		static_assert(
-			std::is_base_of_v<::engine::core::SceneObject, T>,
-			"T must derive from ::engine::core::SceneObject.");
+			std::is_base_of_v<engine::core::SceneObject, T>,
+			"T must derive from engine::core::SceneObject.");
 
 		static_assert(
-			std::is_base_of_v<::engine::core::GameObject, T> || std::is_base_of_v<::engine::ui::UiElement, T>,
-			"T must derive from ::engine::core::GameObject or ::engine::ui::UiElement.");
+			std::is_base_of_v<engine::core::GameObject, T> || std::is_base_of_v<engine::ui::UiElement, T>,
+			"T must derive from engine::core::GameObject or engine::ui::UiElement.");
 
 		if (!object)
 			return nullptr;
@@ -93,9 +93,9 @@ public:
 		T* raw_object = object.get();
 		bool added = false;
 
-		if constexpr (std::is_base_of_v<::engine::core::GameObject, T>)
+		if constexpr (std::is_base_of_v<engine::core::GameObject, T>)
 			added = add_game_object(std::move(object));
-		else if constexpr (std::is_base_of_v<::engine::ui::UiElement, T>)
+		else if constexpr (std::is_base_of_v<engine::ui::UiElement, T>)
 			added = add_ui_root(std::move(object));
 
 		if (!added)
@@ -107,48 +107,48 @@ public:
 	}
 
 private:
-	void register_scene_object_interfaces(::engine::core::SceneObject* object);
+	void register_scene_object_interfaces(engine::core::SceneObject* object);
 
 protected:
 	bool _paused = false;
-	[[nodiscard]] ::engine::physics::PhysicsManager& physics_manager() noexcept { return _physics_manager; }
-	[[nodiscard]] const ::engine::physics::PhysicsManager& physics_manager() const noexcept { return _physics_manager; }
+	[[nodiscard]] engine::physics::PhysicsManager& physics_manager() noexcept { return _physics_manager; }
+	[[nodiscard]] const engine::physics::PhysicsManager& physics_manager() const noexcept { return _physics_manager; }
 
 private:
 	void remove_destroyed_objects();
-	bool add_game_object(std::unique_ptr<::engine::core::GameObject> object);
-	bool add_ui_root(std::unique_ptr<::engine::ui::UiElement> object);
+	bool add_game_object(std::unique_ptr<engine::core::GameObject> object);
+	bool add_ui_root(std::unique_ptr<engine::ui::UiElement> object);
 
 	struct UpdatableEntry
 	{
-		::engine::core::SceneObject* object = nullptr;
-		::engine::core::Updatable* updatable = nullptr;
+		engine::core::SceneObject* object = nullptr;
+		engine::core::Updatable* updatable = nullptr;
 	};
 
 	struct InputSnapshotReceiverEntry
 	{
-		::engine::core::SceneObject* object = nullptr;
-		::engine::input::InputSnapshotReceiver* receiver = nullptr;
+		engine::core::SceneObject* object = nullptr;
+		engine::input::InputSnapshotReceiver* receiver = nullptr;
 	};
 
 	struct InputEventReceiverEntry
 	{
-		::engine::core::SceneObject* object = nullptr;
-		::engine::input::InputEventReceiver* receiver = nullptr;
+		engine::core::SceneObject* object = nullptr;
+		engine::input::InputEventReceiver* receiver = nullptr;
 	};
 
 
 protected:
-	::engine::camera::Camera camera;
+	engine::camera::Camera camera;
 
 private:
-	std::array<std::vector<std::unique_ptr<::engine::core::GameObject>>,
-		static_cast<size_t>(::engine::core::DepthLayer::Count)> _object_layers;
-	std::vector<std::unique_ptr<::engine::ui::UiElement>> _ui_roots;
+	std::array<std::vector<std::unique_ptr<engine::core::GameObject>>,
+		static_cast<size_t>(engine::core::DepthLayer::Count)> _object_layers;
+	std::vector<std::unique_ptr<engine::ui::UiElement>> _ui_roots;
 
 	std::vector<UpdatableEntry> _updatables;
 	std::vector<InputSnapshotReceiverEntry> _snapshot_receivers;
 	std::vector<InputEventReceiverEntry> _event_receivers;
-	::engine::physics::PhysicsManager _physics_manager;
+	engine::physics::PhysicsManager _physics_manager;
 };
 }

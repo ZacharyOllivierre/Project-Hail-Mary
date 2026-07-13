@@ -26,7 +26,7 @@ public:
     // Coordinate transormations
     SDL_FPoint world_to_screen(float world_x, float world_y) const;
     SDL_FRect world_to_screen(const SDL_FRect &world_rect) const;
-    ::engine::core::Rect world_to_screen(const ::engine::core::Rect &world_rect) const;
+    engine::core::Rect world_to_screen(const engine::core::Rect &world_rect) const;
     SDL_FPoint screen_to_world(float screen_x, float screen_y) const;
 
     float get_x() const { return _x; }

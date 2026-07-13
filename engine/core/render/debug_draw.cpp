@@ -38,7 +38,7 @@ void DebugDraw::add_world_rect(
     _world_rects.push_back(WorldRect{ world_rect, category });
 }
 
-void DebugDraw::render(SDL_Renderer* renderer, const ::engine::camera::Camera& camera) const
+void DebugDraw::render(SDL_Renderer* renderer, const engine::camera::Camera& camera) const
 {
     if (!renderer || !_enabled || _world_rects.empty())
         return;

@@ -79,8 +79,8 @@ bool Application::init(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	init_assert(::engine::io::PathManager::instance()->init(), "::engine::io::PathManager init fail");
-	init_assert(::engine::io::PathManager::instance()->ensure_runtime_dirs(), "Runtime dir init fail");
+	init_assert(engine::io::PathManager::instance()->init(), "engine::io::PathManager init fail");
+	init_assert(engine::io::PathManager::instance()->ensure_runtime_dirs(), "Runtime dir init fail");
 
 	return true;
 }
@@ -95,7 +95,7 @@ int Application::run(int argc, char **argv)
 	_counter_freq = SDL_GetPerformanceFrequency();
 	_last_counter = SDL_GetPerformanceCounter();
 
-	::engine::scene::SceneManager::instance()->switch_to<StartUpLoadingScene>();
+	engine::scene::SceneManager::instance()->switch_to<StartUpLoadingScene>();
 
 	while (_active)
 	{
@@ -110,7 +110,7 @@ int Application::run(int argc, char **argv)
 
 			// Added for main menu
 			// After SDL recieves an event and processes it, check if a menu exists
-			if (MenuScene* menu_scene = ::engine::scene::SceneManager::instance()->try_find_scene<MenuScene>())
+			if (MenuScene* menu_scene = engine::scene::SceneManager::instance()->try_find_scene<MenuScene>())
 			{
 				// Forward raw SDL event to scene, allows button to react to mouse clicks and SDL events
 				menu_scene->handle_sdl_event(_event);
@@ -118,7 +118,7 @@ int Application::run(int argc, char **argv)
 
 		}
 
-		::engine::scene::SceneManager::instance()->on_input(
+		engine::scene::SceneManager::instance()->on_input(
 			_input_system.snapshot(),
 			_input_system.events());
 
@@ -128,7 +128,7 @@ int Application::run(int argc, char **argv)
 
 		
 
-		::engine::scene::SceneManager::instance()->on_update(delta);
+		engine::scene::SceneManager::instance()->on_update(delta);
 
 		SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0);
 		SDL_RenderClear(_renderer);
@@ -138,9 +138,9 @@ int Application::run(int argc, char **argv)
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		::engine::scene::SceneManager::instance()->on_render(_renderer);
+		engine::scene::SceneManager::instance()->on_render(_renderer);
 		//imgui debug
-		::engine::scene::SceneManager::instance()->on_imgui();
+		engine::scene::SceneManager::instance()->on_imgui();
 		ImGui::Render();
 		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), _renderer);
 

@@ -62,7 +62,7 @@ void RoomScene::on_enter()
 void RoomScene::on_update(double delta)
 {
 
-    this->::engine::scene::Scene::on_update(delta);
+    this->engine::scene::Scene::on_update(delta);
 
     if (_player && !_player->is_destroyed() && !_player->is_dead())
     {
@@ -72,7 +72,7 @@ void RoomScene::on_update(double delta)
 
 void RoomScene::on_render(SDL_Renderer *renderer)
 {
-    this->::engine::scene::Scene::on_render(renderer);
+    this->engine::scene::Scene::on_render(renderer);
 }
 
 //imgui debug
@@ -84,14 +84,14 @@ void RoomScene::on_imgui()
     ImGui::End();
 }
 
-void RoomScene::on_input(const ::engine::input::InputSnapshot &input, const std::vector<::engine::input::InputEvent> &events)
+void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::vector<engine::input::InputEvent> &events)
 {
-    this->::engine::scene::Scene::on_input(input, events);
+    this->engine::scene::Scene::on_input(input, events);
 
     if (!_player || _player->is_destroyed() || _player->is_dead())
         return;
 
-    if (input.state.is_just_pressed(::engine::input::InputAction::Attack))
+    if (input.state.is_just_pressed(engine::input::InputAction::Attack))
     {
         int mouse_x = 0;
         int mouse_y = 0;
@@ -102,11 +102,11 @@ void RoomScene::on_input(const ::engine::input::InputSnapshot &input, const std:
             logical_mouse.x,
             logical_mouse.y);
 
-        ::engine::core::Vector2 aim_direction = ::engine::core::Vector2(mouse_world.x, mouse_world.y) - _player->center();
+        engine::core::Vector2 aim_direction = engine::core::Vector2(mouse_world.x, mouse_world.y) - _player->center();
         if (aim_direction.is_zero())
-            aim_direction = ::engine::core::Vector2(1.0f, 0.0f);
+            aim_direction = engine::core::Vector2(1.0f, 0.0f);
 
-        const ::engine::core::Vector2 shot_direction = aim_direction.normalized();
+        const engine::core::Vector2 shot_direction = aim_direction.normalized();
 
         std::vector<std::unique_ptr<Projectile>> projectile = _player->create_projectile(shot_direction);
 
@@ -126,11 +126,11 @@ void RoomScene::on_input(const ::engine::input::InputSnapshot &input, const std:
                 added_projectile,
                 added_projectile);
 
-            ::engine::physics::CollisionBox* collision_box = ::engine::physics::CollisionManager::instance()->create_box(
+            engine::physics::CollisionBox* collision_box = engine::physics::CollisionManager::instance()->create_box(
                 added_projectile,
-                ::engine::physics::CollisionLayer::PlayerProjectile,
-                ::engine::physics::CollisionTarget::Enemy,
-                [added_projectile](const ::engine::physics::CollisionInfo&)
+                engine::physics::CollisionLayer::PlayerProjectile,
+                engine::physics::CollisionTarget::Enemy,
+                [added_projectile](const engine::physics::CollisionInfo&)
                 {
                     added_projectile->destroy();
                 });
@@ -140,23 +140,23 @@ void RoomScene::on_input(const ::engine::input::InputSnapshot &input, const std:
     }
 }
 
-void RoomScene::spawn_effect(const ::engine::animation::EffectSpawnRequest &request)
+void RoomScene::spawn_effect(const engine::animation::EffectSpawnRequest &request)
 {
-    std::unique_ptr<::engine::animation::Effect> effect = ::engine::animation::EffectManager::instance()->create_effect(request);
+    std::unique_ptr<engine::animation::Effect> effect = engine::animation::EffectManager::instance()->create_effect(request);
     if (!effect)
         return;
 
     add_object(std::move(effect));
 }
 
-::engine::core::Vector2 RoomScene::closest_enemy_to_point(::engine::core::Vector2 &point)
+engine::core::Vector2 RoomScene::closest_enemy_to_point(engine::core::Vector2 &point)
 {
     if (_enemies.empty())
     {
-        return ::engine::core::Vector2(0, 0);
+        return engine::core::Vector2(0, 0);
     }
 
-    ::engine::core::Vector2 closest = _enemies[0]->center();
+    engine::core::Vector2 closest = _enemies[0]->center();
     float closest_dist_sq = (closest - point).length_squared();
 
     for (int i = 1; i < _enemies.size(); i++)
@@ -213,8 +213,8 @@ void RoomScene::spawn_player()
 
     _player = create_and_add_object<Character>(
         "elves",
-        ::engine::core::Vector2(540.0f, 540.0f),
-        ::engine::core::Vector2(64.0f, 64.0f),
+        engine::core::Vector2(540.0f, 540.0f),
+        engine::core::Vector2(64.0f, 64.0f),
         "fire.impact_radial");
 
     if (_player)
@@ -233,8 +233,8 @@ void RoomScene::spawn_enemies()
     {
         Character *enemy = create_and_add_object<Character>(
             "elves",
-            ::engine::core::Vector2(540.0f + distance * i, 540.0f + distance * i),
-            ::engine::core::Vector2(64.0f, 64.0f),
+            engine::core::Vector2(540.0f + distance * i, 540.0f + distance * i),
+            engine::core::Vector2(64.0f, 64.0f),
             "fire.impact_radial");
 
         if (enemy)

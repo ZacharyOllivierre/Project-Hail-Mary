@@ -10,29 +10,29 @@ namespace engine::physics
 
 namespace
 {
-    [[nodiscard]] ::engine::core::DebugDrawCategory collision_debug_category(
+    [[nodiscard]] engine::core::DebugDrawCategory collision_debug_category(
         CollisionLayer layer) noexcept
     {
         switch (layer)
         {
         case CollisionLayer::World:
-            return ::engine::core::DebugDrawCategory::CollisionWorld;
+            return engine::core::DebugDrawCategory::CollisionWorld;
         case CollisionLayer::Player:
-            return ::engine::core::DebugDrawCategory::CollisionPlayer;
+            return engine::core::DebugDrawCategory::CollisionPlayer;
         case CollisionLayer::Enemy:
-            return ::engine::core::DebugDrawCategory::CollisionEnemy;
+            return engine::core::DebugDrawCategory::CollisionEnemy;
         case CollisionLayer::PlayerProjectile:
-            return ::engine::core::DebugDrawCategory::CollisionPlayerProjectile;
+            return engine::core::DebugDrawCategory::CollisionPlayerProjectile;
         case CollisionLayer::EnemyProjectile:
-            return ::engine::core::DebugDrawCategory::CollisionEnemyProjectile;
+            return engine::core::DebugDrawCategory::CollisionEnemyProjectile;
         case CollisionLayer::None:
         default:
-            return ::engine::core::DebugDrawCategory::CollisionWorld;
+            return engine::core::DebugDrawCategory::CollisionWorld;
         }
     }
 }
 
-CollisionBox* CollisionManager::create_box(::engine::core::GameObject* owner,CollisionLayer layer,
+CollisionBox* CollisionManager::create_box(engine::core::GameObject* owner,CollisionLayer layer,
     CollisionTarget targets,CollisionCallback on_collided)
 {
     if (!owner)
@@ -93,7 +93,7 @@ void CollisionManager::update()
         if (!is_box_valid(collision_box.get()))
             continue;
 
-        ::engine::core::DebugDraw::instance()->add_world_rect(
+        engine::core::DebugDraw::instance()->add_world_rect(
             collision_box->rect(),
             collision_debug_category(collision_box->layer()));
     }
@@ -118,12 +118,12 @@ void CollisionManager::update()
                 continue;
             }
 
-            ::engine::core::DebugDraw::instance()->add_world_rect(
+            engine::core::DebugDraw::instance()->add_world_rect(
                 left->rect(),
-                ::engine::core::DebugDrawCategory::CollisionHit);
-            ::engine::core::DebugDraw::instance()->add_world_rect(
+                engine::core::DebugDrawCategory::CollisionHit);
+            engine::core::DebugDraw::instance()->add_world_rect(
                 right->rect(),
-                ::engine::core::DebugDrawCategory::CollisionHit);
+                engine::core::DebugDrawCategory::CollisionHit);
             left->invoke_on_collided(*right);
             right->invoke_on_collided(*left);
         }
@@ -139,7 +139,7 @@ bool CollisionManager::is_box_valid(const CollisionBox* collision_box) const noe
     if (!collision_box || _clear_pending || is_pending_destruction(collision_box))
         return false;
 
-    const ::engine::core::GameObject* owner = collision_box->owner();
+    const engine::core::GameObject* owner = collision_box->owner();
     return owner && !owner->is_destroyed() && owner->is_active();
 }
 

@@ -18,11 +18,11 @@ public:
     void clear_collision_world() noexcept;
 
     void register_body(
-        ::engine::core::SceneObject* owner,
-        ::engine::core::KinematicBody* body,
-        ::engine::core::Collidable* collider
+        engine::core::SceneObject* owner,
+        engine::core::KinematicBody* body,
+        engine::core::Collidable* collider
     ) noexcept;
-    void unregister_body(const ::engine::core::SceneObject* owner) noexcept;
+    void unregister_body(const engine::core::SceneObject* owner) noexcept;
     void clear_bodies() noexcept;
 
     void step(double delta) noexcept;
@@ -30,9 +30,9 @@ public:
 private:
     struct BodyEntry
     {
-        ::engine::core::SceneObject* owner = nullptr;
-        ::engine::core::KinematicBody* body = nullptr;
-        ::engine::core::Collidable* collider = nullptr;
+        engine::core::SceneObject* owner = nullptr;
+        engine::core::KinematicBody* body = nullptr;
+        engine::core::Collidable* collider = nullptr;
     };
 
     void remove_invalid_entries() noexcept;

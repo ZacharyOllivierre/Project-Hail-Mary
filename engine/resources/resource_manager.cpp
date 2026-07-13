@@ -27,10 +27,10 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 
 	_renderer = renderer;
 
-	if (!::engine::io::PathManager::instance()->init())
+	if (!engine::io::PathManager::instance()->init())
 	{
-		std::cout << "ResourceManager init failed: ::engine::io::PathManager init fail." << std::endl;
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "::engine::io::PathManager init fail");
+		std::cout << "ResourceManager init failed: engine::io::PathManager init fail." << std::endl;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "engine::io::PathManager init fail");
 		return false;
 	}
 

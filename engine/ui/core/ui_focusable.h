@@ -5,7 +5,7 @@
 namespace engine::ui
 {
 
-class UiFocusable : public ::engine::input::InputEventReceiver
+class UiFocusable : public engine::input::InputEventReceiver
 {
 public:
     virtual ~UiFocusable() = default;

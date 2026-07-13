@@ -20,9 +20,9 @@ class Atlas;
 class AtlasManager;
 class ResourceBootstrapper;
 
-class ResourceManager : public ::engine::tools::Singleton<ResourceManager>
+class ResourceManager : public engine::tools::Singleton<ResourceManager>
 {
-	friend ::engine::tools::Singleton<ResourceManager>;
+	friend engine::tools::Singleton<ResourceManager>;
 	friend class ResourceBootstrapper;
 
 public:

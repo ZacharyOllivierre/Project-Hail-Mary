@@ -32,8 +32,8 @@ void SceneManager::on_imgui()
 }
 
 void SceneManager::on_input(
-    const ::engine::input::InputSnapshot& input,
-    const std::vector<::engine::input::InputEvent>& events
+    const engine::input::InputSnapshot& input,
+    const std::vector<engine::input::InputEvent>& events
 )
 {
     if (_current_scene)

@@ -26,20 +26,20 @@ void erase_destroyed_entries(std::vector<Entry>& entries)
 }
 
 [[nodiscard]] bool scene_object_input_event_less(
-	const ::engine::core::SceneObject* lhs,const ::engine::core::SceneObject* rhs
+	const engine::core::SceneObject* lhs,const engine::core::SceneObject* rhs
 ) noexcept
 {
 	if (lhs == rhs)
 		return false;
 
-	const ::engine::ui::UiElement* lhs_ui = dynamic_cast<const ::engine::ui::UiElement*>(lhs);
-	const ::engine::ui::UiElement* rhs_ui = dynamic_cast<const ::engine::ui::UiElement*>(rhs);
+	const engine::ui::UiElement* lhs_ui = dynamic_cast<const engine::ui::UiElement*>(lhs);
+	const engine::ui::UiElement* rhs_ui = dynamic_cast<const engine::ui::UiElement*>(rhs);
 
 	if (lhs_ui && rhs_ui)
 		return lhs_ui->order() > rhs_ui->order();
 
-	const ::engine::core::GameObject* lhs_game = dynamic_cast<const ::engine::core::GameObject*>(lhs);
-	const ::engine::core::GameObject* rhs_game = dynamic_cast<const ::engine::core::GameObject*>(rhs);
+	const engine::core::GameObject* lhs_game = dynamic_cast<const engine::core::GameObject*>(lhs);
+	const engine::core::GameObject* rhs_game = dynamic_cast<const engine::core::GameObject*>(rhs);
 
 	if (lhs_game && rhs_game)
 	{
@@ -58,7 +58,7 @@ void erase_destroyed_entries(std::vector<Entry>& entries)
 	if (lhs_game && rhs_ui)
 		return false;
 
-	return std::less<const ::engine::core::SceneObject*>{}(lhs, rhs);
+	return std::less<const engine::core::SceneObject*>{}(lhs, rhs);
 }
 
 template <typename Entry>
@@ -75,11 +75,11 @@ void insert_input_event_entry_sorted(std::vector<Entry>& entries, Entry entry)
 
 }
 
-void Scene::on_input(const ::engine::input::InputSnapshot& input,const std::vector<::engine::input::InputEvent>& events)
+void Scene::on_input(const engine::input::InputSnapshot& input,const std::vector<engine::input::InputEvent>& events)
 {
 	for (const InputSnapshotReceiverEntry& entry : _snapshot_receivers)
 	{
-		::engine::core::SceneObject* object = entry.object;
+		engine::core::SceneObject* object = entry.object;
 
 		if (!object || object->is_destroyed() || !object->is_active())
 			continue;
@@ -90,11 +90,11 @@ void Scene::on_input(const ::engine::input::InputSnapshot& input,const std::vect
 		entry.receiver->on_input_snapshot(input);
 	}
 
-    for (const ::engine::input::InputEvent& input_event : events)
+    for (const engine::input::InputEvent& input_event : events)
 	{
 		for (const InputEventReceiverEntry& entry : _event_receivers)
 		{
-			::engine::core::SceneObject* object = entry.object;
+			engine::core::SceneObject* object = entry.object;
 
 			if (!object || object->is_destroyed() || !object->is_active())
 				continue;
@@ -107,15 +107,15 @@ void Scene::on_input(const ::engine::input::InputSnapshot& input,const std::vect
         }
     }
 
-    for (const ::engine::input::InputEvent& input_event : events)
+    for (const engine::input::InputEvent& input_event : events)
     {
-        if (input_event.action != ::engine::input::InputAction::Tab
-            || input_event.type != ::engine::input::InputEventType::Pressed)
+        if (input_event.action != engine::input::InputAction::Tab
+            || input_event.type != engine::input::InputEventType::Pressed)
         {
             continue;
         }
 
-        ::engine::core::DebugDraw* debug_draw = ::engine::core::DebugDraw::instance();
+        engine::core::DebugDraw* debug_draw = engine::core::DebugDraw::instance();
         debug_draw->set_enabled(!debug_draw->enabled());
     }
 }
@@ -124,7 +124,7 @@ void Scene::on_update(double delta)
 {
 	for (const UpdatableEntry& entry : _updatables)
 	{
-		::engine::core::SceneObject* object = entry.object;
+		engine::core::SceneObject* object = entry.object;
 
 		if (!object || object->is_destroyed() || !object->is_active())
 			continue;
@@ -137,9 +137,9 @@ void Scene::on_update(double delta)
 
 	if (!_paused)
 	{
-		::engine::core::DebugDraw::instance()->begin_frame();
+		engine::core::DebugDraw::instance()->begin_frame();
 		_physics_manager.step(delta);
-		::engine::physics::CollisionManager::instance()->update();
+		engine::physics::CollisionManager::instance()->update();
 	}
 
 	remove_destroyed_objects();
@@ -150,8 +150,8 @@ void Scene::on_render(SDL_Renderer* renderer)
 	if (!renderer)
 		return;
 
-	std::vector<::engine::core::RenderCommand> render_commands;
-	std::vector<::engine::core::UiRenderCommand> ui_render_commands;
+	std::vector<engine::core::RenderCommand> render_commands;
+	std::vector<engine::core::UiRenderCommand> ui_render_commands;
 	render_commands.reserve(256);
 	ui_render_commands.reserve(256);
 
@@ -159,7 +159,7 @@ void Scene::on_render(SDL_Renderer* renderer)
 	{
 		render_commands.clear();
 
-		for (const std::unique_ptr<::engine::core::GameObject>& obj : layer)
+		for (const std::unique_ptr<engine::core::GameObject>& obj : layer)
 		{
 			if (!obj || obj->is_destroyed() || !obj->is_visible())
 				continue;
@@ -168,7 +168,7 @@ void Scene::on_render(SDL_Renderer* renderer)
 		}
 
 		// Translate world rec to screenRec
-		for (::engine::core::RenderCommand& command : render_commands)
+		for (engine::core::RenderCommand& command : render_commands)
 		{
 			command.command_rect = camera.world_to_screen(command.command_rect);
 		}
@@ -187,21 +187,21 @@ void Scene::on_render(SDL_Renderer* renderer)
 	}
 
 	execute_render_commands(renderer, ui_render_commands);
-	::engine::core::DebugDraw::instance()->render(renderer, camera);
+	engine::core::DebugDraw::instance()->render(renderer, camera);
 }
 
 void Scene::destroy_all_scene_objects()
 {
 	for (auto& layer : _object_layers)
 	{
-		for (std::unique_ptr<::engine::core::GameObject>& object : layer)
+		for (std::unique_ptr<engine::core::GameObject>& object : layer)
 		{
 			if (object)
 				object->destroy();
 		}
 	}
 
-	for (std::unique_ptr<::engine::ui::UiElement>& ui_root : _ui_roots)
+	for (std::unique_ptr<engine::ui::UiElement>& ui_root : _ui_roots)
 	{
 		if (ui_root)
 			ui_root->destroy();
@@ -209,24 +209,24 @@ void Scene::destroy_all_scene_objects()
 
 	_physics_manager.clear_collision_world();
 	_physics_manager.clear_bodies();
-	::engine::physics::CollisionManager::instance()->clear();
-	::engine::core::DebugDraw::instance()->clear();
+	engine::physics::CollisionManager::instance()->clear();
+	engine::core::DebugDraw::instance()->clear();
 
 	remove_destroyed_objects();
 }
 
-void Scene::register_scene_object_interfaces(::engine::core::SceneObject* object)
+void Scene::register_scene_object_interfaces(engine::core::SceneObject* object)
 {
 	if (!object)
 		return;
 
-	if (::engine::core::Updatable* updatable = dynamic_cast<::engine::core::Updatable*>(object))
+	if (engine::core::Updatable* updatable = dynamic_cast<engine::core::Updatable*>(object))
 		_updatables.push_back(UpdatableEntry{ object,updatable });
 
-	if (::engine::input::InputSnapshotReceiver* receiver =dynamic_cast<::engine::input::InputSnapshotReceiver*>(object))
+	if (engine::input::InputSnapshotReceiver* receiver =dynamic_cast<engine::input::InputSnapshotReceiver*>(object))
 		_snapshot_receivers.push_back(InputSnapshotReceiverEntry{ object,receiver });
 
-	if (::engine::input::InputEventReceiver* receiver =dynamic_cast<::engine::input::InputEventReceiver*>(object))
+	if (engine::input::InputEventReceiver* receiver =dynamic_cast<engine::input::InputEventReceiver*>(object))
 		insert_input_event_entry_sorted(_event_receivers,InputEventReceiverEntry{object,receiver});
 }
 
@@ -238,19 +238,19 @@ void Scene::remove_destroyed_objects()
 
 	for (auto& layer : _object_layers)
 	{
-		std::erase_if(layer, [](const std::unique_ptr<::engine::core::GameObject>& object)
+		std::erase_if(layer, [](const std::unique_ptr<engine::core::GameObject>& object)
 			{
 				return !object || object->is_destroyed();
 			});
 	}
 
-	std::erase_if(_ui_roots, [](const std::unique_ptr<::engine::ui::UiElement>& object)
+	std::erase_if(_ui_roots, [](const std::unique_ptr<engine::ui::UiElement>& object)
 		{
 			return !object || object->is_destroyed();
 		});
 }
 
-bool Scene::add_game_object(std::unique_ptr<::engine::core::GameObject> object)
+bool Scene::add_game_object(std::unique_ptr<engine::core::GameObject> object)
 {
 	if (!object)
 		return false;
@@ -260,13 +260,13 @@ bool Scene::add_game_object(std::unique_ptr<::engine::core::GameObject> object)
 	if (layer_index >= _object_layers.size())
 		return false;
 
-	std::vector<std::unique_ptr<::engine::core::GameObject>>& layer = _object_layers[layer_index];
+	std::vector<std::unique_ptr<engine::core::GameObject>>& layer = _object_layers[layer_index];
 
 	auto iter = std::upper_bound(
 		layer.begin(),
 		layer.end(),
 		object->order_in_layer(),
-		[](int order, const std::unique_ptr<::engine::core::GameObject>& existing)
+		[](int order, const std::unique_ptr<engine::core::GameObject>& existing)
 		{
 			return order < existing->order_in_layer();
 		}
@@ -276,7 +276,7 @@ bool Scene::add_game_object(std::unique_ptr<::engine::core::GameObject> object)
 	return true;
 }
 
-bool Scene::add_ui_root(std::unique_ptr<::engine::ui::UiElement> object)
+bool Scene::add_ui_root(std::unique_ptr<engine::ui::UiElement> object)
 {
 	if (!object)
 		return false;
@@ -285,7 +285,7 @@ bool Scene::add_ui_root(std::unique_ptr<::engine::ui::UiElement> object)
 		_ui_roots.begin(),
 		_ui_roots.end(),
 		object->order(),
-		[](int order, const std::unique_ptr<::engine::ui::UiElement>& existing)
+		[](int order, const std::unique_ptr<engine::ui::UiElement>& existing)
 		{
 			return order < existing->order();
 		}

@@ -19,27 +19,27 @@ void StartUpLoadingScene::on_enter()
 
 void StartUpLoadingScene::on_update(double delta)
 {
-	::engine::scene::Scene::on_update(delta);
+	engine::scene::Scene::on_update(delta);
 
 	if (_state != LoadingState::ReadyToStartFullLoad || !_renderer)
 		return;
 
 	_state = LoadingState::Loading;
 
-	if (!::engine::resources::ResourceManager::instance()->init(_renderer))
+	if (!engine::resources::ResourceManager::instance()->init(_renderer))
 	{
 		_state = LoadingState::Failed;
-		_error_message = "::engine::resources::ResourceManager init fail";
+		_error_message = "engine::resources::ResourceManager init fail";
 		std::cout << "Startup loading failed: " << _error_message << std::endl;
 		return;
 	}
 
-	::engine::scene::SceneManager::instance()->switch_to<MenuScene>();
+	engine::scene::SceneManager::instance()->switch_to<MenuScene>();
 }
 
 void StartUpLoadingScene::on_render(SDL_Renderer* renderer)
 {
-	::engine::scene::Scene::on_render(renderer);
+	engine::scene::Scene::on_render(renderer);
 
 	if (!renderer)
 		return;
@@ -59,13 +59,13 @@ void StartUpLoadingScene::on_render(SDL_Renderer* renderer)
 
 // Handles menu input, including keyboard input for starting the game.
 void StartUpLoadingScene::on_input(
-	const ::engine::input::InputSnapshot& input,
-	const std::vector<::engine::input::InputEvent>& events
+	const engine::input::InputSnapshot& input,
+	const std::vector<engine::input::InputEvent>& events
 )
 {
 	(void)events;
 
-	::engine::scene::Scene::on_input(input, events);
+	engine::scene::Scene::on_input(input, events);
 }
 
 // Runs when menu scene is exited.
@@ -103,15 +103,15 @@ bool StartUpLoadingScene::ensure_preload_texture(SDL_Renderer* renderer)
 		return true;
 	}
 
-	if (!::engine::io::PathManager::instance()->init())
+	if (!engine::io::PathManager::instance()->init())
 	{
-		_error_message = "::engine::io::PathManager init fail";
+		_error_message = "engine::io::PathManager init fail";
 		std::cout << "Startup preload failed: " << _error_message << std::endl;
 		return false;
 	}
 
 	const std::filesystem::path preload_path =
-		::engine::io::PathManager::instance()->resolve_asset_path("preload/loading.png");
+		engine::io::PathManager::instance()->resolve_asset_path("preload/loading.png");
 	_preload_texture = IMG_LoadTexture(renderer, preload_path.string().c_str());
 	if (!_preload_texture)
 	{

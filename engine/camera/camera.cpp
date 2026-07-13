@@ -97,9 +97,9 @@ SDL_FRect Camera::world_to_screen(const SDL_FRect &world_rect) const
     return screen_rec;
 }
 
-::engine::core::Rect Camera::world_to_screen(const ::engine::core::Rect &world_rect) const
+engine::core::Rect Camera::world_to_screen(const engine::core::Rect &world_rect) const
 {
-    ::engine::core::Rect screen_rec;
+    engine::core::Rect screen_rec;
 
     screen_rec.set_x((world_rect.x() - _x) * _zoom + (_screen_width * 0.5));
     screen_rec.set_y((world_rect.y() - _y) * _zoom + (_screen_height * 0.5));

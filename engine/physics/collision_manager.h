@@ -9,12 +9,12 @@
 namespace engine::physics
 {
 
-class CollisionManager final : public ::engine::tools::Singleton<CollisionManager>
+class CollisionManager final : public engine::tools::Singleton<CollisionManager>
 {
-    friend class ::engine::tools::Singleton<CollisionManager>;
+    friend class engine::tools::Singleton<CollisionManager>;
 
 public:
-    CollisionBox* create_box(::engine::core::GameObject* owner,CollisionLayer layer,
+    CollisionBox* create_box(engine::core::GameObject* owner,CollisionLayer layer,
         CollisionTarget targets,CollisionCallback on_collided);
     void destroy_box(CollisionBox* collision_box) noexcept;
     void clear() noexcept;

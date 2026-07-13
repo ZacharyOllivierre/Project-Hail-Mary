@@ -8,8 +8,8 @@ namespace engine::animation
 {
 
 bool AnimationManager::register_animation(
-	const ::engine::resources::AnimationBuildRequest& request,
-	const ::engine::resources::Atlas* atlas
+	const engine::resources::AnimationBuildRequest& request,
+	const engine::resources::Atlas* atlas
 )
 {
 	if (request.animation_key.empty())
@@ -52,13 +52,13 @@ bool AnimationManager::register_animation(
 }
 
 bool AnimationManager::register_animations(
-	const std::vector<::engine::resources::AnimationBuildRequest>& requests,
-	const ::engine::resources::ResourceManager& resource_manager
+	const std::vector<engine::resources::AnimationBuildRequest>& requests,
+	const engine::resources::ResourceManager& resource_manager
 )
 {
-	for (const ::engine::resources::AnimationBuildRequest& request : requests)
+	for (const engine::resources::AnimationBuildRequest& request : requests)
 	{
-		const ::engine::resources::Atlas* atlas = resource_manager.find_atlas(request.atlas_key);
+		const engine::resources::Atlas* atlas = resource_manager.find_atlas(request.atlas_key);
 		if (!register_animation(request, atlas))
 			return false;
 	}

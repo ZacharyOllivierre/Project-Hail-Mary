@@ -5,15 +5,15 @@ namespace engine::animation
 {
 
 Effect::Effect(std::string effect_key, std::string animation_key, std::unique_ptr<Animation> animation) 
-    : ::engine::core::GameObject(::engine::core::DepthLayer::EffectFront), _effect_key(effect_key), _animation_key(animation_key), _animation(std::move(animation))
+    : engine::core::GameObject(engine::core::DepthLayer::EffectFront), _effect_key(effect_key), _animation_key(animation_key), _animation(std::move(animation))
 {}
 
-void Effect::submit_render_commands(std::vector<::engine::core::RenderCommand>& out_commands) const
+void Effect::submit_render_commands(std::vector<engine::core::RenderCommand>& out_commands) const
 {
 	if (!_animation)
 		return;
 
-	::engine::core::RenderCommand render_command;
+	engine::core::RenderCommand render_command;
 	if (_animation->build_render_command(world_rect(), _angle_degrees, _flip, render_command))
 		out_commands.push_back(render_command);
 }
@@ -22,7 +22,7 @@ void Effect::update(double delta)
 {
 	_animation->update(delta);
 	if (_animation->is_finished())
-		::engine::core::GameObject::destroy();
+		engine::core::GameObject::destroy();
 }
 
 std::unique_ptr<Effect> Effect::clone() const
@@ -48,7 +48,7 @@ void Effect::set_angle(double angle_degrees)
 	_angle_degrees = angle_degrees;
 }
 
-void Effect::set_flip(::engine::core::SpriteFlip flip)
+void Effect::set_flip(engine::core::SpriteFlip flip)
 {
 	_flip = flip;
 }

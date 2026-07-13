@@ -9,7 +9,7 @@
 
 #include <SDL.h>
 
-class RoomScene final : public ::engine::scene::Scene
+class RoomScene final : public engine::scene::Scene
 {
 public:
     RoomScene() = default;
@@ -23,11 +23,11 @@ public:
     void on_render(SDL_Renderer *renderer) override;
 	//imgui debug
     void on_imgui() override;
-    void on_input(const ::engine::input::InputSnapshot &input, const std::vector<::engine::input::InputEvent> &events) override;
+    void on_input(const engine::input::InputSnapshot &input, const std::vector<engine::input::InputEvent> &events) override;
 
-    void spawn_effect(const ::engine::animation::EffectSpawnRequest &request);
+    void spawn_effect(const engine::animation::EffectSpawnRequest &request);
 
-    ::engine::core::Vector2 closest_enemy_to_point(::engine::core::Vector2 &point);
+    engine::core::Vector2 closest_enemy_to_point(engine::core::Vector2 &point);
 
 private:
     void build_room();

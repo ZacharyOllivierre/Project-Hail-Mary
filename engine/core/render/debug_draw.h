@@ -26,9 +26,9 @@ enum class DebugDrawCategory
     CollisionHit
 };
 
-class DebugDraw final : public ::engine::tools::Singleton<DebugDraw>
+class DebugDraw final : public engine::tools::Singleton<DebugDraw>
 {
-    friend class ::engine::tools::Singleton<DebugDraw>;
+    friend class engine::tools::Singleton<DebugDraw>;
 
 public:
     void set_enabled(bool enabled) noexcept;
@@ -39,7 +39,7 @@ public:
     void add_world_rect(
         const Rect& world_rect,
         DebugDrawCategory category) noexcept;
-    void render(SDL_Renderer* renderer, const ::engine::camera::Camera& camera) const;
+    void render(SDL_Renderer* renderer, const engine::camera::Camera& camera) const;
 
 private:
     struct WorldRect
