@@ -56,19 +56,13 @@ float Wand::calculate_bullet_angle(int index)
 
 float Wand::calc_uniform_spread_angle(int num)
 {
-    float spread_degrees = _wand_attributes.spread_degrees /
-                           static_cast<float>(_wand_attributes.bullet_count);
-    float angle;
-
     if (_wand_attributes.bullet_count == 1)
-    {
-        angle = 0.0;
-    }
-    else
-    {
-        angle = -spread_degrees * 0.5 + num * (spread_degrees / (_wand_attributes.bullet_count - 1));
-    }
-    return angle;
+        return 0.0f;
+
+    float total_spread = _wand_attributes.spread_degrees;
+
+    return -total_spread * 0.5f +
+           num * (total_spread / (_wand_attributes.bullet_count - 1));
 }
 
 float Wand::calc_circular_spread_angle(int num)
@@ -86,13 +80,21 @@ float Wand::calc_random_spread_angle()
 
 float Wand::get_shot_delay(int index)
 {
+    float delay;
     switch (_wand_attributes.shot_style)
     {
-    case ShotStyle::Instant:
-        return 0.0f;
+    case ShotStyle::Simultaneous:
+        delay = 0.0f;
+        break;
+
     case ShotStyle::Sequential:
-        return _wand_attributes.first_shot_delay + index * _wand_attributes.shot_delay_sec;
-    default:
+        delay = index * _wand_attributes.shot_delay_sec;
+        break;
+
+    case ShotStyle::ReverseSequential:
+        delay = (_wand_attributes.bullet_count - 1 - index) * _wand_attributes.shot_delay_sec;
+        break;
     }
-    return 0.0f;
+
+    return _wand_attributes.first_shot_delay + delay;
 }

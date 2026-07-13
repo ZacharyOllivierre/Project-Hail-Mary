@@ -75,6 +75,12 @@ void Bullet::update(double delta)
         Projectile::destroy();
     }
 
+    // Apply accelleration
+    if (_bullet_attributes.acceleration != 0)
+    {
+        apply_acceleration(delta);
+    }
+
     // Apply curve
     if (_bullet_attributes.curve != 0)
     {
@@ -93,6 +99,7 @@ void Bullet::update(double delta)
         apply_damage_sizing();
     }
 
+    // Apply homing
     if (_bullet_attributes.homing_strength != 0)
     {
         apply_homing(delta);
@@ -166,17 +173,15 @@ void Bullet::apply_damage_sizing()
     Projectile::set_size(new_size);
 }
 
-// Todo bullets dont seem to be homing as strong when moving away from target
 void Bullet::apply_homing(double &delta)
 {
-    // Todo save a pointer so dont have to search for scene each time
-    // Cant in header; circular dependency; add forward declaration
     RoomScene *room_scene = engine::scene::SceneManager::instance()->try_find_scene<RoomScene>();
     if (!room_scene)
     {
         return;
     }
 
+    float speed = _bullet_attributes.bullet_velocity.length();
     engine::core::Vector2 pos = center();
     engine::core::Vector2 target = room_scene->closest_enemy_to_point(pos);
     if (target.is_zero())
@@ -203,8 +208,16 @@ void Bullet::apply_homing(double &delta)
 
     // Maintain speed
     if (_bullet_attributes.homing_maintains_speed)
-        velocity = velocity.normalized() * _bullet_attributes.bullet_speed;
+        velocity = velocity.normalized() * speed;
 
     Projectile::set_velocity(velocity);
     _bullet_attributes.bullet_velocity = velocity;
+}
+
+void Bullet::apply_acceleration(double &delta)
+{
+    engine::core::Vector2 direction = _bullet_attributes.bullet_velocity.normalized();
+    _bullet_attributes.bullet_velocity += direction * (_bullet_attributes.acceleration * delta);
+
+    Projectile::set_velocity(_bullet_attributes.bullet_velocity);
 }

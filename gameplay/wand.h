@@ -14,8 +14,7 @@ using std::vector;
 /*
 ShotDescriptor is a per shot intention record, not a live projectile. It carries the bullet template,
 the relative spawn offset, and the spawn delay. The room scene resolves the final world position when the
-shot actually fires so delayed shots still spawn relative to the character’s current position. Keep
-this type copyable/movable because it is stored in vectors and erased during scheduling.
+shot actually fires so delayed shots still spawn relative to the character’s current position.
 */
 struct ShotDescriptor
 {
@@ -35,21 +34,25 @@ enum class SpreadStyle
 
 enum class ShotStyle
 {
-    Instant,
-    Sequential
+    Simultaneous,
+    Sequential,
+    ReverseSequential
 };
 
 struct WandAttributes
 {
-    // Number of bullets in one attack
-    int bullet_count = 4;
+    // Need to implement these two
+    float cooldown_seconds;
+    float mana_cost;
 
-    SpreadStyle spread_style = SpreadStyle::Circular;
-    float spread_degrees = 80.0;
+    int bullet_count = 3;
 
-    ShotStyle shot_style = ShotStyle::Sequential;
+    SpreadStyle spread_style = SpreadStyle::Uniform;
+    float spread_degrees = 30.0;
+
+    ShotStyle shot_style = ShotStyle::Simultaneous;
     float first_shot_delay = 0.0f;
-    float shot_delay_sec = 0.1f;
+    float shot_delay_sec = 0.00f;
 
     float spawn_distance = 32.0f;
 };

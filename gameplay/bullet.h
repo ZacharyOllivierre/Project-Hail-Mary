@@ -8,17 +8,19 @@
 
 struct Bullet_Attributes
 {
-    float bullet_speed = 400.0f;
+    float bullet_speed = 1200.0f;
     engine::core::Vector2 bullet_velocity;
 
-    float max_age = 20.0f;
+    float acceleration = 100.0f;
+
+    float max_age = 0.08f;
 
     engine::core::Vector2 start_position;
     engine::core::Vector2 bullet_size = {24.0f, 24.0f};
     bool damage_based_size = false;
 
     float curve = 0.0f;
-    int bounces = 0;
+    int bounces = 1;
     float homing_strength = 0;
     bool homing_maintains_speed = true;
 
@@ -26,9 +28,6 @@ struct Bullet_Attributes
     float growth = 40.0f;
     float damage = 100.0f;
 };
-
-// Need to seperate entity and map collisison in collidable interface
-// All collision treated as wall collisison right now
 
 class Bullet final : public Projectile
 {
@@ -50,6 +49,7 @@ private:
     void apply_growth();
     void apply_damage_sizing();
     void apply_homing(double &delta);
+    void apply_acceleration(double &delta);
 
 private:
     SDL_Texture *_texture = nullptr;

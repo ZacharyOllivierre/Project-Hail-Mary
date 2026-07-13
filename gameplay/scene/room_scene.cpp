@@ -89,10 +89,7 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
 
         // Get schedule of projectiles from wand attack and add to buffer
         vector<ShotDescriptor> shots = _player->create_projectile(shot_direction);
-        for (const ShotDescriptor &shot : shots)
-        {
-            _scheduled_projectiles.push_back(QueuedShot{shot, shot.spawn_delay_sec});
-        }
+        _scheduled_projectiles.insert(_scheduled_projectiles.end(), shots.begin(), shots.end());
     }
 }
 
@@ -164,17 +161,17 @@ void RoomScene::spawn_scheduled_projectiles(double delta)
     // Update projectile timer and spawn any shots which timer is at or below 0
     for (auto it = _scheduled_projectiles.begin(); it != _scheduled_projectiles.end();)
     {
-        it->time_remaining_sec -= delta;
+        it->spawn_delay_sec -= delta;
 
-        if (it->time_remaining_sec > 0.0f)
+        if (it->spawn_delay_sec > 0.0f)
         {
             ++it;
             continue;
         }
 
         // Update bullut spawn position with offset relative to player
-        Bullet_Attributes bullet_attributes = it->shot.bullet_attributes;
-        bullet_attributes.start_position = _player->center() + it->shot.spawn_offset;
+        Bullet_Attributes &bullet_attributes = it->bullet_attributes;
+        bullet_attributes.start_position = _player->center() + it->spawn_offset;
         unique_ptr<Projectile> projectile = std::make_unique<Bullet>(bullet_attributes);
 
         Projectile *added_projectile = add_object(std::move(projectile));

@@ -9,12 +9,6 @@
 
 #include <SDL.h>
 
-struct QueuedShot
-{
-    ShotDescriptor shot;
-    float time_remaining_sec;
-};
-
 class RoomScene final : public engine::scene::Scene
 {
 public:
@@ -46,7 +40,7 @@ private:
 
 private:
     Character *_player = nullptr;
-    vector<QueuedShot> _scheduled_projectiles;
+    vector<ShotDescriptor> _scheduled_projectiles;
 
     DungeonRoom *_room = nullptr;
     RoomTileCollisionWorld _collision_world;
