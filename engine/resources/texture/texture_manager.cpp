@@ -3,6 +3,9 @@
 #include <iostream>
 #include <utility>
 
+namespace engine::resources
+{
+
 bool TextureManager::load_texture(SDL_Renderer* renderer, const std::string& key,std::filesystem::path file_path)
 {
 	if (!renderer)
@@ -46,4 +49,5 @@ SDL_Texture* TextureManager::find_texture(const std::string_view& key)
 		return nullptr;
 
 	return iterator->second;
+}
 }

@@ -3,7 +3,7 @@
 #include "../../engine/scene/scene.h"
 #include "../character.h"
 
-class GameScene final : public Scene
+class GameScene final : public engine::scene::Scene
 {
 public:
 	GameScene() = default;
@@ -11,7 +11,7 @@ public:
 
 	void on_update(double delta) override;
 	void on_render(SDL_Renderer* renderer) override;
-	void on_input(const InputSnapshot& input, const std::vector<InputEvent>& events) override;
+	void on_input(const engine::input::InputSnapshot& input, const std::vector<engine::input::InputEvent>& events) override;
 
 	void on_enter() override;
 	void on_exit() override;
@@ -25,8 +25,8 @@ private:
 
 	Character* _player = nullptr;
 
-	GameObject* _map = nullptr;
+	engine::core::GameObject* _map = nullptr;
 
-	Rect _rect{ 460, 180, 360, 360 };
+	engine::core::Rect _rect{ 460, 180, 360, 360 };
 	bool _contain = false;
 };

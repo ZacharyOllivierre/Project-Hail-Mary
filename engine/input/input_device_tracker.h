@@ -4,6 +4,9 @@
 
 #include <SDL.h>
 
+namespace engine::input
+{
+
 struct InputDeviceUpdateResult
 {
     bool should_translate = true;
@@ -27,3 +30,4 @@ private:
     InputDevice _current_device = InputDevice::Unknown;
     bool _device_switched_this_frame = false;
 };
+}

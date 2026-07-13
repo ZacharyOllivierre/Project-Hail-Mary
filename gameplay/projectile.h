@@ -1,25 +1,25 @@
 #pragma once
 
 #include "../engine/core/game_object.h"
-#include "../engine/core/collision_box.h"
+#include "../engine/physics/collision_box.h"
 #include "../engine/core/interface/collidable.h"
 #include "../engine/core/interface/kinematic_body.h"
 #include "../engine/core/interface/updatable.h"
 
-class Projectile : public GameObject,
-                   public Updatable,
-                   public Collidable,
-                   public KinematicBody
+class Projectile : public engine::core::GameObject,
+                   public engine::core::Updatable,
+                   public engine::core::Collidable,
+                   public engine::core::KinematicBody
 {
 public:
     explicit Projectile(
-        DepthLayer layer,
-        const Vector2 &start_position = Vector2::zero(),
-        const Vector2 &start_size = Vector2::zero(),
-        const Vector2 &start_velocity = Vector2::zero()) noexcept
-        : GameObject(layer), _velocity(start_velocity)
+        engine::core::DepthLayer layer,
+        const engine::core::Vector2 &start_position = engine::core::Vector2::zero(),
+        const engine::core::Vector2 &start_size = engine::core::Vector2::zero(),
+        const engine::core::Vector2 &start_velocity = engine::core::Vector2::zero()) noexcept
+        : engine::core::GameObject(layer), _velocity(start_velocity)
     {
-        set_world_rect(Rect(start_position, start_size));
+        set_world_rect(engine::core::Rect(start_position, start_size));
     }
 
     ~Projectile() override = default;
@@ -29,73 +29,73 @@ public:
         (void)delta;
     }
 
-    [[nodiscard]] Vector2 desired_velocity() const noexcept override
+    [[nodiscard]] engine::core::Vector2 desired_velocity() const noexcept override
     {
         return _velocity;
     }
 
-    void apply_translation(const Vector2 &delta) noexcept override
+    void apply_translation(const engine::core::Vector2 &delta) noexcept override
     {
-        GameObject::set_position(position() + delta);
+        engine::core::GameObject::set_position(position() + delta);
         _collision_rect.set_position(_collision_rect.position() + delta);
         _damage_rect.set_position(_damage_rect.position() + delta);
         update_collision_box();
     }
 
-    [[nodiscard]] Rect collision_rect() const noexcept override
+    [[nodiscard]] engine::core::Rect collision_rect() const noexcept override
     {
         return _collision_rect;
     }
 
-    void on_collision(const Vector2 &collision_direction) noexcept override
+    void on_collision(const engine::core::Vector2 &collision_direction) noexcept override
     {
         destroy();
     }
 
-    void set_velocity(const Vector2 &velocity) noexcept
+    void set_velocity(const engine::core::Vector2 &velocity) noexcept
     {
         _velocity = velocity;
     }
 
-    void set_collision_box(CollisionBox *collision_box) noexcept
+    void set_collision_box(engine::physics::CollisionBox *collision_box) noexcept
     {
         _collision_box = collision_box;
         update_collision_box();
     }
 
-    void set_world_rect(const Rect &rect) noexcept
+    void set_world_rect(const engine::core::Rect &rect) noexcept
     {
-        GameObject::set_world_rect(rect);
+        engine::core::GameObject::set_world_rect(rect);
         _collision_rect = rect;
         _damage_rect = rect;
         update_collision_box();
     }
 
-    void set_damage_rect(const Rect &rect) noexcept
+    void set_damage_rect(const engine::core::Rect &rect) noexcept
     {
         _damage_rect = rect;
         update_collision_box();
     }
 
-    void set_position(const Vector2 &position) noexcept
+    void set_position(const engine::core::Vector2 &position) noexcept
     {
-        GameObject::set_position(position);
+        engine::core::GameObject::set_position(position);
         _collision_rect.set_position(position);
         _damage_rect.set_position(position);
         update_collision_box();
     }
 
-    void set_center(const Vector2 &center) noexcept
+    void set_center(const engine::core::Vector2 &center) noexcept
     {
-        GameObject::set_center(center);
+        engine::core::GameObject::set_center(center);
         _collision_rect.set_center(center);
         _damage_rect.set_center(center);
         update_collision_box();
     }
 
-    void set_size(const Vector2 &size) noexcept
+    void set_size(const engine::core::Vector2 &size) noexcept
     {
-        GameObject::set_size(size);
+        engine::core::GameObject::set_size(size);
         _collision_rect.set_size(size);
         _damage_rect.set_size(size);
         update_collision_box();
@@ -114,7 +114,7 @@ public:
 protected:
     void reset() noexcept override
     {
-        GameObject::reset();
+        engine::core::GameObject::reset();
     }
 
 private:
@@ -124,9 +124,9 @@ private:
             _collision_box->set_rect(_damage_rect);
     }
 
-    Vector2 _velocity = Vector2::zero();
-    Rect _collision_rect{};
-    Rect _damage_rect{};
-    CollisionBox *_collision_box = nullptr;
+    engine::core::Vector2 _velocity = engine::core::Vector2::zero();
+    engine::core::Rect _collision_rect{};
+    engine::core::Rect _damage_rect{};
+    engine::physics::CollisionBox *_collision_box = nullptr;
     double _age_seconds = 0.0;
 };

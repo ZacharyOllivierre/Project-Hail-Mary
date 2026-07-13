@@ -8,6 +8,9 @@
 
 struct SDL_Texture;
 
+namespace engine::ui
+{
+
 enum class UiButtonState
 {
     Idle,
@@ -34,17 +37,17 @@ struct UiButtonTextures
 };
 
 // A pointer-operated UI button. Textures are caller-owned and never released here.
-class UiButton : public UiElement, public InputEventReceiver
+class UiButton : public UiElement, public engine::input::InputEventReceiver
 {
 public:
     using ClickCallback = std::function<void()>;
 
-    UiButton(const Rect& rect = Rect::zero(), int order = 0) noexcept;
-    UiButton(const Vector2& position, const Vector2& size, int order = 0) noexcept;
+    UiButton(const engine::core::Rect& rect = engine::core::Rect::zero(), int order = 0) noexcept;
+    UiButton(const engine::core::Vector2& position, const engine::core::Vector2& size, int order = 0) noexcept;
 
     void reset() noexcept override;
-    bool on_input_event(const InputEvent& event) override;
-    void submit_ui_render_commands(std::vector<UiRenderCommand>& out_commands) const override;
+    bool on_input_event(const engine::input::InputEvent& event) override;
+    void submit_ui_render_commands(std::vector<engine::core::UiRenderCommand>& out_commands) const override;
 
     void set_enabled(bool enabled) noexcept;
     [[nodiscard]] bool is_enabled() const noexcept;
@@ -57,7 +60,7 @@ public:
     [[nodiscard]] const UiButtonTextures& state_textures() const noexcept;
 
     // Content uses the supplied pixel size and is scaled down to fit inside padding.
-    void set_content_texture(SDL_Texture* texture, const Vector2& size) noexcept;
+    void set_content_texture(SDL_Texture* texture, const engine::core::Vector2& size) noexcept;
     void clear_content_texture() noexcept;
     void set_padding(float padding) noexcept;
     [[nodiscard]] float padding() const noexcept;
@@ -66,8 +69,8 @@ private:
     [[nodiscard]] bool contains_pointer(int x, int y) const noexcept;
     [[nodiscard]] SDL_Color current_fill_color() const noexcept;
     [[nodiscard]] SDL_Texture* current_state_texture() const noexcept;
-    [[nodiscard]] Rect content_rect() const noexcept;
-    [[nodiscard]] Rect fitted_content_rect() const noexcept;
+    [[nodiscard]] engine::core::Rect content_rect() const noexcept;
+    [[nodiscard]] engine::core::Rect fitted_content_rect() const noexcept;
     void set_hovered(bool hovered) noexcept;
 
 private:
@@ -75,9 +78,10 @@ private:
     UiButtonColors _colors{};
     UiButtonTextures _state_textures{};
     SDL_Texture* _content_texture = nullptr;
-    Vector2 _content_size{};
+    engine::core::Vector2 _content_size{};
     ClickCallback _on_click;
     float _padding = 5.0f;
     bool _enabled = true;
     bool _is_pressing = false;
 };
+}

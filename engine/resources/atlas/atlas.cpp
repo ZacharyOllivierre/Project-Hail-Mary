@@ -1,5 +1,8 @@
 #include "atlas.h"
 
+namespace engine::resources
+{
+
 static bool query_texture_size(SDL_Texture* texture, int& width, int& height)
 {
 	if (!texture)
@@ -86,4 +89,5 @@ SDL_Texture* Atlas::texture_at(size_t frame_index) const
 {
 	const FrameInfo* frame_info = frame_at(frame_index);
 	return frame_info ? frame_info->_texture : nullptr;
+}
 }

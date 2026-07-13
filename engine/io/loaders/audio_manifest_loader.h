@@ -4,6 +4,9 @@
 
 #include <filesystem>
 
+namespace engine::io
+{
+
 class AudioManifestLoader
 {
 public:
@@ -12,3 +15,4 @@ public:
 		AudioManifest& manifest
 	) const;
 };
+}

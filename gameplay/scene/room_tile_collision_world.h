@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../engine/core/tile_collision_world.h"
+#include "../../engine/physics/tile_collision_world.h"
 #include "../map/dungeon_room.h"
 
-class RoomTileCollisionWorld final : public TileCollisionWorld
+class RoomTileCollisionWorld final : public engine::physics::TileCollisionWorld
 {
 public:
     void set_room(const DungeonRoom* room) noexcept
@@ -11,14 +11,14 @@ public:
         _room = room;
     }
 
-    [[nodiscard]] Vector2 world_origin() const noexcept override
+    [[nodiscard]] engine::core::Vector2 world_origin() const noexcept override
     {
-        return _room ? _room->position() : Vector2::zero();
+        return _room ? _room->position() : engine::core::Vector2::zero();
     }
 
-    [[nodiscard]] Vector2 tile_size() const noexcept override
+    [[nodiscard]] engine::core::Vector2 tile_size() const noexcept override
     {
-        return _room ? _room->tile_render_size() : Vector2::zero();
+        return _room ? _room->tile_render_size() : engine::core::Vector2::zero();
     }
 
     [[nodiscard]] int tile_columns() const noexcept override

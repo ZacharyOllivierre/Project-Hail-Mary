@@ -3,6 +3,9 @@
 #include <fstream>
 #include <utility>
 
+namespace engine::io
+{
+
 void JsonLoader::add_error_message(
     JsonReadResult& result,
     const std::string& error
@@ -119,4 +122,5 @@ JsonReadResult JsonLoader::get_object(
     out = &value;
     result.success = true;
     return result;
+}
 }

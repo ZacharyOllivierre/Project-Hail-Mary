@@ -13,13 +13,16 @@
 #include "resource_types.h"
 #include "texture/texture_manager.h"
 
+namespace engine::resources
+{
+
 class Atlas;
 class AtlasManager;
 class ResourceBootstrapper;
 
-class ResourceManager : public Singleton<ResourceManager>
+class ResourceManager : public engine::tools::Singleton<ResourceManager>
 {
-	friend Singleton<ResourceManager>;
+	friend engine::tools::Singleton<ResourceManager>;
 	friend class ResourceBootstrapper;
 
 public:
@@ -63,3 +66,4 @@ private:
 	AudioManager _audio_manager;
 	std::unique_ptr<AtlasManager> _atlas_manager;
 };
+}

@@ -65,7 +65,7 @@ void MenuScene::on_enter()
 	}
 
 	// The "assets/../..." Needs to ppoint to an actual font file
-	_menu_font = ResourceManager::instance()->find_font("latin.16");
+	_menu_font = engine::resources::ResourceManager::instance()->find_font("latin.16");
 
 	if (!_menu_font)
 	{
@@ -77,13 +77,13 @@ void MenuScene::on_enter()
 // Updates menu scene each frame.
 void MenuScene::on_update(double delta)
 {
-	Scene::on_update(delta);
+	engine::scene::Scene::on_update(delta);
 }
 
 // Renders menu background, title area, and start button every frame.
 void MenuScene::on_render(SDL_Renderer *renderer)
 {
-	Scene::on_render(renderer);
+	engine::scene::Scene::on_render(renderer);
 
 	// Stops rendering if the renderer is missing.
 	if (!renderer)
@@ -131,18 +131,18 @@ void MenuScene::on_render(SDL_Renderer *renderer)
 
 // Handles menu input, including keyboard input for starting the game.
 void MenuScene::on_input(
-	const InputSnapshot &input,
-	const std::vector<InputEvent> &events)
+	const engine::input::InputSnapshot &input,
+	const std::vector<engine::input::InputEvent> &events)
 {
 	(void)events;
 
-	Scene::on_input(input, events);
+	engine::scene::Scene::on_input(input, events);
 
 	// Starts the gameplay scene if the confirm input, like Enter, was just pressed.
-	if (input.state.is_just_pressed(InputAction::Confirm))
+	if (input.state.is_just_pressed(engine::input::InputAction::Confirm))
 	{
 		std::cout << "Start pressed from keyboard!" << std::endl;
-		SceneManager::instance()->switch_to<RoomScene>();
+		engine::scene::SceneManager::instance()->switch_to<RoomScene>();
 	}
 }
 
@@ -191,7 +191,7 @@ void MenuScene::create_start_button(SDL_Renderer *renderer)
 	// x, y, width, height
 	SDL_Rect button_rect{540, 320, 200, 70};
 
-	_start_button = std::make_unique<Button>(renderer, button_rect);
+	_start_button = std::make_unique<engine::ui::Button>(renderer, button_rect);
 
 	// Runs when start button is clicked.
 	_start_button->set_on_click([]()
@@ -199,5 +199,5 @@ void MenuScene::create_start_button(SDL_Renderer *renderer)
 		std::cout << "Start button clicked!" << std::endl;
 
 		// This sends the program from menu_scene to game_scene.
-		SceneManager::instance()->switch_to<RoomScene>(); });
+		engine::scene::SceneManager::instance()->switch_to<RoomScene>(); });
 }

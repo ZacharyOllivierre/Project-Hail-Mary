@@ -13,10 +13,10 @@ namespace
 	constexpr float kCollisionWidthScale = 0.65f;
 	constexpr float kCollisionHeightScale = 0.38f;
 
-	[[nodiscard]] Rect make_collision_rect(const Rect &render_rect) noexcept
+	[[nodiscard]] engine::core::Rect make_collision_rect(const engine::core::Rect &render_rect) noexcept
 	{
-		Rect collision = Rect::zero();
-		collision.set_size(Vector2(
+		engine::core::Rect collision = engine::core::Rect::zero();
+		collision.set_size(engine::core::Vector2(
 			render_rect.width() * kCollisionWidthScale,
 			render_rect.height() * kCollisionHeightScale));
 		collision.set_bottom_center(render_rect.bottom_center());
@@ -26,7 +26,7 @@ namespace
 	void apply_animation_state(
 		const std::string &character_id,
 		Character::AnimationState new_state,
-		std::unique_ptr<Animation> &animation,
+		std::unique_ptr<engine::animation::Animation> &animation,
 		Character::AnimationState &animation_state)
 	{
 		if (animation && animation_state == new_state)
@@ -49,8 +49,8 @@ namespace
 			break;
 		}
 
-		std::unique_ptr<Animation> new_animation =
-			AnimationManager::instance()->create_animation(animation_key);
+		std::unique_ptr<engine::animation::Animation> new_animation =
+			engine::animation::AnimationManager::instance()->create_animation(animation_key);
 		if (!new_animation)
 		{
 			std::cout << "Set Character animation failed: "
@@ -65,10 +65,10 @@ namespace
 
 Character::Character(
 	std::string character_id,
-	const Vector2 &start_position,
-	const Vector2 &start_size,
+	const engine::core::Vector2 &start_position,
+	const engine::core::Vector2 &start_size,
 	std::string effect_id)
-	: GameObject(DepthLayer::Character),
+	: engine::core::GameObject(engine::core::DepthLayer::Character),
 	  _character_id(std::move(character_id)),
 	  _effect_id(std::move(effect_id))
 {
@@ -86,7 +86,7 @@ void Character::update(double delta)
 		_animation->update(frame_delta);
 }
 
-void Character::on_input_snapshot(const InputSnapshot &input)
+void Character::on_input_snapshot(const engine::input::InputSnapshot &input)
 {
 	if (_is_dead)
 		return;
@@ -94,18 +94,18 @@ void Character::on_input_snapshot(const InputSnapshot &input)
 	float move_x = 0.0f;
 	float move_y = 0.0f;
 
-	if (input.state.is_pressed(InputAction::Left))
+	if (input.state.is_pressed(engine::input::InputAction::Left))
 		move_x -= 1.0f;
-	if (input.state.is_pressed(InputAction::Right))
+	if (input.state.is_pressed(engine::input::InputAction::Right))
 		move_x += 1.0f;
-	if (input.state.is_pressed(InputAction::Up))
+	if (input.state.is_pressed(engine::input::InputAction::Up))
 		move_y -= 1.0f;
-	if (input.state.is_pressed(InputAction::Down))
+	if (input.state.is_pressed(engine::input::InputAction::Down))
 		move_y += 1.0f;
 
 	_move_input = {move_x, move_y};
 	_desired_velocity = _move_input.is_zero()
-							? Vector2::zero()
+							? engine::core::Vector2::zero()
 							: _move_input.normalized() * _move_speed;
 
 	if (_move_input.x < 0.0f)
@@ -113,17 +113,17 @@ void Character::on_input_snapshot(const InputSnapshot &input)
 	else if (_move_input.x > 0.0f)
 		_facing_direction = FacingDirection::Right;
 
-	if (input.state.is_just_pressed(InputAction::Attack) &&
+	if (input.state.is_just_pressed(engine::input::InputAction::Attack) &&
 		!_effect_id.empty())
 	{
-		EffectSpawnRequest request;
-		request.size = Vector2{500, 500};
+		engine::animation::EffectSpawnRequest request;
+		request.size = engine::core::Vector2{500, 500};
 		request.effect_key = _effect_id;
 		request.position = center();
-		request.anchor = EffectAnchor::Center;
+		request.anchor = engine::animation::EffectAnchor::Center;
 		request.flip = _facing_direction == FacingDirection::Left
-						   ? SpriteFlip::Horizontal
-						   : SpriteFlip::None;
+						   ? engine::core::SpriteFlip::Horizontal
+						   : engine::core::SpriteFlip::None;
 		_pending_effect_requests.push_back(std::move(request));
 	}
 
@@ -134,32 +134,32 @@ void Character::on_input_snapshot(const InputSnapshot &input)
 		_animation_state);
 }
 
-void Character::submit_render_commands(std::vector<RenderCommand> &out_commands) const
+void Character::submit_render_commands(std::vector<engine::core::RenderCommand> &out_commands) const
 {
 	if (!_animation)
 		return;
 
-	RenderCommand command;
+	engine::core::RenderCommand command;
 	if (_animation->build_render_command(
 			world_rect(),
 			0.0,
 			_facing_direction == FacingDirection::Left
-				? SpriteFlip::Horizontal
-				: SpriteFlip::None,
+				? engine::core::SpriteFlip::Horizontal
+				: engine::core::SpriteFlip::None,
 			command))
 	{
 		out_commands.push_back(std::move(command));
 	}
 }
 
-std::vector<EffectSpawnRequest> Character::drain_effect_spawn_requests()
+std::vector<engine::animation::EffectSpawnRequest> Character::drain_effect_spawn_requests()
 {
-	std::vector<EffectSpawnRequest> drained_requests = std::move(_pending_effect_requests);
+	std::vector<engine::animation::EffectSpawnRequest> drained_requests = std::move(_pending_effect_requests);
 	_pending_effect_requests.clear();
 	return drained_requests;
 }
 
-std::vector<std::unique_ptr<Projectile>> Character::create_projectile(const Vector2 &direction)
+std::vector<std::unique_ptr<Projectile>> Character::create_projectile(const engine::core::Vector2 &direction)
 {
 	return _wand.attack(center(), direction);
 }
@@ -168,7 +168,7 @@ void Character::set_move_speed(float move_speed) noexcept
 {
 	_move_speed = std::max(0.0f, move_speed);
 	_desired_velocity = _move_input.is_zero()
-							? Vector2::zero()
+							? engine::core::Vector2::zero()
 							: _move_input.normalized() * _move_speed;
 }
 
@@ -184,26 +184,26 @@ void Character::set_mana(float mana) noexcept
 	_mana = std::max(0.0f, mana);
 }
 
-void Character::set_character_size(const Vector2 &size)
+void Character::set_character_size(const engine::core::Vector2 &size)
 {
-	GameObject::set_size(size);
+	engine::core::GameObject::set_size(size);
 	_collision_rect = make_collision_rect(world_rect());
 }
 
-void Character::set_position(const Vector2 &position)
+void Character::set_position(const engine::core::Vector2 &position)
 {
-	GameObject::set_position(position);
+	engine::core::GameObject::set_position(position);
 	_collision_rect = make_collision_rect(world_rect());
 }
 
-Vector2 Character::desired_velocity() const noexcept
+engine::core::Vector2 Character::desired_velocity() const noexcept
 {
 	return _desired_velocity;
 }
 
-void Character::apply_translation(const Vector2 &delta) noexcept
+void Character::apply_translation(const engine::core::Vector2 &delta) noexcept
 {
-	GameObject::set_position(position() + delta);
+	engine::core::GameObject::set_position(position() + delta);
 	_collision_rect.set_position(_collision_rect.position() + delta);
 }
 
@@ -213,8 +213,8 @@ void Character::die()
 		return;
 
 	_is_dead = true;
-	_move_input = Vector2::zero();
-	_desired_velocity = Vector2::zero();
+	_move_input = engine::core::Vector2::zero();
+	_desired_velocity = engine::core::Vector2::zero();
 	apply_animation_state(_character_id, AnimationState::Die, _animation, _animation_state);
 }
 
@@ -238,7 +238,7 @@ bool Character::use_mana(float mana_cost) noexcept
 	return true;
 }
 
-Rect Character::collision_rect() const noexcept
+engine::core::Rect Character::collision_rect() const noexcept
 {
 	return _collision_rect;
 }

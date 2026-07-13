@@ -4,9 +4,12 @@
 #include <filesystem>
 #include <optional>
 
-class PathManager : public Singleton<PathManager>
+namespace engine::io
 {
-    friend Singleton<PathManager>;
+
+class PathManager : public engine::tools::Singleton<PathManager>
+{
+    friend engine::tools::Singleton<PathManager>;
 
 public:
     bool init();
@@ -43,3 +46,4 @@ private:
 private:
     std::filesystem::path _root;
 };
+}

@@ -20,6 +20,22 @@
 #include <utility>
 #include <vector>
 
+namespace engine::resources
+{
+using engine::io::AudioManifest;
+using engine::io::AudioManifestEntry;
+using engine::io::AudioManifestLoader;
+using engine::io::ConfigRegistry;
+using engine::io::ConfigsListLoader;
+using engine::io::FontManifest;
+using engine::io::FontManifestEntry;
+using engine::io::FontsManifestLoader;
+using engine::io::JsonReadResult;
+using engine::io::TextureManifest;
+using engine::io::TextureManifestEntry;
+using engine::io::TextureManifestLoader;
+using engine::io::json;
+
 namespace
 {
 struct AnimationSettings
@@ -35,7 +51,7 @@ struct EffectConfig
 	std::filesystem::path directory_path;
 	double fps = 10.0;
 	bool loop = true;
-	std::optional<Vector2> default_size;
+	std::optional<engine::core::Vector2> default_size;
 	std::optional<double> angle_degrees;
 };
 
@@ -140,7 +156,7 @@ bool collect_animation_frame_paths(
 		return true;
 	}
 
-	out_error = "Animation assets not found for "
+	out_error = "engine::animation::Animation assets not found for "
 		+ character_id + "." + animation_name
 		+ " (expected directory: " + animation_directory.string()
 		+ " or file: " + single_frame_path.string() + ")";
@@ -148,10 +164,10 @@ bool collect_animation_frame_paths(
 }
 
 bool read_vector2(
-	const JsonLoader& loader,
+	const engine::io::JsonLoader& loader,
 	const json& node,
 	std::string_view key,
-	Vector2& out,
+	engine::core::Vector2& out,
 	std::string& out_error
 )
 {
@@ -190,7 +206,7 @@ bool load_fonts(
 	if (!loader.load(config_path, manifest))
 		return false;
 
-	const std::filesystem::path font_root = PathManager::instance()->fonts();
+	const std::filesystem::path font_root = engine::io::PathManager::instance()->fonts();
 	for (const FontManifestEntry& entry : manifest.fonts)
 	{
 		const std::filesystem::path file_path =
@@ -219,7 +235,7 @@ bool load_audio(
 	if (!loader.load(config_path, manifest))
 		return false;
 
-	const std::filesystem::path audio_root = PathManager::instance()->audio();
+	const std::filesystem::path audio_root = engine::io::PathManager::instance()->audio();
 	for (const AudioManifestEntry& entry : manifest.sounds)
 	{
 		const std::filesystem::path file_path =
@@ -258,7 +274,7 @@ bool load_textures(
 	if (!loader.load(config_path, manifest))
 		return false;
 
-	const std::filesystem::path texture_root = PathManager::instance()->textures();
+	const std::filesystem::path texture_root = engine::io::PathManager::instance()->textures();
 	for (const TextureManifestEntry& entry : manifest.textures)
 	{
 		const std::filesystem::path file_path =
@@ -279,7 +295,7 @@ bool load_character_animations(
 	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
 )
 {
-	JsonLoader loader;
+	engine::io::JsonLoader loader;
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
@@ -354,7 +370,7 @@ bool load_character_animations(
 	}
 
 	const std::filesystem::path character_root =
-		PathManager::instance()->assets() / "character";
+		engine::io::PathManager::instance()->assets() / "character";
 
 	for (const std::string& character_id : characters)
 	{
@@ -395,7 +411,7 @@ bool load_character_animations(
 			animation_request.atlas_key = animation_key;
 			animation_request.fps = settings.fps;
 			animation_request.loop = settings.loop;
-			if (!AnimationManager::instance()->register_animation(animation_request, atlas))
+			if (!engine::animation::AnimationManager::instance()->register_animation(animation_request, atlas))
 			{
 				std::cout << "Register character animation failed: "
 					<< animation_key << std::endl;
@@ -412,7 +428,7 @@ bool load_effects(
 	const std::function<const Atlas*(const AtlasLoadRequest&)>& build_atlas
 )
 {
-	JsonLoader loader;
+	engine::io::JsonLoader loader;
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
@@ -453,7 +469,7 @@ bool load_effects(
 		if (!effect_node.is_object())
 		{
 			std::cout << "Read effect config failed:\n"
-				<< "Effect entry is not an object at index " << index << std::endl;
+				<< "engine::animation::Effect entry is not an object at index " << index << std::endl;
 			return false;
 		}
 
@@ -510,7 +526,7 @@ bool load_effects(
 
 		if (effect_node.contains("default_size"))
 		{
-			Vector2 default_size;
+			engine::core::Vector2 default_size;
 			std::string error;
 			if (!read_vector2(loader, effect_node, "default_size", default_size, error))
 			{
@@ -542,7 +558,7 @@ bool load_effects(
 		std::vector<std::filesystem::path> frame_paths;
 		std::string error;
 		const std::filesystem::path directory_path =
-			PathManager::instance()->resolve_asset_path(effect_config.directory_path);
+			engine::io::PathManager::instance()->resolve_asset_path(effect_config.directory_path);
 		if (!collect_png_frame_paths(directory_path, frame_paths, error))
 		{
 			std::cout << "Collect effect frames failed for "
@@ -568,7 +584,7 @@ bool load_effects(
 		animation_request.atlas_key = effect_config.animation_key;
 		animation_request.fps = effect_config.fps;
 		animation_request.loop = effect_config.loop;
-		if (!AnimationManager::instance()->register_animation(animation_request, atlas))
+		if (!engine::animation::AnimationManager::instance()->register_animation(animation_request, atlas))
 		{
 			std::cout << "Register effect animation failed: "
 				<< effect_config.animation_key << std::endl;
@@ -583,7 +599,7 @@ bool load_effects(
 		effect_requests.push_back(std::move(effect_request));
 	}
 
-	if (!EffectManager::instance()->register_effect(effect_requests))
+	if (!engine::animation::EffectManager::instance()->register_effect(effect_requests))
 	{
 		std::cout << "Register effect definitions failed." << std::endl;
 		return false;
@@ -612,7 +628,7 @@ bool ResourceBootstrapper::bootstrap(
 
 	ConfigsListLoader configs_list_loader;
 	ConfigRegistry config_registry;
-	if (!configs_list_loader.load(PathManager::instance()->configs_list(), config_registry))
+	if (!configs_list_loader.load(engine::io::PathManager::instance()->configs_list(), config_registry))
 		return false;
 
 	std::filesystem::path fonts_config_path;
@@ -631,4 +647,5 @@ bool ResourceBootstrapper::bootstrap(
 		&& load_textures(resource_manager, renderer, textures_config_path)
 		&& load_character_animations(characters_config_path, build_atlas)
 		&& load_effects(effects_config_path, build_atlas);
+}
 }

@@ -2,6 +2,9 @@
 
 #include <SDL.h>
 
+namespace engine::input
+{
+
 std::vector<InputEvent> GamepadInputTranslator::translate_event(const SDL_Event& event) const
 {
     std::vector<InputEvent> events;
@@ -62,4 +65,5 @@ void GamepadInputTranslator::append_controller_button_events(
     default:
         break;
     }
+}
 }

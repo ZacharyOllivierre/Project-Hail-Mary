@@ -5,6 +5,9 @@
 #include <iostream>
 #include <utility>
 
+namespace engine::io
+{
+
 bool TextureManifestLoader::load(
 	const std::filesystem::path& manifest_path,
 	TextureManifest& manifest
@@ -62,4 +65,5 @@ bool TextureManifestLoader::load(
 
 	manifest = std::move(parsed_manifest);
 	return true;
+}
 }

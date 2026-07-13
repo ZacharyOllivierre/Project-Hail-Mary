@@ -5,6 +5,9 @@
 #include <SDL.h>
 #include <vector>
 
+namespace engine::input
+{
+
 class InputTranslator
 {
 public:
@@ -23,3 +26,4 @@ protected:
         bool has_pointer_position = false
     ) const;
 };
+}

@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+namespace engine::resources
+{
+
 struct FrameInfo
 {
 	std::filesystem::path _path;
@@ -52,3 +55,4 @@ private:
 	std::string _name;
 	std::vector<FrameInfo> _frames;
 };
+}

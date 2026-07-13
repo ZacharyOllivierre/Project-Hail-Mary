@@ -1,4 +1,7 @@
 #pragma once
+
+namespace engine::tools
+{
 #include<string>
 
 #define FILE_READ
@@ -18,3 +21,4 @@ struct Error
 	int _error_line;
 	std::string _error_message;
 };
+}

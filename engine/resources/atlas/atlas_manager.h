@@ -9,6 +9,9 @@
 #include <string_view>
 #include <unordered_map>
 
+namespace engine::resources
+{
+
 class TextureManager;
 
 using AtlasPool = std::unordered_map<std::string, Atlas>;
@@ -28,3 +31,4 @@ public:
 private:
 	AtlasPool _atlas_pool;
 };
+}

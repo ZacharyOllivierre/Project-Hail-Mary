@@ -3,6 +3,9 @@
 #include "render_command.h"
 #include "sdl_render_command_executor.h"
 
+namespace engine::core
+{
+
 void DebugDraw::set_enabled(bool enabled) noexcept
 {
     _enabled = enabled;
@@ -35,7 +38,7 @@ void DebugDraw::add_world_rect(
     _world_rects.push_back(WorldRect{ world_rect, category });
 }
 
-void DebugDraw::render(SDL_Renderer* renderer, const Camera& camera) const
+void DebugDraw::render(SDL_Renderer* renderer, const engine::camera::Camera& camera) const
 {
     if (!renderer || !_enabled || _world_rects.empty())
         return;
@@ -81,4 +84,5 @@ SDL_Color DebugDraw::color_for(DebugDrawCategory category) noexcept
     default:
         return SDL_Color{ 255, 255, 255, 255 };
     }
+}
 }

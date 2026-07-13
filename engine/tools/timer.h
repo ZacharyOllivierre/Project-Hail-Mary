@@ -2,6 +2,9 @@
 
 #include <functional>
 
+namespace engine::tools
+{
+
 class Timer
 {
 public:
@@ -29,3 +32,4 @@ private:
 	TimeoutCallback _on_timeout;
 	unsigned long long _state_version = 0;
 };
+}

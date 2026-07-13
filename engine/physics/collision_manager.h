@@ -6,12 +6,15 @@
 #include <memory>
 #include <vector>
 
-class CollisionManager final : public Singleton<CollisionManager>
+namespace engine::physics
 {
-    friend class Singleton<CollisionManager>;
+
+class CollisionManager final : public engine::tools::Singleton<CollisionManager>
+{
+    friend class engine::tools::Singleton<CollisionManager>;
 
 public:
-    CollisionBox* create_box(GameObject* owner,CollisionLayer layer,
+    CollisionBox* create_box(engine::core::GameObject* owner,CollisionLayer layer,
         CollisionTarget targets,CollisionCallback on_collided);
     void destroy_box(CollisionBox* collision_box) noexcept;
     void clear() noexcept;
@@ -34,3 +37,4 @@ private:
     bool _is_updating = false;
     bool _clear_pending = false;
 };
+}

@@ -1,5 +1,8 @@
 #pragma once
 
+namespace engine::core
+{
+
 enum class DepthLayer
 {
     Background,
@@ -11,3 +14,4 @@ enum class DepthLayer
     Foreground,
     Count
 };
+}

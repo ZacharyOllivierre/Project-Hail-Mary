@@ -9,6 +9,9 @@
 #include <utility>
 #include <vector>
 
+namespace engine::io
+{
+
 using json = nlohmann::json;
 
 struct JsonReadResult
@@ -234,4 +237,5 @@ bool JsonLoader::read_value(const json& value, T& out) const
     }
 
     return true;
+}
 }

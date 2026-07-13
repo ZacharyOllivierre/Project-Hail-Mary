@@ -1,5 +1,8 @@
 #include "camera.h"
 
+namespace engine::camera
+{
+
 // Init camera with screen size, default position, zoom, and no world bounds
 Camera::Camera(int screen_width, int screen_height)
 {
@@ -94,9 +97,9 @@ SDL_FRect Camera::world_to_screen(const SDL_FRect &world_rect) const
     return screen_rec;
 }
 
-Rect Camera::world_to_screen(const Rect &world_rect) const
+engine::core::Rect Camera::world_to_screen(const engine::core::Rect &world_rect) const
 {
-    Rect screen_rec;
+    engine::core::Rect screen_rec;
 
     screen_rec.set_x((world_rect.x() - _x) * _zoom + (_screen_width * 0.5));
     screen_rec.set_y((world_rect.y() - _y) * _zoom + (_screen_height * 0.5));
@@ -140,4 +143,5 @@ void Camera::clamp_to_bounds()
         _y,
         half_height,
         _world_height - half_height);
+}
 }

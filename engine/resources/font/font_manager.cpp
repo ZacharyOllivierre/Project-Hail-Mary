@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+namespace engine::resources
+{
+
 
 bool FontManager::load_font(const std::string& key,const std::filesystem::path& file_path,int point_size)
 {
@@ -75,4 +78,5 @@ TTF_Font* FontManager::find_font(const std::string_view& key) const
 		return nullptr;
 
 	return iterator->second;
+}
 }

@@ -1,12 +1,20 @@
 #pragma once
 
-#include "geometry/rect.h"
+#include "../core/geometry/rect.h"
 
 #include <cstdint>
 #include <functional>
 #include <utility>
 
+namespace engine::core
+{
 class GameObject;
+}
+
+namespace engine::physics
+{
+
+
 class CollisionManager;
 
 enum class CollisionLayer : std::uint32_t
@@ -75,17 +83,17 @@ using CollisionCallback = std::function<void(const CollisionInfo&)>;
 class CollisionBox
 {
 public:
-    void set_rect(const Rect& rect) noexcept
+    void set_rect(const engine::core::Rect& rect) noexcept
     {
         _rect = rect;
     }
 
-    [[nodiscard]] GameObject* owner() const noexcept
+    [[nodiscard]] engine::core::GameObject* owner() const noexcept
     {
         return _owner;
     }
 
-    [[nodiscard]] const Rect& rect() const noexcept
+    [[nodiscard]] const engine::core::Rect& rect() const noexcept
     {
         return _rect;
     }
@@ -104,7 +112,7 @@ private:
     friend class CollisionManager;
 
     CollisionBox(
-        GameObject* owner,
+        engine::core::GameObject* owner,
         CollisionLayer layer,
         CollisionTarget targets,
         CollisionCallback on_collided) noexcept
@@ -127,9 +135,10 @@ private:
             _on_collided(CollisionInfo{ *this, other });
     }
 
-    Rect _rect{};
-    GameObject* _owner = nullptr;
+    engine::core::Rect _rect{};
+    engine::core::GameObject* _owner = nullptr;
     CollisionLayer _layer = CollisionLayer::None;
     CollisionTarget _targets = CollisionTarget::None;
     CollisionCallback _on_collided;
 };
+}

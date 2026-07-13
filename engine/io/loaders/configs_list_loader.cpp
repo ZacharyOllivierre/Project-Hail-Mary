@@ -6,6 +6,9 @@
 #include <iostream>
 #include <string>
 
+namespace engine::io
+{
+
 bool ConfigsListLoader::load(
 	const std::filesystem::path& configs_list_path,
 	ConfigRegistry& out_registry
@@ -58,4 +61,5 @@ bool ConfigsListLoader::load(
 	}
 
 	return true;
+}
 }

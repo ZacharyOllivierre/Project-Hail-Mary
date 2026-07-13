@@ -5,12 +5,15 @@
 #include <algorithm>
 #include <utility>
 
-UiButton::UiButton(const Rect& rect, int order) noexcept
+namespace engine::ui
+{
+
+UiButton::UiButton(const engine::core::Rect& rect, int order) noexcept
     : UiElement(rect, order)
 {
 }
 
-UiButton::UiButton(const Vector2& position, const Vector2& size, int order) noexcept
+UiButton::UiButton(const engine::core::Vector2& position, const engine::core::Vector2& size, int order) noexcept
     : UiElement(position, size, order)
 {
 }
@@ -23,7 +26,7 @@ void UiButton::reset() noexcept
     _is_pressing = false;
 }
 
-bool UiButton::on_input_event(const InputEvent& event)
+bool UiButton::on_input_event(const engine::input::InputEvent& event)
 {
     if (!event.has_pointer_position)
         return false;
@@ -32,23 +35,23 @@ bool UiButton::on_input_event(const InputEvent& event)
     if (!_enabled)
         return false;
 
-    if (event.type == InputEventType::PointerMoved)
+    if (event.type == engine::input::InputEventType::PointerMoved)
     {
         set_hovered(inside);
         return inside || _is_pressing;
     }
 
-    if (event.action != InputAction::Attack)
+    if (event.action != engine::input::InputAction::Attack)
         return false;
 
-    if (event.type == InputEventType::Pressed && inside)
+    if (event.type == engine::input::InputEventType::Pressed && inside)
     {
         _is_pressing = true;
         _state = UiButtonState::Pressed;
         return true;
     }
 
-    if (event.type == InputEventType::Released && _is_pressing)
+    if (event.type == engine::input::InputEventType::Released && _is_pressing)
     {
         _is_pressing = false;
         _state = inside ? UiButtonState::Hovered : UiButtonState::Idle;
@@ -60,21 +63,21 @@ bool UiButton::on_input_event(const InputEvent& event)
     return false;
 }
 
-void UiButton::submit_ui_render_commands(std::vector<UiRenderCommand>& out_commands) const
+void UiButton::submit_ui_render_commands(std::vector<engine::core::UiRenderCommand>& out_commands) const
 {
     if (screen_rect().is_empty())
         return;
 
     if (SDL_Texture* texture = current_state_texture())
-        out_commands.push_back(make_ui_texture_command(texture, screen_rect()));
+        out_commands.push_back(engine::core::make_ui_texture_command(texture, screen_rect()));
     else
     {
-        out_commands.push_back(make_ui_fill_rect_command(screen_rect(), current_fill_color()));
-        out_commands.push_back(make_ui_draw_rect_command(screen_rect(), _colors.border));
+        out_commands.push_back(engine::core::make_ui_fill_rect_command(screen_rect(), current_fill_color()));
+        out_commands.push_back(engine::core::make_ui_draw_rect_command(screen_rect(), _colors.border));
     }
 
     if (_content_texture)
-        out_commands.push_back(make_ui_texture_command(_content_texture, fitted_content_rect()));
+        out_commands.push_back(engine::core::make_ui_texture_command(_content_texture, fitted_content_rect()));
 }
 
 void UiButton::set_enabled(bool enabled) noexcept
@@ -92,7 +95,7 @@ const UiButtonColors& UiButton::colors() const noexcept { return _colors; }
 void UiButton::set_state_textures(const UiButtonTextures& textures) noexcept { _state_textures = textures; }
 const UiButtonTextures& UiButton::state_textures() const noexcept { return _state_textures; }
 
-void UiButton::set_content_texture(SDL_Texture* texture, const Vector2& size) noexcept
+void UiButton::set_content_texture(SDL_Texture* texture, const engine::core::Vector2& size) noexcept
 {
     _content_texture = texture;
     _content_size = size;
@@ -101,7 +104,7 @@ void UiButton::set_content_texture(SDL_Texture* texture, const Vector2& size) no
 void UiButton::clear_content_texture() noexcept
 {
     _content_texture = nullptr;
-    _content_size = Vector2::zero();
+    _content_size = engine::core::Vector2::zero();
 }
 
 void UiButton::set_padding(float padding) noexcept { _padding = std::max(0.0f, padding); }
@@ -109,7 +112,7 @@ float UiButton::padding() const noexcept { return _padding; }
 
 bool UiButton::contains_pointer(int x, int y) const noexcept
 {
-    return screen_rect().contains_half_open(Vector2(static_cast<float>(x), static_cast<float>(y)));
+    return screen_rect().contains_half_open(engine::core::Vector2(static_cast<float>(x), static_cast<float>(y)));
 }
 
 SDL_Color UiButton::current_fill_color() const noexcept
@@ -136,26 +139,27 @@ SDL_Texture* UiButton::current_state_texture() const noexcept
     return nullptr;
 }
 
-Rect UiButton::content_rect() const noexcept
+engine::core::Rect UiButton::content_rect() const noexcept
 {
-    const Rect& button_rect = screen_rect();
-    return Rect(button_rect.x() + _padding, button_rect.y() + _padding,
+    const engine::core::Rect& button_rect = screen_rect();
+    return engine::core::Rect(button_rect.x() + _padding, button_rect.y() + _padding,
         button_rect.width() - _padding * 2.0f, button_rect.height() - _padding * 2.0f);
 }
 
-Rect UiButton::fitted_content_rect() const noexcept
+engine::core::Rect UiButton::fitted_content_rect() const noexcept
 {
-    const Rect available = content_rect();
+    const engine::core::Rect available = content_rect();
     if (_content_size.x <= 0.0f || _content_size.y <= 0.0f || available.is_empty())
         return available;
 
     const float scale = std::min(1.0f, std::min(available.width() / _content_size.x, available.height() / _content_size.y));
-    const Vector2 size = _content_size * scale;
-    return Rect::from_center(available.center(), size);
+    const engine::core::Vector2 size = _content_size * scale;
+    return engine::core::Rect::from_center(available.center(), size);
 }
 
 void UiButton::set_hovered(bool hovered) noexcept
 {
     if (!_is_pressing)
         _state = hovered ? UiButtonState::Hovered : UiButtonState::Idle;
+}
 }

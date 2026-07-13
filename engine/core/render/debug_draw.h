@@ -1,12 +1,15 @@
 #pragma once
 
-#include "../camera.h"
+#include "../../camera/camera.h"
 #include "../geometry/rect.h"
 #include "../../tools/singleton.h"
 
 #include <SDL.h>
 
 #include <vector>
+
+namespace engine::core
+{
 
 enum class DebugDrawCategory
 {
@@ -23,9 +26,9 @@ enum class DebugDrawCategory
     CollisionHit
 };
 
-class DebugDraw final : public Singleton<DebugDraw>
+class DebugDraw final : public engine::tools::Singleton<DebugDraw>
 {
-    friend class Singleton<DebugDraw>;
+    friend class engine::tools::Singleton<DebugDraw>;
 
 public:
     void set_enabled(bool enabled) noexcept;
@@ -36,7 +39,7 @@ public:
     void add_world_rect(
         const Rect& world_rect,
         DebugDrawCategory category) noexcept;
-    void render(SDL_Renderer* renderer, const Camera& camera) const;
+    void render(SDL_Renderer* renderer, const engine::camera::Camera& camera) const;
 
 private:
     struct WorldRect
@@ -53,3 +56,4 @@ private:
     bool _enabled = false;
     std::vector<WorldRect> _world_rects;
 };
+}

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 
+namespace engine::io
+{
+
 bool PathManager::init()
 {
     std::optional<std::filesystem::path> root_path =
@@ -166,4 +169,5 @@ std::optional<std::filesystem::path> PathManager::find_project_root(const std::f
     }
 
     return std::nullopt;
+}
 }

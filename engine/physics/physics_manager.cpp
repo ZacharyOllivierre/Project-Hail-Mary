@@ -1,31 +1,34 @@
 #include "physics_manager.h"
 
-#include "game_object.h"
-#include "geometry/rect.h"
-#include "render/debug_draw.h"
+#include "../core/game_object.h"
+#include "../core/geometry/rect.h"
+#include "../core/render/debug_draw.h"
 
 #include <algorithm>
 #include <cmath>
 
+namespace engine::physics
+{
+
 namespace
 {
     void add_debug_rect(
-        const Rect& rect,
-        DebugDrawCategory category
+        const engine::core::Rect& rect,
+        engine::core::DebugDrawCategory category
     ) noexcept
     {
-        DebugDraw::instance()->add_world_rect(rect, category);  
+        engine::core::DebugDraw::instance()->add_world_rect(rect, category);
     }
 
-    [[nodiscard]] Rect tile_rect(
+    [[nodiscard]] engine::core::Rect tile_rect(
         const TileCollisionWorld &world,
         int tile_x,
         int tile_y) noexcept
     {
-        const Vector2 origin = world.world_origin();
-        const Vector2 size = world.tile_size();
+        const engine::core::Vector2 origin = world.world_origin();
+        const engine::core::Vector2 size = world.tile_size();
 
-        return Rect(
+        return engine::core::Rect(
             origin.x + static_cast<float>(tile_x) * size.x,
             origin.y + static_cast<float>(tile_y) * size.y,
             size.x,size.y);
@@ -58,23 +61,23 @@ namespace
         float origin,
         float tile_extent) noexcept
     {
-        return static_cast<int>(std::floor((value - origin - Rect::k_epsilon) / tile_extent));
+        return static_cast<int>(std::floor((value - origin - engine::core::Rect::k_epsilon) / tile_extent));
     }
 
     [[nodiscard]] float resolve_horizontal_move(
         const TileCollisionWorld& world,
-        const Rect& current_rect,
+        const engine::core::Rect& current_rect,
         float delta_x
     ) noexcept
     {
-        if (std::fabs(delta_x) <= Vector2::k_epsilon)
+        if (std::fabs(delta_x) <= engine::core::Vector2::k_epsilon)
             return 0.0f;
 
-        const Rect candidate = current_rect.translated(Vector2(delta_x, 0.0f));
-        add_debug_rect(candidate, DebugDrawCategory::PhysicsHorizontalCandidate);
+        const engine::core::Rect candidate = current_rect.translated(engine::core::Vector2(delta_x, 0.0f));
+        add_debug_rect(candidate, engine::core::DebugDrawCategory::PhysicsHorizontalCandidate);
 
-        const Vector2 origin = world.world_origin();
-        const Vector2 size = world.tile_size();
+        const engine::core::Vector2 origin = world.world_origin();
+        const engine::core::Vector2 size = world.tile_size();
 
         const int min_x = tile_index_min(candidate.left(), origin.x, size.x);
         const int max_x = tile_index_max(candidate.right(), origin.x, size.x);
@@ -90,11 +93,11 @@ namespace
                 if (!is_blocking_tile(world, tile_x, tile_y))
                     continue;
 
-                const Rect blocking_tile = tile_rect(world, tile_x, tile_y);
+                const engine::core::Rect blocking_tile = tile_rect(world, tile_x, tile_y);
                 if (!candidate.intersects(blocking_tile))
                     continue;
 
-                add_debug_rect(blocking_tile, DebugDrawCategory::PhysicsBlockingTile);
+                add_debug_rect(blocking_tile, engine::core::DebugDrawCategory::PhysicsBlockingTile);
 
                 if (delta_x > 0.0f)
                 {
@@ -114,18 +117,18 @@ namespace
 
     [[nodiscard]] float resolve_vertical_move(
         const TileCollisionWorld& world,
-        const Rect& current_rect,
+        const engine::core::Rect& current_rect,
         float delta_y
     ) noexcept
     {
-        if (std::fabs(delta_y) <= Vector2::k_epsilon)
+        if (std::fabs(delta_y) <= engine::core::Vector2::k_epsilon)
             return 0.0f;
 
-        const Rect candidate = current_rect.translated(Vector2(0.0f, delta_y));
-        add_debug_rect(candidate, DebugDrawCategory::PhysicsVerticalCandidate);
+        const engine::core::Rect candidate = current_rect.translated(engine::core::Vector2(0.0f, delta_y));
+        add_debug_rect(candidate, engine::core::DebugDrawCategory::PhysicsVerticalCandidate);
 
-        const Vector2 origin = world.world_origin();
-        const Vector2 size = world.tile_size();
+        const engine::core::Vector2 origin = world.world_origin();
+        const engine::core::Vector2 size = world.tile_size();
 
         const int min_x = tile_index_min(candidate.left(), origin.x, size.x);
         const int max_x = tile_index_max(candidate.right(), origin.x, size.x);
@@ -141,11 +144,11 @@ namespace
                 if (!is_blocking_tile(world, tile_x, tile_y))
                     continue;
 
-                const Rect blocking_tile = tile_rect(world, tile_x, tile_y);
+                const engine::core::Rect blocking_tile = tile_rect(world, tile_x, tile_y);
                 if (!candidate.intersects(blocking_tile))
                     continue;
 
-                add_debug_rect(blocking_tile, DebugDrawCategory::PhysicsBlockingTile);
+                add_debug_rect(blocking_tile, engine::core::DebugDrawCategory::PhysicsBlockingTile);
 
                 if (delta_y > 0.0f)
                 {
@@ -175,9 +178,9 @@ void PhysicsManager::clear_collision_world() noexcept
 }
 
 void PhysicsManager::register_body(
-    SceneObject *owner,
-    KinematicBody *body,
-    Collidable *collider) noexcept
+    engine::core::SceneObject *owner,
+    engine::core::KinematicBody *body,
+    engine::core::Collidable *collider) noexcept
 {
     if (!owner || !body || !collider)
         return;
@@ -198,7 +201,7 @@ void PhysicsManager::register_body(
     _bodies.push_back(BodyEntry{owner, body, collider});
 }
 
-void PhysicsManager::unregister_body(const SceneObject *owner) noexcept
+void PhysicsManager::unregister_body(const engine::core::SceneObject *owner) noexcept
 {
     if (!owner)
         return;
@@ -226,20 +229,20 @@ void PhysicsManager::step(double delta) noexcept
 
         add_debug_rect(
             entry.collider->collision_rect(),
-            DebugDrawCategory::PhysicsCollider
+            engine::core::DebugDrawCategory::PhysicsCollider
         );
 
         double effective_delta = delta;
-        if (const GameObject *game_object = dynamic_cast<const GameObject *>(entry.owner))
+        if (const engine::core::GameObject *game_object = dynamic_cast<const engine::core::GameObject *>(entry.owner))
         {
             effective_delta = game_object->scaled_delta(delta);
         }
 
-        const Vector2 desired_velocity = entry.body->desired_velocity();
+        const engine::core::Vector2 desired_velocity = entry.body->desired_velocity();
         if (desired_velocity.is_zero() || effective_delta <= 0.0)
             continue;
 
-        const Vector2 desired_move =
+        const engine::core::Vector2 desired_move =
             desired_velocity * static_cast<float>(effective_delta);
 
         if (!entry.collider->collision_enabled() || !_collision_world)
@@ -248,8 +251,8 @@ void PhysicsManager::step(double delta) noexcept
             continue;
         }
 
-        const Vector2 world_tile_size = _collision_world->tile_size();
-        if (world_tile_size.x <= Vector2::k_epsilon || world_tile_size.y <= Vector2::k_epsilon)
+        const engine::core::Vector2 world_tile_size = _collision_world->tile_size();
+        if (world_tile_size.x <= engine::core::Vector2::k_epsilon || world_tile_size.y <= engine::core::Vector2::k_epsilon)
         {
             entry.body->apply_translation(desired_move);
             continue;
@@ -262,7 +265,7 @@ void PhysicsManager::step(double delta) noexcept
             kMaxSubsteps,
             std::max( 1, static_cast<int>(std::ceil(desired_move.length() / max_step_distance)))
         );
-        const Vector2 substep_move = desired_move / static_cast<float>(substep_count);
+        const engine::core::Vector2 substep_move = desired_move / static_cast<float>(substep_count);
         bool collided_x = false;
         bool collided_y = false;
 
@@ -274,10 +277,10 @@ void PhysicsManager::step(double delta) noexcept
                 substep_move.x
             );
             collided_x = collided_x
-                || std::fabs(allowed_x - substep_move.x) > Vector2::k_epsilon;
-            if (std::fabs(allowed_x) > Vector2::k_epsilon)
+                || std::fabs(allowed_x - substep_move.x) > engine::core::Vector2::k_epsilon;
+            if (std::fabs(allowed_x) > engine::core::Vector2::k_epsilon)
             {
-                entry.body->apply_translation(Vector2(allowed_x, 0.0f));
+                entry.body->apply_translation(engine::core::Vector2(allowed_x, 0.0f));
             }
 
             const float allowed_y = resolve_vertical_move(
@@ -286,22 +289,22 @@ void PhysicsManager::step(double delta) noexcept
                 substep_move.y
             );
             collided_y = collided_y
-                || std::fabs(allowed_y - substep_move.y) > Vector2::k_epsilon;
-            if (std::fabs(allowed_y) > Vector2::k_epsilon)
+                || std::fabs(allowed_y - substep_move.y) > engine::core::Vector2::k_epsilon;
+            if (std::fabs(allowed_y) > engine::core::Vector2::k_epsilon)
             {
-                entry.body->apply_translation(Vector2(0.0f, allowed_y));
+                entry.body->apply_translation(engine::core::Vector2(0.0f, allowed_y));
             }
 
             add_debug_rect(
                 entry.collider->collision_rect(),
-                DebugDrawCategory::PhysicsSubstepCollider
+                engine::core::DebugDrawCategory::PhysicsSubstepCollider
             );
         }
 
         // Added for wand
         // Calc collision direction
-        Vector2 collision_direction = Vector2::zero();
-        if (collided_x && std::fabs(desired_move.x) > Vector2::k_epsilon)
+        engine::core::Vector2 collision_direction = engine::core::Vector2::zero();
+        if (collided_x && std::fabs(desired_move.x) > engine::core::Vector2::k_epsilon)
         {
             if (desired_move.x > 0.0f)
                 collision_direction.x = -1.0f;
@@ -309,7 +312,7 @@ void PhysicsManager::step(double delta) noexcept
                 collision_direction.x = 1.0f;
         }
 
-        if (collided_y && std::fabs(desired_move.y) > Vector2::k_epsilon)
+        if (collided_y && std::fabs(desired_move.y) > engine::core::Vector2::k_epsilon)
         {
             if (desired_move.y > 0.0f)
                 collision_direction.y = -1.0f;
@@ -329,4 +332,5 @@ void PhysicsManager::remove_invalid_entries() noexcept
 {
     std::erase_if(_bodies, [](const BodyEntry &entry)
                   { return !entry.owner || !entry.body || !entry.collider || entry.owner->is_destroyed(); });
+}
 }

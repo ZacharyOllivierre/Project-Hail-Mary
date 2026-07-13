@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+namespace engine::resources
+{
+
 bool AudioManager::load_sound(
 	const std::string& key,
 	const std::filesystem::path& file_path
@@ -135,4 +138,5 @@ Mix_Music* AudioManager::find_music(const std::string_view& key) const
 		return nullptr;
 
 	return iterator->second;
+}
 }

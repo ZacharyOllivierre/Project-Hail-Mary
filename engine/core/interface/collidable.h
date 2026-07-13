@@ -3,6 +3,9 @@
 #include "../geometry/rect.h"
 #include "../geometry/vector2.h"
 
+namespace engine::core
+{
+
 class Collidable
 {
 public:
@@ -25,3 +28,4 @@ public:
         return true;
     }
 };
+}

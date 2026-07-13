@@ -19,7 +19,7 @@ enum class Side
 class MapGenerator
 {
 public:
-    MapGenerator(const Vector2 gridDimensions, MapConfig config, TileMap &grid);
+    MapGenerator(const engine::core::Vector2 gridDimensions, MapConfig config, TileMap &grid);
 
     void generateRoom();
     void clearGrid();
@@ -27,10 +27,10 @@ public:
 private:
     void initGrid();
 
-    Rect buildBaseRoom();
-    Rect buildSubRoom(Rect &base, Side side = Side::None);
+    engine::core::Rect buildBaseRoom();
+    engine::core::Rect buildSubRoom(engine::core::Rect &base, Side side = Side::None);
 
-    void addRecToGrid(Rect &rec);
+    void addRecToGrid(engine::core::Rect &rec);
     void classifyRecs();
 
     bool isSolid(const int x, const int y);
@@ -38,7 +38,7 @@ private:
     void resetTile(Tile &tile);
 
 private:
-    Vector2 _gridDimensions;
+    engine::core::Vector2 _gridDimensions;
     TileMap &grid;
 
     MapConfig config;

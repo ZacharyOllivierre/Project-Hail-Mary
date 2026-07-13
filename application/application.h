@@ -5,9 +5,9 @@
 #include <SDL.h>
 #include <cstdlib>
 
-class Application: public Singleton<Application>
+class Application: public engine::tools::Singleton<Application>
 {
-    friend Singleton<Application>;
+    friend engine::tools::Singleton<Application>;
 public:
     Application();
     ~Application();
@@ -34,7 +34,7 @@ private:
     Uint64 _counter_freq = 0;
 
     SDL_Event _event;
-    InputSystem _input_system;
+    engine::input::InputSystem _input_system;
 
     SDL_Window* _window = nullptr;
     SDL_Renderer* _renderer = nullptr;
