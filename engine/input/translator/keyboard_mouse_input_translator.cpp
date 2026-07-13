@@ -40,10 +40,25 @@ std::vector<InputEvent> KeyboardMouseInputTranslator::translate_event(const SDL_
                 events,
                 *action,
                 input_event_type(event.type == SDL_MOUSEBUTTONDOWN),
-                InputDevice::Mouse
+                InputDevice::Mouse,
+                event.button.x,
+                event.button.y,
+                true
             );
         }
 
+        break;
+    }
+
+    case SDL_MOUSEMOTION:
+    {
+        InputEvent input_event;
+        input_event.type = InputEventType::PointerMoved;
+        input_event.device = InputDevice::Mouse;
+        input_event.has_pointer_position = true;
+        input_event.pointer_x = event.motion.x;
+        input_event.pointer_y = event.motion.y;
+        events.push_back(input_event);
         break;
     }
 

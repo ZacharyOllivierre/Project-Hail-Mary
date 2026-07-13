@@ -5,9 +5,9 @@
 #include "../../core/scene_object.h"
 #include "../../core/geometry/vector2.h"
 #include "../../core/geometry/rect.h"
+#include "../../core/render/render_command.h"
 
 struct UiTheme;
-struct UiRenderCommand;
 
 class UiElement : public SceneObject
 {
