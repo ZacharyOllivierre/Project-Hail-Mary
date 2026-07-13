@@ -4,6 +4,9 @@
 
 #include <filesystem>
 
+namespace engine::io
+{
+
 class FontsManifestLoader
 {
 public:
@@ -12,3 +15,4 @@ public:
 		FontManifest& manifest
 	) const;
 };
+}

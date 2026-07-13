@@ -5,6 +5,9 @@
 #include <SDL.h>
 #include <vector>
 
+namespace engine::input
+{
+
 class InputTranslator
 {
 public:
@@ -20,3 +23,4 @@ protected:
         InputDevice device
     ) const;
 };
+}

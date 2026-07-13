@@ -7,6 +7,9 @@
 #include <string_view>
 #include <unordered_map>
 
+namespace engine::resources
+{
+
 using TexturePool = std::unordered_map<std::string, SDL_Texture*>;
 
 class TextureManager
@@ -20,3 +23,4 @@ public:
 private:
 	TexturePool _texture_pool;
 };
+}

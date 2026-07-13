@@ -4,6 +4,9 @@
 
 #include <iostream>
 
+namespace engine::resources
+{
+
 const Atlas* AtlasManager::find_atlas(const std::string_view& key) const
 {
 	AtlasPool::const_iterator iterator = _atlas_pool.find(std::string(key));
@@ -79,4 +82,5 @@ bool AtlasManager::load_atlas(
 
 	_atlas_pool.emplace(request.atlas_key, std::move(atlas));
 	return true;
+}
 }

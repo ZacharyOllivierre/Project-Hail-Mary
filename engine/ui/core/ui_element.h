@@ -6,22 +6,30 @@
 #include "../../core/geometry/vector2.h"
 #include "../../core/geometry/rect.h"
 
-struct UiTheme;
+namespace engine::core
+{
 struct UiRenderCommand;
+}
 
-class UiElement : public SceneObject
+namespace engine::ui
+{
+
+struct UiTheme;
+
+
+class UiElement : public ::engine::core::SceneObject
 {
 public:
 
     // Higher UI order values are rendered on top and receive input first.
     explicit UiElement(
-        const Rect& rect = Rect::zero(),
+        const ::engine::core::Rect& rect = ::engine::core::Rect::zero(),
         int order = 0
     ) noexcept : _screen_rect(rect), _order(order) {}
 
     UiElement(
-        const Vector2& position,
-        const Vector2& size,
+        const ::engine::core::Vector2& position,
+        const ::engine::core::Vector2& size,
         int order = 0
     ) noexcept : _screen_rect(position, size), _order(order) {}
 
@@ -32,26 +40,26 @@ public:
     UiElement(UiElement&&) = delete;
     UiElement& operator=(UiElement&&) = delete;
 
-    virtual void submit_ui_render_commands(std::vector<UiRenderCommand>& out_commands) const
+    virtual void submit_ui_render_commands(std::vector<::engine::core::UiRenderCommand>& out_commands) const
     {
         (void)out_commands;
     }
 
     void reset() noexcept override
     {
-        SceneObject::reset();
+        ::engine::core::SceneObject::reset();
         _use_theme = true;
     }
 
-    void set_screen_rect(const Rect& rect) noexcept { _screen_rect = rect; }
-    void set_position(const Vector2& position) noexcept { _screen_rect.set_position(position); }
-    void set_center(const Vector2& center) noexcept { _screen_rect.set_center(center); }
-    void set_size(const Vector2& size) noexcept { _screen_rect.set_size(size); }
+    void set_screen_rect(const ::engine::core::Rect& rect) noexcept { _screen_rect = rect; }
+    void set_position(const ::engine::core::Vector2& position) noexcept { _screen_rect.set_position(position); }
+    void set_center(const ::engine::core::Vector2& center) noexcept { _screen_rect.set_center(center); }
+    void set_size(const ::engine::core::Vector2& size) noexcept { _screen_rect.set_size(size); }
 
-    [[nodiscard]] const Rect& screen_rect() const noexcept { return _screen_rect; }
-    [[nodiscard]] Vector2 position() const noexcept { return _screen_rect.position(); }
-    [[nodiscard]] Vector2 center() const noexcept { return _screen_rect.center(); }
-    [[nodiscard]] Vector2 size() const noexcept { return _screen_rect.size(); }
+    [[nodiscard]] const ::engine::core::Rect& screen_rect() const noexcept { return _screen_rect; }
+    [[nodiscard]] ::engine::core::Vector2 position() const noexcept { return _screen_rect.position(); }
+    [[nodiscard]] ::engine::core::Vector2 center() const noexcept { return _screen_rect.center(); }
+    [[nodiscard]] ::engine::core::Vector2 size() const noexcept { return _screen_rect.size(); }
 
     [[nodiscard]] int order() const noexcept { return _order; }
 
@@ -66,7 +74,8 @@ protected:
     virtual void apply_theme(const UiTheme& theme) { (void)theme; }
 
 private:
-    Rect _screen_rect{};
+    ::engine::core::Rect _screen_rect{};
     int _order = 0;
     bool _use_theme = true;
 };
+}

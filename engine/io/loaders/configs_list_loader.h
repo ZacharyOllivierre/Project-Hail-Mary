@@ -4,6 +4,9 @@
 
 #include <filesystem>
 
+namespace engine::io
+{
+
 class ConfigsListLoader
 {
 public:
@@ -12,3 +15,4 @@ public:
 		ConfigRegistry& out_registry
 	) const;
 };
+}

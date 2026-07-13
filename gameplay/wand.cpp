@@ -1,6 +1,6 @@
 #include "wand.h"
 
-vector<unique_ptr<Projectile>> Wand::attack(const Vector2 &origin, const Vector2 &direction)
+vector<unique_ptr<Projectile>> Wand::attack(const ::engine::core::Vector2 &origin, const ::engine::core::Vector2 &direction)
 {
     _origin = origin;
     vector<unique_ptr<Projectile>> projectiles;
@@ -10,10 +10,10 @@ vector<unique_ptr<Projectile>> Wand::attack(const Vector2 &origin, const Vector2
     return projectiles;
 }
 
-void Wand::make_bullets(vector<unique_ptr<Projectile>> &projectiles, const Vector2 &direction)
+void Wand::make_bullets(vector<unique_ptr<Projectile>> &projectiles, const ::engine::core::Vector2 &direction)
 {
     const int count = std::max(1, _wand_attributes.bullet_count);
-    Vector2 aim = direction.normalized();
+    ::engine::core::Vector2 aim = direction.normalized();
 
     for (int i = 0; i < count; i++)
     {
@@ -21,7 +21,7 @@ void Wand::make_bullets(vector<unique_ptr<Projectile>> &projectiles, const Vecto
         float angle = calculate_bullet_angle(i);
 
         // Calculate shot direction
-        Vector2 shot_direction = aim.rotated(angle);
+        ::engine::core::Vector2 shot_direction = aim.rotated(angle);
 
         // Update bullet velocity via shot direction
         _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;

@@ -1,5 +1,8 @@
 #include "scene_manager.h"
 
+namespace engine::scene
+{
+
 SceneManager::~SceneManager()
 {
     if (_current_scene)
@@ -29,8 +32,8 @@ void SceneManager::on_imgui()
 }
 
 void SceneManager::on_input(
-    const InputSnapshot& input,
-    const std::vector<InputEvent>& events
+    const ::engine::input::InputSnapshot& input,
+    const std::vector<::engine::input::InputEvent>& events
 )
 {
     if (_current_scene)
@@ -52,4 +55,5 @@ void SceneManager::reset_current_scene()
 {
     if (_current_scene)
         _current_scene->reset();
+}
 }

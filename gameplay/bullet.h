@@ -9,12 +9,12 @@
 struct Bullet_Attributes
 {
     float bullet_speed = 400.0f;
-    Vector2 bullet_velocity;
+    ::engine::core::Vector2 bullet_velocity;
 
     float max_age = 20.0f;
 
-    Vector2 start_position;
-    Vector2 bullet_size = {24.0f, 24.0f};
+    ::engine::core::Vector2 start_position;
+    ::engine::core::Vector2 bullet_size = {24.0f, 24.0f};
     bool damage_based_size = false;
 
     float curve = 0.0f;
@@ -35,16 +35,16 @@ class Bullet final : public Projectile
 public:
     Bullet(const Bullet_Attributes &bullet_attributes) noexcept;
 
-    void submit_render_commands(std::vector<RenderCommand> &out_commands) const override;
-    void on_collision(const Vector2 &collision_direction) noexcept override;
+    void submit_render_commands(std::vector<::engine::core::RenderCommand> &out_commands) const override;
+    void on_collision(const ::engine::core::Vector2 &collision_direction) noexcept override;
 
     void update(double delta) override;
 
     inline float get_damage() { return _bullet_attributes.damage; }
 
 private:
-    bool handle_wall_bounce(const Vector2 &collision_direction);
-    EffectSpawnRequest create_collision_effect(const std::string &effect_key);
+    bool handle_wall_bounce(const ::engine::core::Vector2 &collision_direction);
+    ::engine::animation::EffectSpawnRequest create_collision_effect(const std::string &effect_key);
 
     void apply_curve(double &delta);
     void apply_growth();

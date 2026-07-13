@@ -2,6 +2,9 @@
 
 #include <string>
 
+namespace engine::input
+{
+
 enum class InputAction
 {
     Left,
@@ -62,3 +65,4 @@ struct InputEvent
     int wheel_y = 0;
     std::string text;
 };
+}

@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <utility>
 
+namespace engine::ui
+{
+
 Button::Button(SDL_Renderer* renderer, SDL_Rect rect_button)
 {
     init_assert(renderer, "Button renderer must not be null.");
@@ -224,3 +227,4 @@ void Button::reset_click_count()
 }
 
 
+}

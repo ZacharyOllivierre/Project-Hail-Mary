@@ -7,6 +7,9 @@
 
 #include <vector>
 
+namespace engine::core
+{
+
 [[nodiscard]] inline SDL_RendererFlip to_sdl_renderer_flip(SpriteFlip flip) noexcept
 {
     switch (flip)
@@ -201,4 +204,5 @@ inline void execute_render_commands(
 {
     for (const UiRenderCommand& render_command : render_commands)
         execute_render_command(renderer, render_command);
+}
 }

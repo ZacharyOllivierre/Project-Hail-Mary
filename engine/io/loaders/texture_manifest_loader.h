@@ -4,6 +4,9 @@
 
 #include <filesystem>
 
+namespace engine::io
+{
+
 class TextureManifestLoader
 {
 public:
@@ -12,3 +15,4 @@ public:
 		TextureManifest& manifest
 	) const;
 };
+}

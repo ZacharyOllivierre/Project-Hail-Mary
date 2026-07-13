@@ -4,6 +4,9 @@
 
 #include <optional>
 
+namespace engine::input
+{
+
 class KeyboardMouseInputTranslator : public InputTranslator
 {
 public:
@@ -13,3 +16,4 @@ private:
     std::optional<InputAction> action_from_key(SDL_Keycode key) const;
     std::optional<InputAction> action_from_mouse_button(Uint8 button) const;
 };
+}

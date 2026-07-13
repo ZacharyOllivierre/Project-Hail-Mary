@@ -12,20 +12,20 @@
 
 namespace
 {
-	class GameplayMap final : public GameObject
+	class GameplayMap final : public ::engine::core::GameObject
 	{
 	public:
 		GameplayMap()
-			: GameObject(DepthLayer::Item)
+			: ::engine::core::GameObject(::engine::core::DepthLayer::Item)
 		{
-			_texture = ResourceManager::instance()->find_texture("room_tiles");
+			_texture = ::engine::resources::ResourceManager::instance()->find_texture("room_tiles");
 			set_position({10.0f, 10.0f});
 			set_size({3344.0f, 1882.0f});
 		}
 
-		void submit_render_commands(std::vector<RenderCommand> &out_commands) const override
+		void submit_render_commands(std::vector<::engine::core::RenderCommand> &out_commands) const override
 		{
-			RenderCommand command;
+			::engine::core::RenderCommand command;
 			command.command_rect = world_rect();
 			command.texture = _texture;
 			out_commands.push_back(std::move(command));
@@ -46,7 +46,7 @@ void GameScene::on_enter()
 
 void GameScene::on_update(double delta)
 {
-	Scene::on_update(delta);
+	::engine::scene::Scene::on_update(delta);
 
 	if (!_player || _player->is_destroyed() || _player->is_dead())
 	{
@@ -60,7 +60,7 @@ void GameScene::on_update(double delta)
 
 void GameScene::on_render(SDL_Renderer *renderer)
 {
-	Scene::on_render(renderer);
+	::engine::scene::Scene::on_render(renderer);
 
 	if (!renderer)
 		return;
@@ -83,16 +83,16 @@ void GameScene::on_render(SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, draw_r, draw_g, draw_b, draw_a);
 }
 
-void GameScene::on_input(const InputSnapshot &input, const std::vector<InputEvent> &events)
+void GameScene::on_input(const ::engine::input::InputSnapshot &input, const std::vector<::engine::input::InputEvent> &events)
 {
-	Scene::on_input(input, events);
+	::engine::scene::Scene::on_input(input, events);
 	consume_player_effect_requests();
 
 	if (_player && _player->is_destroyed())
 		_player = nullptr;
 
 	if ((!_player || _player->is_destroyed() || _player->is_dead()) &&
-		input.state.is_just_pressed(InputAction::Attack))
+		input.state.is_just_pressed(::engine::input::InputAction::Attack))
 	{
 		spawn_player();
 	}
@@ -121,8 +121,8 @@ void GameScene::spawn_player()
 
 	_player = create_and_add_object<Character>(
 		"elves",
-		Vector2(200.0f, 200.0f),
-		Vector2(100.0f, 100.0f),
+		::engine::core::Vector2(200.0f, 200.0f),
+		::engine::core::Vector2(100.0f, 100.0f),
 		"fire.impact_radial");
 
 	if (_player)
@@ -151,13 +151,13 @@ void GameScene::consume_player_effect_requests()
 	if (!_player || _player->is_destroyed() || _player->is_dead())
 		return;
 
-	std::vector<EffectSpawnRequest> effect_requests =
+	std::vector<::engine::animation::EffectSpawnRequest> effect_requests =
 		_player->drain_effect_spawn_requests();
 
-	for (const EffectSpawnRequest &request : effect_requests)
+	for (const ::engine::animation::EffectSpawnRequest &request : effect_requests)
 	{
-		std::unique_ptr<Effect> effect =
-			EffectManager::instance()->create_effect(request);
+		std::unique_ptr<::engine::animation::Effect> effect =
+			::engine::animation::EffectManager::instance()->create_effect(request);
 		if (!effect)
 			continue;
 

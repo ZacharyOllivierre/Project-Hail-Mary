@@ -5,6 +5,9 @@
 #include "../geometry/rect.h"
 #include "../geometry/vector2.h"
 
+namespace engine::core
+{
+
 enum class SpriteFlip
 {
     None,
@@ -188,4 +191,5 @@ inline void set_ui_command_clip_rect(UiRenderCommand& command, const Rect& clip_
     UiRenderCommand command = make_ui_draw_line_command(line_start, line_end, color);
     set_ui_command_clip_rect(command, clip_rect);
     return command;
+}
 }

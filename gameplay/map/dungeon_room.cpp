@@ -54,15 +54,15 @@ namespace
 }
 
 DungeonRoom::DungeonRoom()
-    : GameObject(DepthLayer::Terrain),
+    : ::engine::core::GameObject(::engine::core::DepthLayer::Terrain),
       _grid_size{25.0f, 25.0f},
       _generator(std::make_unique<MapGenerator>(_grid_size, _config, _tile_map))
 {
     set_position({kRoomOriginX, kRoomOriginY});
     set_size({_grid_size.x * k_tile_render_size, _grid_size.y * k_tile_render_size});
-    if (ResourceManager::instance())
+    if (::engine::resources::ResourceManager::instance())
     {
-        _tile_sheet_texture = ResourceManager::instance()->find_texture("room_tiles");
+        _tile_sheet_texture = ::engine::resources::ResourceManager::instance()->find_texture("room_tiles");
     }
 
     if (!_tile_sheet_texture)
@@ -85,9 +85,9 @@ void DungeonRoom::generate()
     _generator->generateRoom();
 }
 
-Vector2 DungeonRoom::tile_render_size() const noexcept
+::engine::core::Vector2 DungeonRoom::tile_render_size() const noexcept
 {
-    return Vector2(k_tile_render_size, k_tile_render_size);
+    return ::engine::core::Vector2(k_tile_render_size, k_tile_render_size);
 }
 
 const TileMap& DungeonRoom::tile_map() const noexcept
@@ -95,7 +95,7 @@ const TileMap& DungeonRoom::tile_map() const noexcept
     return _tile_map;
 }
 
-void DungeonRoom::submit_render_commands(std::vector<RenderCommand> &commands) const
+void DungeonRoom::submit_render_commands(std::vector<::engine::core::RenderCommand> &commands) const
 {
     if (!_tile_sheet_texture)
         return;
@@ -108,15 +108,15 @@ void DungeonRoom::submit_render_commands(std::vector<RenderCommand> &commands) c
         {
             const Tile &tile = tiles[y][x];
 
-            RenderCommand command;
+            ::engine::core::RenderCommand command;
             command.texture = _tile_sheet_texture;
-            command.command_rect = Rect{
+            command.command_rect = ::engine::core::Rect{
                 position().x + static_cast<float>(x) * k_tile_render_size,
                 position().y + static_cast<float>(y) * k_tile_render_size,
                 k_tile_render_size,
                 k_tile_render_size};
             command.use_src_rect = true;
-            command.src_rect = Rect{
+            command.src_rect = ::engine::core::Rect{
                 static_cast<float>(sprite_index_for_tile(tile.type) * kTileSpriteSize),
                 0.0f,
                 static_cast<float>(kTileSpriteSize),

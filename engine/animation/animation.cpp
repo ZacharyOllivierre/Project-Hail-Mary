@@ -1,5 +1,8 @@
 #include "animation.h"
 
+namespace engine::animation
+{
+
 Animation::Animation()
 {
 	_timer.set_one_shot(false);
@@ -29,13 +32,13 @@ Animation::Animation()
 }
 
 bool Animation::build_render_command(
-	const Rect& target_rect,
+	const ::engine::core::Rect& target_rect,
 	double angle_degrees,
-	SpriteFlip flip,
-	RenderCommand& out_command
+	::engine::core::SpriteFlip flip,
+	::engine::core::RenderCommand& out_command
 ) const
 {
-	const FrameInfo* frame_info = current_frame();
+	const ::engine::resources::FrameInfo* frame_info = current_frame();
 	if (!frame_info || !frame_info->_texture)
 		return false;
 
@@ -43,7 +46,7 @@ bool Animation::build_render_command(
 	out_command.command_rect = target_rect;
 	out_command.use_src_rect = false;
 	out_command.rotation_degrees = angle_degrees;
-	out_command.rotation_origin = Vector2(0.5f, 0.5f);
+	out_command.rotation_origin = ::engine::core::Vector2(0.5f, 0.5f);
 	out_command.flip = flip;
 	return true;
 }
@@ -56,7 +59,7 @@ void Animation::update(double delta_seconds)
 	_timer.update(delta_seconds);
 }
 
-void Animation::set_atlas(const Atlas* atlas)
+void Animation::set_atlas(const ::engine::resources::Atlas* atlas)
 {
 	_atlas = atlas;
 	reset();
@@ -110,10 +113,11 @@ size_t Animation::current_frame_index() const
 	return _frame_index;
 }
 
-const FrameInfo* Animation::current_frame() const
+const ::engine::resources::FrameInfo* Animation::current_frame() const
 {
 	if (!_atlas)
 		return nullptr;
 
 	return _atlas->frame_at(_frame_index);
+}
 }

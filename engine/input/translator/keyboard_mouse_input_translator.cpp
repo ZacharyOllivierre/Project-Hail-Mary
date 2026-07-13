@@ -2,6 +2,9 @@
 
 #include <SDL.h>
 
+namespace engine::input
+{
+
 std::vector<InputEvent> KeyboardMouseInputTranslator::translate_event(const SDL_Event& event) const
 {
     std::vector<InputEvent> events;
@@ -138,4 +141,5 @@ std::optional<InputAction> KeyboardMouseInputTranslator::action_from_mouse_butto
     default:
         return std::nullopt;
     }
+}
 }

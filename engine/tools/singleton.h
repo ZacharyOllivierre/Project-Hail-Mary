@@ -1,5 +1,8 @@
 #pragma once
 
+namespace engine::tools
+{
+
 template<typename T>
 class Singleton
 {
@@ -16,3 +19,4 @@ protected:
     Singleton(const Singleton&) = delete;
     Singleton& operator=(const Singleton&) = delete;
 };
+}

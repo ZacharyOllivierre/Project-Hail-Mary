@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 
+namespace engine::resources
+{
+
 struct AtlasLoadRequest
 {
 	std::string atlas_key;
@@ -27,6 +30,7 @@ struct EffectBuildRequest
 {
 	std::string effect_key;
 	std::string animation_key;
-	std::optional<Vector2> default_size;
+	std::optional<::engine::core::Vector2> default_size;
 	std::optional<double> angle_degrees;
 };
+}

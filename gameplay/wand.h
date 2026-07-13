@@ -36,10 +36,10 @@ class Wand
 public:
     Wand() = default;
 
-    vector<unique_ptr<Projectile>> attack(const Vector2 &origin, const Vector2 &direction);
+    vector<unique_ptr<Projectile>> attack(const ::engine::core::Vector2 &origin, const ::engine::core::Vector2 &direction);
 
 private:
-    void make_bullets(vector<unique_ptr<Projectile>> &projectiles, const Vector2 &direction);
+    void make_bullets(vector<unique_ptr<Projectile>> &projectiles, const ::engine::core::Vector2 &direction);
 
     float calculate_bullet_angle(int index);
     float calc_uniform_spread_angle(int num);
@@ -50,5 +50,5 @@ private:
     WandAttributes _wand_attributes;
     Bullet_Attributes _bullet_attributes;
 
-    Vector2 _origin;
+    ::engine::core::Vector2 _origin;
 };

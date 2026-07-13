@@ -2,6 +2,9 @@
 
 #include <cmath>
 
+namespace engine::core
+{
+
 class Vector2
 {
 public:
@@ -190,3 +193,4 @@ public:
 		return vec * val;
 	}
 };
+}

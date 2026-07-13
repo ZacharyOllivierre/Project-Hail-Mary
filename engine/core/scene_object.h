@@ -1,5 +1,8 @@
 #pragma once
 
+namespace engine::core
+{
+
 class SceneObject
 {
 public:
@@ -35,3 +38,4 @@ private:
     bool _visible = true;
     bool _active = true;
 };
+}

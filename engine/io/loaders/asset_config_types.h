@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include <vector>
 
+namespace engine::io
+{
+
 struct FontManifestEntry
 {
 	std::string key;
@@ -55,3 +58,4 @@ struct ConfigRegistry
 
 	std::unordered_map<std::string, std::filesystem::path> config_paths;
 };
+}

@@ -3,6 +3,9 @@
 #include <SDL_mixer.h>
 #include <functional>
 
+namespace engine::ui
+{
+
 class Button
 {
 public:
@@ -108,3 +111,4 @@ private:
     int time_on_click = 0;
 
 };
+}

@@ -5,6 +5,9 @@
 #include "../geometry/rect.h"
 #include "../geometry/vector2.h"
 
+namespace engine::core
+{
+
 [[nodiscard]] inline SDL_Point to_sdl_point(const Vector2& point) noexcept
 {
     return SDL_Point{
@@ -34,4 +37,5 @@
     sdl_rect.w = rect.width();
     sdl_rect.h = rect.height();
     return sdl_rect;
+}
 }

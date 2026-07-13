@@ -4,9 +4,12 @@
 
 #include <iostream>
 
+namespace engine::animation
+{
+
 bool AnimationManager::register_animation(
-	const AnimationBuildRequest& request,
-	const Atlas* atlas
+	const ::engine::resources::AnimationBuildRequest& request,
+	const ::engine::resources::Atlas* atlas
 )
 {
 	if (request.animation_key.empty())
@@ -49,13 +52,13 @@ bool AnimationManager::register_animation(
 }
 
 bool AnimationManager::register_animations(
-	const std::vector<AnimationBuildRequest>& requests,
-	const ResourceManager& resource_manager
+	const std::vector<::engine::resources::AnimationBuildRequest>& requests,
+	const ::engine::resources::ResourceManager& resource_manager
 )
 {
-	for (const AnimationBuildRequest& request : requests)
+	for (const ::engine::resources::AnimationBuildRequest& request : requests)
 	{
-		const Atlas* atlas = resource_manager.find_atlas(request.atlas_key);
+		const ::engine::resources::Atlas* atlas = resource_manager.find_atlas(request.atlas_key);
 		if (!register_animation(request, atlas))
 			return false;
 	}
@@ -88,4 +91,5 @@ std::unique_ptr<Animation> AnimationManager::create_animation(const std::string_
 	animation->set_loop(definition->loop);
 	animation->set_interval_seconds(1.0 / definition->fps);
 	return animation;
+}
 }

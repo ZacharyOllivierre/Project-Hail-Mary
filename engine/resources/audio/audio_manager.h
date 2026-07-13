@@ -7,6 +7,9 @@
 #include <string_view>
 #include <unordered_map>
 
+namespace engine::resources
+{
+
 using SoundPool = std::unordered_map<std::string, Mix_Chunk*>;
 using MusicPool = std::unordered_map<std::string, Mix_Music*>;
 
@@ -26,3 +29,4 @@ private:
 	SoundPool _sound_pool;
 	MusicPool _music_pool;
 };
+}

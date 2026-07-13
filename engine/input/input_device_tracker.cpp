@@ -1,5 +1,8 @@
 #include "input_device_tracker.h"
 
+namespace engine::input
+{
+
 void InputDeviceTracker::begin_frame()
 {
     _device_switched_this_frame = false;
@@ -84,4 +87,5 @@ InputDevice InputDeviceTracker::detect_event_device(const SDL_Event& event) cons
 bool InputDeviceTracker::is_keyboard_or_mouse(InputDevice device) const
 {
     return device == InputDevice::Keyboard || device == InputDevice::Mouse;
+}
 }

@@ -12,7 +12,7 @@ int random_value(int min_value, int max_value)
     return min_value + (std::rand() % (max_value - min_value + 1));
 }
 
-MapGenerator::MapGenerator(const Vector2 gridDimensions, MapConfig config, TileMap &grid)
+MapGenerator::MapGenerator(const ::engine::core::Vector2 gridDimensions, MapConfig config, TileMap &grid)
     : _gridDimensions(gridDimensions), grid(grid), config(config)
 {
     static bool seeded = false;
@@ -29,12 +29,12 @@ void MapGenerator::generateRoom()
 {
     clearGrid();
 
-    Rect base = buildBaseRoom();
+    ::engine::core::Rect base = buildBaseRoom();
     addRecToGrid(base);
 
     for (int i = 0; i < config.numSubRooms; i++)
     {
-        Rect subRoom = buildSubRoom(base);
+        ::engine::core::Rect subRoom = buildSubRoom(base);
         addRecToGrid(subRoom);
     }
 
@@ -70,10 +70,10 @@ void MapGenerator::initGrid()
     }
 }
 
-Rect MapGenerator::buildBaseRoom()
+::engine::core::Rect MapGenerator::buildBaseRoom()
 {
-    Rect room{0.0f, 0.0f, config.baseRoomSize.x, config.baseRoomSize.y};
-    Vector2 center = {_gridDimensions.x / 2.0f, _gridDimensions.y / 2.0f};
+    ::engine::core::Rect room{0.0f, 0.0f, config.baseRoomSize.x, config.baseRoomSize.y};
+    ::engine::core::Vector2 center = {_gridDimensions.x / 2.0f, _gridDimensions.y / 2.0f};
 
     room.set_x(center.x - (room.width() / 2.0f));
     room.set_y(center.y - (room.height() / 2.0f));
@@ -82,20 +82,20 @@ Rect MapGenerator::buildBaseRoom()
 }
 
 // Builds room adjacent to main room, bounded by grid size / minimum gap
-Rect MapGenerator::buildSubRoom(Rect &base, Side side)
+::engine::core::Rect MapGenerator::buildSubRoom(::engine::core::Rect &base, Side side)
 {
     if (side == Side::None)
     {
         side = static_cast<Side>(random_value(static_cast<int>(Side::Top), static_cast<int>(Side::Right)));
     }
 
-    Rect room;
+    ::engine::core::Rect room;
 
     int baseRight = static_cast<int>(base.x() + base.width() - 1.0f);
     int baseBottom = static_cast<int>(base.y() + base.height() - 1.0f);
 
-    Vector2 minSize = config.minSubRoomSize;
-    Vector2 anchorPoint;
+    ::engine::core::Vector2 minSize = config.minSubRoomSize;
+    ::engine::core::Vector2 anchorPoint;
 
     /*When taking only outer most edges of full shape minGap space
     will always be walkable between rooms*/
@@ -167,7 +167,7 @@ Rect MapGenerator::buildSubRoom(Rect &base, Side side)
     return room;
 }
 
-void MapGenerator::addRecToGrid(Rect &rec)
+void MapGenerator::addRecToGrid(::engine::core::Rect &rec)
 {
     auto &tiles = grid.data();
 

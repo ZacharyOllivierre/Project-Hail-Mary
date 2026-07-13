@@ -1,1 +1,0 @@
-// Translating map to compressed data and vice versa 

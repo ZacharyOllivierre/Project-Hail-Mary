@@ -7,6 +7,9 @@
 #include <iostream>
 #include <memory>
 
+namespace engine::resources
+{
+
 ResourceManager::ResourceManager()
 	: _atlas_manager(std::make_unique<AtlasManager>())
 {
@@ -24,10 +27,10 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 
 	_renderer = renderer;
 
-	if (!PathManager::instance()->init())
+	if (!::engine::io::PathManager::instance()->init())
 	{
-		std::cout << "ResourceManager init failed: PathManager init fail." << std::endl;
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "PathManager init fail");
+		std::cout << "ResourceManager init failed: ::engine::io::PathManager init fail." << std::endl;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "::engine::io::PathManager init fail");
 		return false;
 	}
 
@@ -112,4 +115,5 @@ const Atlas* ResourceManager::build_atlas(
 		return nullptr;
 
 	return _atlas_manager->find_atlas(request.atlas_key);
+}
 }

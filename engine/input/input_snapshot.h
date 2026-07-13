@@ -2,6 +2,9 @@
 
 #include "input_types.h"
 
+namespace engine::input
+{
+
 class InputState;
 
 struct InputSnapshot
@@ -11,3 +14,4 @@ struct InputSnapshot
     InputDevice device = InputDevice::Unknown;
     bool device_switched_this_frame = false;
 };
+}

@@ -12,6 +12,9 @@
 #include <SDL.h>
 #include <vector>
 
+namespace engine::input
+{
+
 class InputSystem
 {
 public:
@@ -38,3 +41,4 @@ private:
     KeyboardMouseInputTranslator _keyboard_mouse_translator;
     GamepadInputTranslator _gamepad_translator;
 };
+}

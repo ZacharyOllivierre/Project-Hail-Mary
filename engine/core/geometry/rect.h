@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <cmath>
 
+namespace engine::core
+{
+
 struct Rect
 {
     static constexpr float k_epsilon = Vector2::k_epsilon;
@@ -364,3 +367,4 @@ private:
     float _width = 0.0f;
     float _height = 0.0f;
 };
+}

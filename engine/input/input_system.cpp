@@ -1,5 +1,8 @@
 #include "input_system.h"
 
+namespace engine::input
+{
+
 void InputSystem::begin_frame()
 {
     _state.begin_frame();
@@ -113,3 +116,4 @@ void InputSystem::append_event(const InputEvent& event)
     _events.push_back(event);
 }
 
+}

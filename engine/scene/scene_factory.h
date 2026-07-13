@@ -7,6 +7,9 @@
 #include <type_traits>
 #include <utility>
 
+namespace engine::scene
+{
+
 //Factory + Registry
 class SceneFactory
 {
@@ -84,4 +87,5 @@ bool SceneFactory::destroy_scene()
 	_scene_cache.erase(iter);
 
 	return true;
+}
 }

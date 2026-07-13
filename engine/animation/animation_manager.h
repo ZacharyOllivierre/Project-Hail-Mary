@@ -10,7 +10,16 @@
 #include <unordered_map>
 #include <vector>
 
+namespace engine::resources
+{
+class Atlas;
 class ResourceManager;
+}
+
+namespace engine::animation
+{
+
+
 
 struct AnimationDefinition
 {
@@ -19,21 +28,21 @@ struct AnimationDefinition
 	double fps = 10.0;
 	bool loop = true;
 	size_t segment_index = 0;
-	const Atlas* atlas = nullptr;
+	const ::engine::resources::Atlas* atlas = nullptr;
 };
 
-class AnimationManager : public Singleton<AnimationManager>
+class AnimationManager : public ::engine::tools::Singleton<AnimationManager>
 {
-	friend Singleton<AnimationManager>;
+	friend ::engine::tools::Singleton<AnimationManager>;
 
 public:
 	bool register_animation(
-		const AnimationBuildRequest& request,
-		const Atlas* atlas
+		const ::engine::resources::AnimationBuildRequest& request,
+		const ::engine::resources::Atlas* atlas
 	);
 	bool register_animations(
-		const std::vector<AnimationBuildRequest>& requests,
-		const ResourceManager& resource_manager
+		const std::vector<::engine::resources::AnimationBuildRequest>& requests,
+		const ::engine::resources::ResourceManager& resource_manager
 	);
 
 	const AnimationDefinition* find_definition(const std::string_view& key) const;
@@ -42,3 +51,4 @@ public:
 private:
 	std::unordered_map<std::string, AnimationDefinition> _definitions;
 };
+}

@@ -1,5 +1,8 @@
 #include "timer.h"
 
+namespace engine::tools
+{
+
 void Timer::restart()
 {
 	_elapsed_seconds = 0.0;
@@ -88,4 +91,5 @@ void Timer::update(double delta_seconds)
 			break;
 		}
 	}
+}
 }

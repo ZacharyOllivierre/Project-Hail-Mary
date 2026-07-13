@@ -7,6 +7,9 @@
 #include <string_view>
 #include <unordered_map>
 
+namespace engine::resources
+{
+
 using FontPool = std::unordered_map<std::string, TTF_Font*>;
 
 class FontManager
@@ -19,3 +22,4 @@ public:
 private:
 	FontPool _font_pool;
 };
+}

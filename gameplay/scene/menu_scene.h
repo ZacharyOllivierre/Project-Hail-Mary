@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-class MenuScene final : public Scene
+class MenuScene final : public ::engine::scene::Scene
 {
 public:
 	MenuScene() = default;
@@ -17,7 +17,7 @@ public:
 	void on_enter() override;
 	void on_update(double delta) override;
 	void on_render(SDL_Renderer* renderer) override;
-	void on_input(const InputSnapshot& input, const std::vector<InputEvent>& events) override;
+	void on_input(const ::engine::input::InputSnapshot& input, const std::vector<::engine::input::InputEvent>& events) override;
 	void on_exit() override;
 	void reset() override;
 
@@ -27,7 +27,7 @@ public:
 private:
 	void create_start_button(SDL_Renderer* renderer);
 
-	std::unique_ptr<Button> _start_button;
+	std::unique_ptr<::engine::ui::Button> _start_button;
 
 	// Menu text
 	TTF_Font* _menu_font = nullptr;

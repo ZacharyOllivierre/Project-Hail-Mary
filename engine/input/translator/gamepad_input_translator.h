@@ -2,6 +2,9 @@
 
 #include "input_translator.h"
 
+namespace engine::input
+{
+
 class GamepadInputTranslator : public InputTranslator
 {
 public:
@@ -14,3 +17,4 @@ private:
         InputEventType type
     ) const;
 };
+}

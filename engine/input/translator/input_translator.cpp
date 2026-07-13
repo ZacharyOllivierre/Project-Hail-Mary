@@ -1,5 +1,8 @@
 #include "input_translator.h"
 
+namespace engine::input
+{
+
 InputEventType InputTranslator::input_event_type(bool pressed) const
 {
     return pressed ? InputEventType::Pressed : InputEventType::Released;
@@ -13,4 +16,5 @@ void InputTranslator::append_event(
 ) const
 {
     events.push_back({ action, type, device });
+}
 }

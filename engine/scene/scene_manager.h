@@ -9,9 +9,12 @@
 #include "../tools/singleton.h"
 #include "scene_factory.h"
 
-class SceneManager : public Singleton<SceneManager>
+namespace engine::scene
 {
-	friend class Singleton<SceneManager>;
+
+class SceneManager : public ::engine::tools::Singleton<SceneManager>
+{
+	friend class ::engine::tools::Singleton<SceneManager>;
 
 private:
 	SceneManager() = default;
@@ -23,8 +26,8 @@ public:
 	//imgui debug
 	void on_imgui();
 	void on_input(
-		const InputSnapshot& input,
-		const std::vector<InputEvent>& events
+		const ::engine::input::InputSnapshot& input,
+		const std::vector<::engine::input::InputEvent>& events
 	);
 
 	void shutdown();
@@ -102,4 +105,5 @@ bool SceneManager::reset_scene()
 
 	target_scene->reset();
 	return true;
+}
 }
