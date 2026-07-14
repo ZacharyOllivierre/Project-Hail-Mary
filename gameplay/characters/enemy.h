@@ -57,7 +57,14 @@ protected:
     void update_hurt_collision_box() noexcept;
 
 private:
-    std::unique_ptr<engine::animation::Animation> _idle_animation;
+    enum class AnimationState { Idle, Die };
+
+    void set_animation_state(AnimationState state);
+
+private:
+    std::string _character_id;
+    std::unique_ptr<engine::animation::Animation> _animation;
+    AnimationState _animation_state = AnimationState::Idle;
     float _move_speed = 240.0f;
     float _hp = 100.0f;
     engine::core::Vector2 _desired_velocity = engine::core::Vector2::zero();

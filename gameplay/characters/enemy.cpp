@@ -6,6 +6,7 @@
 #include "../../engine/physics/collision_manager.h"
 
 #include <algorithm>
+#include <iostream>
 #include <utility>
 
 namespace
@@ -21,11 +22,11 @@ namespace
 
 Enemy::Enemy(std::string character_id,
     const engine::core::Vector2& start_position,const engine::core::Vector2& start_size)
-    : _idle_animation(engine::animation::AnimationManager::instance()->create_animation(
-          std::move(character_id) + ".idle"))
+    : _character_id(std::move(character_id))
 {
     set_position(start_position);
     set_character_size(start_size);
+    set_animation_state(AnimationState::Idle);
 
     //tmp testing
     auto box = engine::physics::CollisionManager::instance()->create_box(this, engine::physics::CollisionLayer::Enemy,
@@ -38,17 +39,17 @@ Enemy::Enemy(std::string character_id,
 
 void Enemy::update(double delta)
 {
-    if (_idle_animation)
-        _idle_animation->update(scaled_delta(delta));
+    if (_animation)
+        _animation->update(scaled_delta(delta));
 }
 
 void Enemy::submit_render_commands(std::vector<engine::core::RenderCommand>& out_commands) const
 {
-    if (!_idle_animation)
+    if (!_animation)
         return;
 
     engine::core::RenderCommand command;
-    if (_idle_animation->build_render_command(world_rect(), 0.0, engine::core::SpriteFlip::None, command))
+    if (_animation->build_render_command(world_rect(), 0.0, engine::core::SpriteFlip::None, command))
         out_commands.push_back(std::move(command));
 }
 
@@ -76,6 +77,7 @@ void Enemy::die() noexcept
 
     _is_dead = true;
     _desired_velocity = engine::core::Vector2::zero();
+    set_animation_state(AnimationState::Die);
 }
 
 void Enemy::set_move_speed(float move_speed) noexcept { _move_speed = std::max(0.0f, move_speed); }
@@ -124,4 +126,22 @@ void Enemy::update_hurt_collision_box() noexcept
 {
     if (_hurt_collision_box)
         _hurt_collision_box->set_rect(world_rect());
+}
+
+void Enemy::set_animation_state(AnimationState state)
+{
+    if (_animation && _animation_state == state)
+        return;
+
+    const char* suffix = state == AnimationState::Die ? "die" : "idle";
+    std::unique_ptr<engine::animation::Animation> animation =
+        engine::animation::AnimationManager::instance()->create_animation(_character_id + "." + suffix);
+    if (!animation)
+    {
+        std::cout << "Set Enemy animation failed: " << _character_id << "." << suffix << '\n';
+        return;
+    }
+
+    _animation = std::move(animation);
+    _animation_state = state;
 }
