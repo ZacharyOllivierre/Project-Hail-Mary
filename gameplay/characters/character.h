@@ -6,53 +6,28 @@
 #include "../../engine/core/interface/updatable.h"
 #include "../combat/attack_info.h"
 
-class Character : public engine::core::GameObject, public engine::core::Updatable,
-                  public engine::core::Collidable,public engine::core::KinematicBody,
+class Character : public engine::core::GameObject,public engine::core::Updatable,
+                  public engine::core::Collidable, public engine::core::KinematicBody,
                   public CombatReceiver
 {
 public:
-    explicit Character(
-        const engine::core::Vector2& start_position = engine::core::Vector2(300.0f, 300.0f),
-        const engine::core::Vector2& start_size = engine::core::Vector2(100.0f, 100.0f));
-    ~Character() override;
+    ~Character() override = default;
 
-    //from updateable
-    void update(double delta) override;
+    // from GameObject
+    // for Scene rendering
+    virtual void submit_render_commands(std::vector<engine::core::RenderCommand>& out_commands) const = 0;
 
-    //from KinematicBody
-    //for PhysicsManager
-    [[nodiscard]] engine::core::Vector2 desired_velocity() const noexcept override;
-    void apply_translation(const engine::core::Vector2& delta) noexcept override;
+    // Character state
+    [[nodiscard]] virtual float hp() const noexcept = 0;
+    [[nodiscard]] virtual bool is_dead() const noexcept = 0;
 
-    //from CombatReceiver
-    //for CollisionManager
-    void receive_attack(const AttackInfo& attack_info) noexcept override;
+    // Character lifecycle
+    virtual void die() noexcept = 0;
 
-    //from Collidable
-    //for PhysicsManager
-    [[nodiscard]] engine::core::Rect collision_rect() const noexcept override;
+protected:
+    Character() noexcept: engine::core::GameObject(engine::core::DepthLayer::Character){}
 
-    [[nodiscard]] engine::core::Rect collision_rect() const noexcept override;
-    [[nodiscard]] engine::core::Rect hurt_rect() const noexcept override;
-
-    void die() noexcept;
-    void set_move_speed(float move_speed) noexcept;
-    void set_hp(float hp) noexcept;
-    void set_character_size(const engine::core::Vector2& size);
-    void set_position(const engine::core::Vector2& position);
-    void set_desired_velocity(const engine::core::Vector2& velocity) noexcept;
-
-    [[nodiscard]] float move_speed() const noexcept;
-    [[nodiscard]] float hp() const noexcept;
-    [[nodiscard]] bool is_dead() const noexcept;
-
-private:
-    float _move_speed = 240.0f;
-    float _hp = 100.0f;
-    
-    engine::core::Vector2 _desired_velocity = engine::core::Vector2::zero();
-
-    engine::core::Rect _hurt_rect{};//CollisionManager
-    engine::core::Rect _collision_rect{};//PhysicsManager
-    bool _is_dead = false;
+    // Character shape
+    // Rebuild the PhysicsManager collision rect after a size or pose change.
+    virtual void refresh_collision_rect() = 0;
 };
