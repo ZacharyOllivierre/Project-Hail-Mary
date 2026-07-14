@@ -49,6 +49,7 @@ public:
 
 	// Wand
 	vector<ShotDescriptor> create_projectile(const engine::core::Vector2 &direction);
+	Wand &wand();
 
 	void set_move_speed(float move_speed) noexcept;
 	void set_hp(float hp) noexcept;
@@ -64,7 +65,7 @@ public:
 	bool use_mana(float mana_cost) noexcept;
 
 	// getter
-	[[nodiscard]] virtual engine::core::Rect collision_rect() const noexcept;
+	[[nodiscard]] virtual engine::core::Rect collision_rect() const noexcept override;
 	[[nodiscard]] const std::string &character_id() const noexcept;
 	[[nodiscard]] float move_speed() const noexcept;
 	[[nodiscard]] float hp() const noexcept;

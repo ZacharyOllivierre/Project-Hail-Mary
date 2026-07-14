@@ -164,6 +164,11 @@ vector<ShotDescriptor> Character::create_projectile(const engine::core::Vector2 
 	return _wand.attack(direction);
 }
 
+Wand &Character::wand()
+{
+	return _wand;
+}
+
 void Character::set_move_speed(float move_speed) noexcept
 {
 	_move_speed = std::max(0.0f, move_speed);

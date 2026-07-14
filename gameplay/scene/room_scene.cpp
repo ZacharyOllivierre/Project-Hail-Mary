@@ -2,6 +2,7 @@
 
 #include "../../engine/physics/collision_manager.h"
 #include "../../engine/input/input_state.h"
+#include "../combat/bullet.h"
 #include "../combat/projectile.h"
 #include "../map/dungeon_room.h"
 #include "../../thirdparty/imgui/imgui.h"
@@ -129,10 +130,11 @@ engine::core::Vector2 RoomScene::closest_enemy_to_point(engine::core::Vector2 &p
 // imgui debug
 void RoomScene::on_imgui()
 {
-    ImGui::Begin("Room Debug");
-    ImGui::Text("Player HP: %.1f", _player ? _player->hp() : 0.0f);
-
-    ImGui::End();
+    if (_player && !_player->is_destroyed())
+    {
+        ImGui::Separator();
+        _player->wand().debug_data().render_debugger();
+    }
 }
 
 void RoomScene::on_exit()
@@ -172,7 +174,7 @@ void RoomScene::spawn_scheduled_projectiles(double delta)
         // Update bullut spawn position with offset relative to player
         Bullet_Attributes &bullet_attributes = it->bullet_attributes;
         bullet_attributes.start_position = _player->center() + it->spawn_offset;
-        unique_ptr<Projectile> projectile = std::make_unique<Bullet>(bullet_attributes);
+        std::unique_ptr<Projectile> projectile = std::make_unique<Bullet>(bullet_attributes);
 
         Projectile *added_projectile = add_object(std::move(projectile));
         it = _scheduled_projectiles.erase(it);

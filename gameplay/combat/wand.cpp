@@ -1,5 +1,9 @@
 #include "wand.h"
 
+Wand::Wand() : _debug_data(_wand_attributes, _bullet_attributes)
+{
+}
+
 vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
 {
     const int count = std::max(1, _wand_attributes.bullet_count);
@@ -14,9 +18,13 @@ vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
     return shots;
 }
 
+WandDebugData &Wand::debug_data() noexcept
+{
+    return _debug_data;
+}
+
 ShotDescriptor Wand::make_shot(const engine::core::Vector2 &direction, int index)
 {
-
     engine::core::Vector2 aim = direction.normalized();
 
     // Get angle for current
