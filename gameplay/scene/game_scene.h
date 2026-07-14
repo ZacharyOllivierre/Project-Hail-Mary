@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../engine/scene/scene.h"
-#include "../character.h"
+#include "../characters/player_character.h"
 
 class GameScene final : public engine::scene::Scene
 {
@@ -23,7 +23,7 @@ private:
 	void destroy_tracked_objects();
 	void consume_player_effect_requests();
 
-	Character* _player = nullptr;
+	PlayerCharacter* _player = nullptr;
 
 	engine::core::GameObject* _map = nullptr;
 

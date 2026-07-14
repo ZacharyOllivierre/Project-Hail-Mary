@@ -211,7 +211,7 @@ void RoomScene::spawn_player()
     if (_player && !_player->is_destroyed() && !_player->is_dead())
         return;
 
-    _player = create_and_add_object<Character>(
+    _player = create_and_add_object<PlayerCharacter>(
         "elves",
         engine::core::Vector2(540.0f, 540.0f),
         engine::core::Vector2(64.0f, 64.0f),
@@ -231,11 +231,10 @@ void RoomScene::spawn_enemies()
 
     for (int i = 0; i < num; i++)
     {
-        Character *enemy = create_and_add_object<Character>(
+        Enemy *enemy = create_and_add_object<Enemy>(
             "elves",
             engine::core::Vector2(540.0f + distance * i, 540.0f + distance * i),
-            engine::core::Vector2(64.0f, 64.0f),
-            "fire.impact_radial");
+            engine::core::Vector2(64.0f, 64.0f));
 
         if (enemy)
         {

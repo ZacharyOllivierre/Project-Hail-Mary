@@ -3,7 +3,8 @@
 #include "../../engine/animation/effect_manager.h"
 #include "../../engine/scene/scene.h"
 #include "../../engine/core/geometry/vector2.h"
-#include "../character.h"
+#include "../characters/enemy.h"
+#include "../characters/player_character.h"
 #include "../map/dungeon_room.h"
 #include "room_tile_collision_world.h"
 
@@ -34,9 +35,9 @@ private:
     void spawn_player();
     void spawn_enemies();
 
-    Character *_player = nullptr;
+    PlayerCharacter *_player = nullptr;
     DungeonRoom *_room = nullptr;
     RoomTileCollisionWorld _collision_world;
 
-    vector<Character *> _enemies;
+    vector<Enemy *> _enemies;
 };
