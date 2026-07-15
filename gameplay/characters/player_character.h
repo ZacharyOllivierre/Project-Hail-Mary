@@ -5,8 +5,7 @@
 #include "../../engine/animation/effect_manager.h"
 #include "../../engine/input/contracts/input_snapshot_receiver.h"
 #include "../../engine/physics/collision_box.h"
-#include "../projectile.h"
-#include "../wand.h"
+#include "../combat/wand.h"
 
 #include <memory>
 #include <string>
@@ -61,7 +60,8 @@ public:
     [[nodiscard]] bool is_dead() const noexcept override;
 
     // Player combat
-    [[nodiscard]] std::vector<std::unique_ptr<Projectile>> create_projectile(const engine::core::Vector2& direction);
+    [[nodiscard]] std::vector<ShotDescriptor> create_projectile(const engine::core::Vector2& direction);
+    [[nodiscard]] Wand& wand() noexcept;
     [[nodiscard]] std::vector<engine::animation::EffectSpawnRequest> drain_effect_spawn_requests();
 
 private:

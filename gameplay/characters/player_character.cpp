@@ -31,7 +31,7 @@ PlayerCharacter::PlayerCharacter(std::string character_id,
     set_animation_state(AnimationState::Idle);
 
     //tmp testing
-    auto box = engine::physics::CollisionManager::instance()->create_box(this, engine::physics::CollisionLayer::Player, 
+    auto box = engine::physics::CollisionManager::instance()->create_box(this, engine::physics::CollisionLayer::Player,
         engine::physics::CollisionTarget::EnemyProjectile,{});
     set_hurt_collision_box(box);
     //tmp testing
@@ -156,9 +156,14 @@ float PlayerCharacter::move_speed() const noexcept { return _move_speed; }
 float PlayerCharacter::hp() const noexcept { return _hp; }
 bool PlayerCharacter::is_dead() const noexcept { return _is_dead; }
 
-std::vector<std::unique_ptr<Projectile>> PlayerCharacter::create_projectile(const engine::core::Vector2& direction)
+std::vector<ShotDescriptor> PlayerCharacter::create_projectile(const engine::core::Vector2& direction)
 {
-    return _wand.attack(center(), direction);
+    return _wand.attack(direction);
+}
+
+Wand& PlayerCharacter::wand() noexcept
+{
+    return _wand;
 }
 
 std::vector<engine::animation::EffectSpawnRequest> PlayerCharacter::drain_effect_spawn_requests()
