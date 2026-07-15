@@ -119,7 +119,7 @@ void GameScene::spawn_player()
 	if (_player && !_player->is_destroyed() && !_player->is_dead())
 		return;
 
-	_player = create_and_add_object<Character>(
+	_player = create_and_add_object<PlayerCharacter>(
 		"elves",
 		engine::core::Vector2(200.0f, 200.0f),
 		engine::core::Vector2(100.0f, 100.0f),
