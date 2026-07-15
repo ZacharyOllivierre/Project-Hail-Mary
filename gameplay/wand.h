@@ -21,7 +21,7 @@ enum class SpreadStyle
 struct WandAttributes
 {
     // Number of bullets in one attack
-    int bullet_count = 4;
+    int bullet_count = 1;
 
     SpreadStyle spread_style = SpreadStyle::Circular;
     float spread_degrees = 80.0;
