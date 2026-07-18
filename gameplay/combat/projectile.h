@@ -19,7 +19,7 @@ public:
         const engine::core::Vector2 &start_velocity = engine::core::Vector2::zero()) noexcept
         : engine::core::GameObject(layer), _velocity(start_velocity)
     {
-        set_world_rect(engine::core::Rect(start_position, start_size));
+        set_world_rect(engine::core::Rect::from_center(start_position, start_size));
     }
 
     ~Projectile() override = default;
