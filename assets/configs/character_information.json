@@ -1,12 +1,7 @@
 {
   "characters": [
     "elves",
-    "joker",
-    "enemy/GoblinWitch",
-    "enemy/Skeleton",
-    "enemy/SkeletonElite",
-    "enemy/Slime",
-    "enemy/Wizard"
+    "joker"
   ],
 
   "animation":

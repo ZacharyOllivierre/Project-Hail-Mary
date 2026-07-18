@@ -57,11 +57,7 @@ void RoomScene::on_enter()
 
     build_room();
     spawn_player();
-    generat_enemies("enemy/Skeleton", 3);
-    generat_enemies("enemy/Slime", 3);
-    generat_enemies("enemy/GoblinWitch", 2);
-    generat_enemies("enemy/Wizard", 1);
-    generat_enemies("enemy/SkeletonElite", 2);
+    spawn_enemies();
 }
 
 void RoomScene::on_update(double delta)
@@ -144,7 +140,6 @@ void RoomScene::on_imgui()
 void RoomScene::on_exit()
 {
     this->destroy_all_scene_objects();
-    _enemies.clear();
     _scheduled_projectiles.clear();
     _collision_world.set_room(nullptr);
     _player = nullptr;
@@ -155,7 +150,6 @@ void RoomScene::on_exit()
 void RoomScene::reset()
 {
     this->destroy_all_scene_objects();
-    _enemies.clear();
     _scheduled_projectiles.clear();
     _collision_world.set_room(nullptr);
     _player = nullptr;
@@ -163,11 +157,6 @@ void RoomScene::reset()
     _room = nullptr;
     build_room();
     spawn_player();
-    generat_enemies("enemy/Skeleton", 3);
-    generat_enemies("enemy/Slime", 3);
-    generat_enemies("enemy/GoblinWitch", 2);
-    generat_enemies("enemy/Wizard", 1);
-    generat_enemies("enemy/SkeletonElite",2);
 }
 
 // Iterate through all scheduled shots and copy over / spawn ready ones
@@ -263,27 +252,23 @@ void RoomScene::spawn_player()
     }
 }
 
-void RoomScene::generat_enemies(std::string id,size_t count)
+void RoomScene::spawn_enemies()
 {
-    if (!_room)
-        return;
+    int num = 2;
+    int distance = 200;
 
-    const EnemyGenerationConfig config{
-        .character_id = id,
-        .count = count,
-        .size = engine::core::Vector2(64.0f, 64.0f),
-        .move_speed = 0.0f};
-
-    std::vector<std::unique_ptr<Enemy>> generated_enemies =
-        _enemy_generator.generate(*_room, config);
-
-    for (std::unique_ptr<Enemy>& enemy : generated_enemies)
+    for (int i = 0; i < num; i++)
     {
-        Enemy *added_enemy = add_object(std::move(enemy));
-        if (!added_enemy)
-            continue;
+        Enemy *enemy = create_and_add_object<Enemy>(
+            "elves",
+            engine::core::Vector2(540.0f + distance * i, 540.0f + distance * i),
+            engine::core::Vector2(64.0f, 64.0f));
 
-        _enemies.push_back(added_enemy);
-        physics_manager().register_body(added_enemy, added_enemy, added_enemy);
+        if (enemy)
+        {
+            enemy->set_move_speed(0);
+            _enemies.push_back(enemy);
+            physics_manager().register_body(enemy, enemy, enemy);
+        }
     }
 }
