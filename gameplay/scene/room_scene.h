@@ -5,6 +5,7 @@
 #include "../../engine/core/geometry/vector2.h"
 #include "../characters/enemy.h"
 #include "../characters/player_character.h"
+#include "../generator/enemy_generator.h"
 #include "../map/dungeon_room.h"
 #include "room_tile_collision_world.h"
 
@@ -37,12 +38,13 @@ private:
 
     void build_room();
     void spawn_player();
-    void spawn_enemies();
+    void generat_enemies(std::string id, size_t count);
 
     PlayerCharacter *_player = nullptr;
     vector<ShotDescriptor> _scheduled_projectiles;
     DungeonRoom *_room = nullptr;
     RoomTileCollisionWorld _collision_world;
 
+    EnemyGenerator _enemy_generator;
     vector<Enemy *> _enemies;
 };
