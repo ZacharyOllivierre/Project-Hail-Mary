@@ -85,6 +85,12 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
 {
     this->engine::scene::Scene::on_input(input, events);
 
+    if (input.state.is_just_pressed(engine::input::InputAction::Reset))
+    {
+        reset();
+        return;
+    }
+
     if (!_player || _player->is_destroyed() || _player->is_dead())
         return;
 
