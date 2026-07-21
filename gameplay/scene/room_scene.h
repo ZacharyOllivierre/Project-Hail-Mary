@@ -38,7 +38,7 @@ private:
 
     void build_room();
     void spawn_player();
-    void generat_enemies(std::string id, size_t count);
+    void generate_enemies(EnemyType type, std::size_t count);
 
     PlayerCharacter *_player = nullptr;
     vector<ShotDescriptor> _scheduled_projectiles;

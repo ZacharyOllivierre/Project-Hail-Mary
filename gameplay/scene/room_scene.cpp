@@ -57,11 +57,11 @@ void RoomScene::on_enter()
 
     build_room();
     spawn_player();
-    generat_enemies("enemy/Skeleton", 3);
-    generat_enemies("enemy/Slime", 3);
-    generat_enemies("enemy/GoblinWitch", 2);
-    generat_enemies("enemy/Wizard", 1);
-    generat_enemies("enemy/SkeletonElite", 2);
+    generate_enemies(EnemyType::Skeleton, 3);
+    generate_enemies(EnemyType::Slime, 3);
+    generate_enemies(EnemyType::GoblinWitch, 2);
+    generate_enemies(EnemyType::Wizard, 1);
+    generate_enemies(EnemyType::SkeletonElite, 2);
 }
 
 void RoomScene::on_update(double delta)
@@ -169,11 +169,11 @@ void RoomScene::reset()
     _room = nullptr;
     build_room();
     spawn_player();
-    generat_enemies("enemy/Skeleton", 3);
-    generat_enemies("enemy/Slime", 3);
-    generat_enemies("enemy/GoblinWitch", 2);
-    generat_enemies("enemy/Wizard", 1);
-    generat_enemies("enemy/SkeletonElite",2);
+    generate_enemies(EnemyType::Skeleton, 3);
+    generate_enemies(EnemyType::Slime, 3);
+    generate_enemies(EnemyType::GoblinWitch, 2);
+    generate_enemies(EnemyType::Wizard, 1);
+    generate_enemies(EnemyType::SkeletonElite, 2);
 }
 
 // Iterate through all scheduled shots and copy over / spawn ready ones
@@ -269,16 +269,14 @@ void RoomScene::spawn_player()
     }
 }
 
-void RoomScene::generat_enemies(std::string id,size_t count)
+void RoomScene::generate_enemies(EnemyType type, std::size_t count)
 {
     if (!_room)
         return;
 
     const EnemyGenerationConfig config{
-        .character_id = id,
-        .count = count,
-        .size = engine::core::Vector2(64.0f, 64.0f),
-        .move_speed = 0.0f};
+        .type = type,
+        .count = count};
 
     std::vector<std::unique_ptr<Enemy>> generated_enemies =
         _enemy_generator.generate(*_room, config);
