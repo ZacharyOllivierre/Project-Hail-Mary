@@ -1,31 +1,14 @@
 #pragma once
 
-#include <variant>
+#include <memory>
 #include <vector>
 
-struct SlowEffect
-{
-    float speed_multiplier = 1.0f;
-    double duration_seconds = 0.0;
-};
-
-struct PoisonEffect
-{
-    float damage_per_second = 0.0f;
-    double duration_seconds = 0.0;
-};
-
-struct StunEffect
-{
-    double duration_seconds = 0.0;
-};
-
-using CombatEffect = std::variant<SlowEffect, PoisonEffect, StunEffect>;
+class StatusEffect;
 
 struct AttackInfo
 {
     float base_damage = 0.0f;
-    std::vector<CombatEffect> effects;
+    std::vector<std::shared_ptr<StatusEffect>> effects;
 };
 
 class CombatReceiver
@@ -33,5 +16,5 @@ class CombatReceiver
 public:
     virtual ~CombatReceiver() = default;
 
-    virtual void receive_attack(const AttackInfo& attack_info) noexcept = 0;
+    virtual void receive_attack(const AttackInfo &attack_info) noexcept = 0;
 };

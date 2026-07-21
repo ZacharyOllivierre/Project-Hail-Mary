@@ -46,9 +46,11 @@ void WandDebugData::render_debugger()
     ImGui::DragFloat2("Bullet Size", &_bullet_attributes->bullet_size.x, 1.0f, 1.0f, 512.0f);
     ImGui::Checkbox("Damage Based Size", &_bullet_attributes->damage_based_size);
     ImGui::DragFloat("Damage", &_bullet_attributes->damage, 1.0f, 0.0f, 10000.0f);
+    ImGui::DragFloat("Damage Cooldown", &_bullet_attributes->damage_cooldown_sec, 0.1f, 0.0f, 10.0f);
 
     ImGui::DragFloat("Curve", &_bullet_attributes->curve, 0.1f, -3000.0f, 3000.0f);
     ImGui::DragInt("Bounces", &_bullet_attributes->bounces, 1.0f, 0, 300);
+    ImGui::DragInt("Pierces", &_bullet_attributes->pierces, 1.0f, 0, 300);
     ImGui::DragFloat("Homing Strength", &_bullet_attributes->homing_strength, 1.0f, 0.0f, 5000.0f);
     ImGui::Checkbox("Homing Maintains Speed", &_bullet_attributes->homing_maintains_speed);
     ImGui::DragFloat("Growth", &_bullet_attributes->growth, 0.1f, 0.0f, 3000.0f);

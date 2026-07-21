@@ -3,6 +3,7 @@
 #include "../../engine/physics/collision_manager.h"
 #include "../../engine/input/input_state.h"
 #include "../combat/bullet.h"
+#include "../combat/attack_info.h"
 #include "../combat/projectile.h"
 #include "../map/dungeon_room.h"
 #include "../../thirdparty/imgui/imgui.h"
@@ -173,9 +174,20 @@ void RoomScene::spawn_scheduled_projectiles(double delta)
             added_projectile,
             engine::physics::CollisionLayer::PlayerProjectile,
             engine::physics::CollisionTarget::Enemy,
-            [added_projectile](const engine::physics::CollisionInfo &)
+            [added_projectile](const engine::physics::CollisionInfo &collision_info)
             {
-                added_projectile->destroy();
+                // forward projectile damage through CombatReciever
+                CombatReceiver *receiver = dynamic_cast<CombatReceiver *>(collision_info.other.owner());
+
+                if (!receiver)
+                    return;
+
+                // Attack only valid if not on bullets cooldown list
+                if (added_projectile->can_hit(collision_info.other.owner()))
+                {
+                    receiver->receive_attack(added_projectile->attack_info());
+                    added_projectile->on_entity_collision(collision_info.other.owner());
+                }
             });
 
         added_projectile->set_collision_box(collision_box);
@@ -238,7 +250,7 @@ void RoomScene::generate_enemies(EnemyType type, std::size_t count)
     std::vector<std::unique_ptr<Enemy>> generated_enemies =
         _enemy_generator.generate(*_room, config);
 
-    for (std::unique_ptr<Enemy>& enemy : generated_enemies)
+    for (std::unique_ptr<Enemy> &enemy : generated_enemies)
     {
         Enemy *added_enemy = add_object(std::move(enemy));
         if (!added_enemy)

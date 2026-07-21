@@ -28,19 +28,19 @@ Enemy::Enemy(std::string character_id,
     set_character_size(start_size);
     set_animation_state(AnimationState::Idle);
 
-    // tmp testing
+    // damage now applied through attackinfo
     engine::physics::CollisionBox *box =
         engine::physics::CollisionManager::instance()->create_box(this,
                                                                   engine::physics::CollisionLayer::Enemy,
                                                                   engine::physics::CollisionTarget::PlayerProjectile,
-                                                                  [this, box](const engine::physics::CollisionInfo &)
-                                                                  { set_hp(hp() - 50); });
+                                                                  {});
     set_hurt_collision_box(box);
-    // tmp testing
 }
 
 void Enemy::update(double delta)
 {
+    update_status_effects(delta);
+
     if (_animation)
         _animation->update(scaled_delta(delta));
 }
@@ -74,8 +74,16 @@ engine::core::Rect Enemy::collision_rect() const noexcept
 
 void Enemy::receive_attack(const AttackInfo &attack_info) noexcept
 {
-    if (!_is_dead && attack_info.base_damage > 0.0f)
+    if (_is_dead)
+        return;
+
+    if (attack_info.base_damage > 0.0f)
         set_hp(_hp - attack_info.base_damage);
+
+    for (const auto &effect : attack_info.effects)
+    {
+        add_status_effect(effect);
+    }
 }
 
 void Enemy::die() noexcept
@@ -85,6 +93,7 @@ void Enemy::die() noexcept
 
     _is_dead = true;
     _desired_velocity = engine::core::Vector2::zero();
+    clear_status_effects();
     set_animation_state(AnimationState::Die);
 }
 

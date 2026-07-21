@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../../engine/core/geometry/vector2.h"
+#include "status_effect.h"
+
+#include <memory>
 
 struct Bullet_Attributes
 {
@@ -17,12 +20,18 @@ struct Bullet_Attributes
 
     float curve = 0.0f;
     int bounces = 0;
+    int pierces = 0;
     float homing_strength = 0;
     bool homing_maintains_speed = true;
 
     // More damage based on bullet age
     float growth = 0.0f;
     float damage = 100.0f;
+
+    float damage_cooldown_sec = 0.5;
+
+    // Copy from wand at creation.. implement bullet independent effects
+    std::shared_ptr<StatusEffect> status_effect = nullptr;
 };
 
 enum class SpreadStyle
@@ -37,20 +46,6 @@ enum class ShotStyle
     Simultaneous,
     Sequential,
     ReverseSequential
-};
-
-/*
-ShotDescriptor is a per shot intention record, not a live projectile. It carries the bullet template,
-the relative spawn offset, and the spawn delay. The room scene resolves the final world position when the
-shot actually fires so delayed shots still spawn relative to the character’s current position.
-*/
-struct ShotDescriptor
-{
-    Bullet_Attributes bullet_attributes;
-
-    // Bullet position position relative to character pos
-    engine::core::Vector2 spawn_offset;
-    float spawn_delay_sec;
 };
 
 struct WandAttributes
@@ -69,4 +64,21 @@ struct WandAttributes
     float shot_delay_sec = 0.1f;
 
     float spawn_distance = 32.0f;
+
+    // std::shared_ptr<StatusEffect> status_effect = nullptr;
+    std::shared_ptr<StatusEffect> status_effect = std::make_shared<PoisonEffect>(10.0f, 5.0f, 10);
+};
+
+/*
+ShotDescriptor is a per shot intention record, not a live projectile. It carries the bullet template,
+the relative spawn offset, and the spawn delay. The room scene resolves the final world position when the
+shot actually fires so delayed shots still spawn relative to the character’s current position.
+*/
+struct ShotDescriptor
+{
+    Bullet_Attributes bullet_attributes;
+
+    // Bullet position position relative to character pos
+    engine::core::Vector2 spawn_offset;
+    float spawn_delay_sec;
 };

@@ -8,9 +8,6 @@
 
 using std::vector;
 
-// Implement later
-// Pull - pulls enemies towards bullet
-
 class Wand
 {
 public:
