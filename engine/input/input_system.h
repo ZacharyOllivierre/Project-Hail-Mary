@@ -40,5 +40,8 @@ private:
     InputDeviceTracker _device_tracker;
     KeyboardMouseInputTranslator _keyboard_mouse_translator;
     GamepadInputTranslator _gamepad_translator;
+    bool _has_pointer_position = false;
+    int _pointer_x = 0;
+    int _pointer_y = 0;
 };
 }

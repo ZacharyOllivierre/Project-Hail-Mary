@@ -34,7 +34,7 @@ public:
 
 private:
     void spawn_scheduled_projectiles(double delta);
-    engine::core::Vector2 get_shot_direction();
+    engine::core::Vector2 get_shot_direction(int pointer_x, int pointer_y);
 
     void build_room();
     void spawn_player();
