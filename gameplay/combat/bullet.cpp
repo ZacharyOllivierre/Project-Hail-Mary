@@ -101,6 +101,11 @@ void Bullet::update(double delta)
     }
 }
 
+AttackInfo Bullet::attack_info() const noexcept
+{
+    return AttackInfo{.base_damage = _bullet_attributes.damage};
+}
+
 // Returns true if ball has been bounces otherwise false
 bool Bullet::handle_wall_bounce(const engine::core::Vector2 &collision_direction)
 {

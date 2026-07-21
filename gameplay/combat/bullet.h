@@ -3,6 +3,7 @@
 #include "wand_types.h"
 #include "projectile.h"
 #include "../../engine/animation/effect_manager.h"
+#include "attack_info.h"
 
 #include <SDL.h>
 #include <string>
@@ -17,7 +18,7 @@ public:
 
     void update(double delta) override;
 
-    inline float get_damage() { return _bullet_attributes.damage; }
+    AttackInfo attack_info() const noexcept;
 
 private:
     bool handle_wall_bounce(const engine::core::Vector2 &collision_direction);

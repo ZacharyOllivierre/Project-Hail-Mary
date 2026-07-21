@@ -29,12 +29,12 @@ Enemy::Enemy(std::string character_id,
     set_animation_state(AnimationState::Idle);
 
     // tmp testing
+    // damage now applied through attackinfo
     engine::physics::CollisionBox *box =
         engine::physics::CollisionManager::instance()->create_box(this,
                                                                   engine::physics::CollisionLayer::Enemy,
                                                                   engine::physics::CollisionTarget::PlayerProjectile,
-                                                                  [this, box](const engine::physics::CollisionInfo &)
-                                                                  { set_hp(hp() - 50); });
+                                                                  {});
     set_hurt_collision_box(box);
     // tmp testing
 }

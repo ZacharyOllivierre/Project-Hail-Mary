@@ -3,6 +3,7 @@
 #include "../../engine/physics/collision_manager.h"
 #include "../../engine/input/input_state.h"
 #include "../combat/bullet.h"
+#include "../combat/attack_info.h"
 #include "../combat/projectile.h"
 #include "../map/dungeon_room.h"
 #include "../../thirdparty/imgui/imgui.h"
@@ -173,7 +174,7 @@ void RoomScene::reset()
     generat_enemies("enemy/Slime", 3);
     generat_enemies("enemy/GoblinWitch", 2);
     generat_enemies("enemy/Wizard", 1);
-    generat_enemies("enemy/SkeletonElite",2);
+    generat_enemies("enemy/SkeletonElite", 2);
 }
 
 // Iterate through all scheduled shots and copy over / spawn ready ones
@@ -210,8 +211,16 @@ void RoomScene::spawn_scheduled_projectiles(double delta)
             added_projectile,
             engine::physics::CollisionLayer::PlayerProjectile,
             engine::physics::CollisionTarget::Enemy,
-            [added_projectile](const engine::physics::CollisionInfo &)
+            [added_projectile](const engine::physics::CollisionInfo &collision_info)
             {
+                // forward projectile damage through CombatReciever
+                if (CombatReceiver *reveiver = dynamic_cast<CombatReceiver *>(collision_info.other.owner()))
+                {
+                    if (const Bullet *bullet = dynamic_cast<const Bullet *>(added_projectile))
+                    {
+                        reveiver->receive_attack(bullet->attack_info());
+                    }
+                }
                 added_projectile->destroy();
             });
 
@@ -269,7 +278,7 @@ void RoomScene::spawn_player()
     }
 }
 
-void RoomScene::generat_enemies(std::string id,size_t count)
+void RoomScene::generat_enemies(std::string id, size_t count)
 {
     if (!_room)
         return;
@@ -283,7 +292,7 @@ void RoomScene::generat_enemies(std::string id,size_t count)
     std::vector<std::unique_ptr<Enemy>> generated_enemies =
         _enemy_generator.generate(*_room, config);
 
-    for (std::unique_ptr<Enemy>& enemy : generated_enemies)
+    for (std::unique_ptr<Enemy> &enemy : generated_enemies)
     {
         Enemy *added_enemy = add_object(std::move(enemy));
         if (!added_enemy)
