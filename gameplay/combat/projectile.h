@@ -49,8 +49,18 @@ public:
 
     void on_collision(const engine::core::Vector2 &collision_direction) noexcept override
     {
-        destroy();
+        SceneObject::destroy();
     }
+
+    virtual void on_entity_collision(GameObject *entity) noexcept
+    {
+        SceneObject::destroy();
+    }
+
+    virtual AttackInfo attack_info() const noexcept = 0;
+
+    // Returns whether or not a bullets collision is valid (cooldown system)
+    virtual bool can_hit(GameObject *object) const noexcept = 0;
 
     void set_velocity(const engine::core::Vector2 &velocity) noexcept
     {

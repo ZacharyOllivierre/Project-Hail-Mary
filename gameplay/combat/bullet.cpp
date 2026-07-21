@@ -63,11 +63,27 @@ void Bullet::on_collision(const engine::core::Vector2 &collision_direction) noex
     }
 }
 
+void Bullet::on_entity_collision(GameObject *entity) noexcept
+{
+    // Adds entity to hit tracker to prevent multiples of damage
+    _hit_cooldowns[entity] = _bullet_attributes.damage_cooldown_sec;
+
+    if (_bullet_attributes.pierces <= 0)
+    {
+        Projectile::on_entity_collision(entity);
+    }
+
+    _bullet_attributes.pierces--;
+}
+
 void Bullet::update(double delta)
 {
     // Update age
     double age = Projectile::age_seconds();
     Projectile::set_age(age + delta);
+
+    // Update hit cooldowns
+    update_hit_cooldowns(delta);
 
     // Enforce max age
     if (age > _bullet_attributes.max_age)
@@ -103,7 +119,20 @@ void Bullet::update(double delta)
 
 AttackInfo Bullet::attack_info() const noexcept
 {
-    return AttackInfo{.base_damage = _bullet_attributes.damage};
+    AttackInfo attack_info;
+    attack_info.base_damage = _bullet_attributes.damage;
+
+    if (_bullet_attributes.status_effect)
+    {
+        attack_info.effects.push_back(_bullet_attributes.status_effect);
+    }
+
+    return attack_info;
+}
+
+bool Bullet::can_hit(GameObject *object) const noexcept
+{
+    return !_hit_cooldowns.contains(object);
 }
 
 // Returns true if ball has been bounces otherwise false
@@ -220,4 +249,20 @@ void Bullet::apply_acceleration(double &delta)
     _bullet_attributes.bullet_velocity += direction * (_bullet_attributes.acceleration * delta);
 
     Projectile::set_velocity(_bullet_attributes.bullet_velocity);
+}
+
+// Remove enemies with elapsed hit cooldowns off list
+void Bullet::update_hit_cooldowns(double &delta)
+{
+    for (auto it = _hit_cooldowns.begin(); it != _hit_cooldowns.end();)
+    {
+        it->second -= delta;
+
+        if (it->second <= 0)
+        {
+            it = _hit_cooldowns.erase(it);
+        }
+        else
+            it++;
+    }
 }

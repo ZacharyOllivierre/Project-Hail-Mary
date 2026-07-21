@@ -214,14 +214,17 @@ void RoomScene::spawn_scheduled_projectiles(double delta)
             [added_projectile](const engine::physics::CollisionInfo &collision_info)
             {
                 // forward projectile damage through CombatReciever
-                if (CombatReceiver *reveiver = dynamic_cast<CombatReceiver *>(collision_info.other.owner()))
+                CombatReceiver *receiver = dynamic_cast<CombatReceiver *>(collision_info.other.owner());
+
+                if (!receiver)
+                    return;
+
+                // Attack only valid if not on bullets cooldown list
+                if (added_projectile->can_hit(collision_info.other.owner()))
                 {
-                    if (const Bullet *bullet = dynamic_cast<const Bullet *>(added_projectile))
-                    {
-                        reveiver->receive_attack(bullet->attack_info());
-                    }
+                    receiver->receive_attack(added_projectile->attack_info());
+                    added_projectile->on_entity_collision(collision_info.other.owner());
                 }
-                added_projectile->destroy();
             });
 
         added_projectile->set_collision_box(collision_box);

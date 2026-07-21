@@ -34,6 +34,11 @@ ShotDescriptor Wand::make_shot(const engine::core::Vector2 &direction, int index
     // Update bullet velocity via shot direction
     _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;
 
+    // Copy wands element over to bullet
+    _bullet_attributes.status_effect = _wand_attributes.status_effect
+                                           ? _wand_attributes.status_effect->make_new_instance()
+                                           : nullptr;
+
     return ShotDescriptor({_bullet_attributes,
                            shot_direction * _wand_attributes.spawn_distance,
                            get_shot_delay(index)});
