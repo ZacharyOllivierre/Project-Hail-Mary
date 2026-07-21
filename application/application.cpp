@@ -136,6 +136,12 @@ int Application::run(int argc, char **argv)
 		//imgui debug
 		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
+
+		ImGuiIO& imgui_io = ImGui::GetIO();
+		imgui_io.DisplaySize = ImVec2(
+			static_cast<float>(_logical_width),
+			static_cast<float>(_logical_height));
+
 		ImGui::NewFrame();
 
 		engine::scene::SceneManager::instance()->on_render(_renderer);

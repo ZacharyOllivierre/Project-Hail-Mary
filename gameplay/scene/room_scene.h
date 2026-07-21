@@ -34,11 +34,11 @@ public:
 
 private:
     void spawn_scheduled_projectiles(double delta);
-    engine::core::Vector2 get_shot_direction();
+    engine::core::Vector2 get_shot_direction(int pointer_x, int pointer_y);
 
     void build_room();
     void spawn_player();
-    void generat_enemies(std::string id, size_t count);
+    void generate_enemies(EnemyType type, std::size_t count);
 
     PlayerCharacter *_player = nullptr;
     vector<ShotDescriptor> _scheduled_projectiles;

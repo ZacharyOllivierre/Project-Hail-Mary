@@ -8,6 +8,12 @@ void InputSystem::begin_frame()
     _state.begin_frame();
     _events.clear();
     _device_tracker.begin_frame();
+
+    if (SDL_GetMouseFocus())
+    {
+        SDL_GetMouseState(&_pointer_x, &_pointer_y);
+        _has_pointer_position = true;
+    }
 }
 
 void InputSystem::end_frame()
@@ -39,7 +45,10 @@ InputSnapshot InputSystem::snapshot() const
         _state,
         _context,
         _device_tracker.current_device(),
-        _device_tracker.device_switched_this_frame()
+        _device_tracker.device_switched_this_frame(),
+        _has_pointer_position,
+        _pointer_x,
+        _pointer_y
     };
 }
 
@@ -112,6 +121,13 @@ void InputSystem::apply_event(const InputEvent& event)
 
 void InputSystem::append_event(const InputEvent& event)
 {
+    if (event.has_pointer_position)
+    {
+        _pointer_x = event.pointer_x;
+        _pointer_y = event.pointer_y;
+        _has_pointer_position = true;
+    }
+
     apply_event(event);
     _events.push_back(event);
 }

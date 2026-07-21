@@ -7,15 +7,21 @@
 
 #include <cstddef>
 #include <memory>
-#include <string>
 #include <vector>
+
+enum class EnemyType
+{
+    Skeleton,
+    SkeletonElite,
+    Slime,
+    GoblinWitch,
+    Wizard
+};
 
 struct EnemyGenerationConfig
 {
-    std::string character_id;
+    EnemyType type = EnemyType::Skeleton;
     std::size_t count = 0;
-    engine::core::Vector2 size = engine::core::Vector2::zero();
-    float move_speed = 0.0f;
 };
 
 class EnemyGenerator
@@ -25,5 +31,14 @@ public:
         const DungeonRoom& room,const EnemyGenerationConfig& config);
 
 private:
+    [[nodiscard]] static std::unique_ptr<Enemy> create_enemy(
+        EnemyType type,
+        const engine::core::Vector2& position);
+    [[nodiscard]] static engine::core::Vector2 enemy_size(EnemyType type) noexcept;
+    [[nodiscard]] static bool is_spawn_area_available(
+        const DungeonRoom& room,
+        const engine::core::Vector2& position,
+        const engine::core::Vector2& size) noexcept;
+
     engine::tools::RandomGenerator _random;
 };
