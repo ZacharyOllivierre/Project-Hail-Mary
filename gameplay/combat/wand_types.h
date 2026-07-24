@@ -30,7 +30,6 @@ struct Bullet_Attributes
 
     float damage_cooldown_sec = 0.5;
 
-    // Copy from wand at creation.. implement bullet independent effects
     std::shared_ptr<StatusEffect> status_effect = nullptr;
 };
 
@@ -65,8 +64,9 @@ struct WandAttributes
 
     float spawn_distance = 32.0f;
 
-    // std::shared_ptr<StatusEffect> status_effect = nullptr;
-    std::shared_ptr<StatusEffect> status_effect = std::make_shared<PoisonEffect>(10.0f, 5.0f, 10);
+    // Temp : Currently set for wand to have poison in wand constructor
+    std::vector<std::shared_ptr<StatusEffect>> status_effect;
+    float effect_chance = 0.5f; // chance for every bullet to roll for status effect
 };
 
 /*

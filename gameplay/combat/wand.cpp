@@ -1,7 +1,10 @@
 #include "wand.h"
 
+#include <cstdlib>
+
 Wand::Wand() : _debug_data(_wand_attributes, _bullet_attributes)
 {
+    _wand_attributes.status_effect.push_back(std::make_shared<PoisonEffect>(10.0f, 5.0f, 10));
 }
 
 vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
@@ -34,14 +37,30 @@ ShotDescriptor Wand::make_shot(const engine::core::Vector2 &direction, int index
     // Update bullet velocity via shot direction
     _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;
 
-    // Copy wands element over to bullet
-    _bullet_attributes.status_effect = _wand_attributes.status_effect
-                                           ? _wand_attributes.status_effect->make_new_instance()
-                                           : nullptr;
+    // Roll for effect to copy over to bullet
+    _bullet_attributes.status_effect = roll_for_effect();
 
     return ShotDescriptor({_bullet_attributes,
                            shot_direction * _wand_attributes.spawn_distance,
                            get_shot_delay(index)});
+}
+
+std::shared_ptr<StatusEffect> Wand::roll_for_effect()
+{
+    if (_wand_attributes.status_effect.empty())
+    {
+        return nullptr;
+    }
+
+    // Chance for bullet to not have an effect
+    if ((rand() % 100) / 100.0 > _wand_attributes.effect_chance)
+    {
+        return nullptr;
+    }
+
+    // Roll for which effect it will be
+    int effectIndex = rand() % _wand_attributes.status_effect.size();
+    return _wand_attributes.status_effect[effectIndex]->make_new_instance();
 }
 
 float Wand::calculate_bullet_angle(int index)

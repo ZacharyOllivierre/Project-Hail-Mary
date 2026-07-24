@@ -19,6 +19,7 @@ public:
 
 private:
     [[nodiscard]] ShotDescriptor make_shot(const engine::core::Vector2 &direction, int index);
+    std::shared_ptr<StatusEffect> roll_for_effect();
 
     float calculate_bullet_angle(int index);
     float calc_uniform_spread_angle(int num);
