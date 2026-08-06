@@ -81,6 +81,7 @@ float Wand::calculate_bullet_angle(int index)
         angle = calc_random_spread_angle();
         break;
     default:
+        break;
     }
 
     return angle;
