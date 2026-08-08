@@ -20,9 +20,7 @@ public:
 	void shutdown();
 
 	bool play_sound(std::string_view key, int loops = 0);
-	SoundRequestResult request_sound(
-		std::string_view key,
-		const SoundPlayOptions& options = {});
+	SoundRequestResult request_sound(std::string_view key,const SoundPlayOptions& options = {});
 	void update(double delta_seconds);
 	bool stop_sound(SoundHandle handle);
 	void cancel_all_scheduled_sounds();
