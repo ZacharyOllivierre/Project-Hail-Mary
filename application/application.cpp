@@ -1,5 +1,6 @@
 #include "application.h"
 
+#include "../engine/audio/audio_service.h"
 #include "../engine/io/path_manager.h"
 #include "../engine/scene/scene_manager.h"
 
@@ -69,6 +70,7 @@ Application::~Application()
 	SDL_DestroyWindow(_window);
 
 	TTF_Quit();
+	Mix_CloseAudio();
 	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
@@ -81,6 +83,9 @@ bool Application::init(int argc, char **argv)
 
 	init_assert(engine::io::PathManager::instance()->init(), "engine::io::PathManager init fail");
 	init_assert(engine::io::PathManager::instance()->ensure_runtime_dirs(), "Runtime dir init fail");
+	init_assert(
+		engine::audio::AudioService::instance()->init({}),
+		"AudioService init fail");
 
 	return true;
 }
@@ -129,6 +134,7 @@ int Application::run(int argc, char **argv)
 		
 
 		engine::scene::SceneManager::instance()->on_update(delta);
+		engine::audio::AudioService::instance()->update(delta);
 
 		SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0);
 		SDL_RenderClear(_renderer);
@@ -160,5 +166,5 @@ int Application::run(int argc, char **argv)
 
 void Application::shutdown()
 {
-	//...
+	engine::audio::AudioService::instance()->shutdown();
 }
