@@ -49,12 +49,20 @@ public:
 
     void on_collision(const engine::core::Vector2 &collision_direction) noexcept override
     {
+        destroy();
+    }
+
+    virtual void on_destroy() noexcept {}
+
+    void destroy() noexcept
+    {
+        on_destroy();
         SceneObject::destroy();
     }
 
     virtual void on_entity_collision(GameObject *entity) noexcept
     {
-        SceneObject::destroy();
+        destroy();
     }
 
     virtual AttackInfo attack_info() const noexcept = 0;

@@ -3,34 +3,28 @@
 #include "../../engine/core/geometry/vector2.h"
 #include "status_effect.h"
 
+#include <functional>
 #include <memory>
+
+class BulletBehaviorSet;
 
 struct Bullet_Attributes
 {
     float bullet_speed = 500.0f;
     engine::core::Vector2 bullet_velocity;
 
-    float acceleration = 0.0f;
-
     float max_age = 20.0f;
 
     engine::core::Vector2 start_position;
     engine::core::Vector2 bullet_size = {24.0f, 24.0f};
-    bool damage_based_size = false;
 
-    float curve = 0.0f;
-    int bounces = 0;
-    int pierces = 0;
-    float homing_strength = 0;
-    bool homing_maintains_speed = true;
-
-    // More damage based on bullet age
-    float growth = 0.0f;
     float damage = 100.0f;
 
-    float damage_cooldown_sec = 0.5;
-
+    // ToDo redo status effect system
     std::shared_ptr<StatusEffect> status_effect = nullptr;
+    std::vector<std::function<void(BulletBehaviorSet &)>> bullet_behavior_appenders;
+
+    float damage_cooldown_sec = 0.3;
 };
 
 enum class SpreadStyle
@@ -80,5 +74,7 @@ struct ShotDescriptor
 
     // Bullet position position relative to character pos
     engine::core::Vector2 spawn_offset;
+    engine::core::Vector2 shot_direction;
+
     float spawn_delay_sec;
 };

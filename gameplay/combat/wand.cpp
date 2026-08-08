@@ -1,23 +1,34 @@
 #include "wand.h"
 
-#include <cstdlib>
+#include "grid/behavior_rune.h"
+#include "grid/stat_rune.h"
+#include "grid/weapon_rune.h"
 
-Wand::Wand() : _debug_data(_wand_attributes, _bullet_attributes)
+#include <algorithm>
+
+/*TODO Move effect into weapon runes*/
+
+Wand::Wand()
+    : _rune_line(1), _debug_data(_wand_attributes, _bullet_attributes)
 {
-    _wand_attributes.status_effect.push_back(std::make_shared<PoisonEffect>(10.0f, 5.0f, 10));
+    seed_test_runes();
 }
 
 vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
 {
-    const int count = std::max(1, _wand_attributes.bullet_count);
     std::vector<ShotDescriptor> shots;
-    shots.reserve(count);
 
-    for (int i = 0; i < count; i++)
+    std::vector<RuneWeaponNode> weapon_nodes = _rune_line.evaluate_weapons();
+    for (const RuneWeaponNode &weapon_node : weapon_nodes)
     {
-        shots.push_back(make_shot(direction, i));
+        append_weapon_shots(weapon_node, direction, 0.0f, shots);
     }
 
+    if (!weapon_nodes.empty())
+    {
+        _wand_attributes = weapon_nodes.front().loadout.wand_attributes;
+        _bullet_attributes = weapon_nodes.front().loadout.bullet_attributes;
+    }
     return shots;
 }
 
@@ -26,59 +37,95 @@ WandDebugData &Wand::debug_data() noexcept
     return _debug_data;
 }
 
-ShotDescriptor Wand::make_shot(const engine::core::Vector2 &direction, int index)
+ShotDescriptor Wand::make_shot(
+    const RuneLoadout &loadout,
+    const engine::core::Vector2 &direction,
+    int index,
+    float delay_offset)
 {
-    engine::core::Vector2 aim = direction.normalized();
+    WandAttributes wand_attributes = loadout.wand_attributes;
+    Bullet_Attributes bullet_attributes = loadout.bullet_attributes;
 
-    // Get angle for current
-    const float angle = calculate_bullet_angle(index);
+    engine::core::Vector2 aim = direction.normalized();
+    const float angle = calculate_bullet_angle(wand_attributes, index);
     const engine::core::Vector2 shot_direction = aim.rotated(angle);
 
-    // Update bullet velocity via shot direction
-    _bullet_attributes.bullet_velocity = shot_direction * _bullet_attributes.bullet_speed;
+    bullet_attributes.bullet_velocity = shot_direction * bullet_attributes.bullet_speed;
+    bullet_attributes.status_effect = roll_for_effect(wand_attributes);
 
-    // Roll for effect to copy over to bullet
-    _bullet_attributes.status_effect = roll_for_effect();
+    bullet_attributes.bullet_behavior_appenders = loadout.bullet_behavior_appenders;
 
-    return ShotDescriptor({_bullet_attributes,
-                           shot_direction * _wand_attributes.spawn_distance,
-                           get_shot_delay(index)});
+    return ShotDescriptor{
+        .bullet_attributes = bullet_attributes,
+        .spawn_offset = shot_direction * wand_attributes.spawn_distance,
+        .shot_direction = shot_direction,
+        .spawn_delay_sec = delay_offset + get_shot_delay(wand_attributes, index)};
 }
 
-std::shared_ptr<StatusEffect> Wand::roll_for_effect()
+int Wand::append_weapon_shots(
+    const RuneWeaponNode &weapon_node,
+    const engine::core::Vector2 &direction,
+    float delay_offset,
+    std::vector<ShotDescriptor> &out_shots)
 {
-    if (_wand_attributes.status_effect.empty())
+    const RuneLoadout &loadout = weapon_node.loadout;
+    const WandAttributes &wand_attributes = loadout.wand_attributes;
+    const int bullet_count = std::max(1, wand_attributes.bullet_count);
+    const float child_fire_delay = weapon_node.consumption.consumption_fire_interval_seconds;
+
+    int emitted_count = 0;
+
+    for (int shot_index = 0; shot_index < bullet_count; ++shot_index)
     {
-        return nullptr;
+        ShotDescriptor parent_shot = make_shot(loadout, direction, shot_index, delay_offset);
+        out_shots.push_back(parent_shot);
+        ++emitted_count;
+
+        for (const RuneWeaponNode &child_weapon : weapon_node.children)
+        {
+            emitted_count += append_weapon_shots(
+                child_weapon,
+                parent_shot.shot_direction,
+                parent_shot.spawn_delay_sec + child_fire_delay,
+                out_shots);
+        }
     }
 
-    // Chance for bullet to not have an effect
-    if ((rand() % 100) / 100.0 > _wand_attributes.effect_chance)
-    {
-        return nullptr;
-    }
-
-    // Roll for which effect it will be
-    int effectIndex = rand() % _wand_attributes.status_effect.size();
-    return _wand_attributes.status_effect[effectIndex]->make_new_instance();
+    return emitted_count;
 }
 
-float Wand::calculate_bullet_angle(int index)
+std::shared_ptr<StatusEffect> Wand::roll_for_effect(const WandAttributes &wand_attributes)
+{
+    if (wand_attributes.status_effect.empty())
+    {
+        return nullptr;
+    }
+
+    if ((rand() % 100) / 100.0 > wand_attributes.effect_chance)
+    {
+        return nullptr;
+    }
+
+    int effectIndex = rand() % wand_attributes.status_effect.size();
+    return wand_attributes.status_effect[effectIndex]->make_new_instance();
+}
+
+float Wand::calculate_bullet_angle(const WandAttributes &wand_attributes, int index)
 {
     float angle = 0.0f;
 
-    switch (_wand_attributes.spread_style)
+    switch (wand_attributes.spread_style)
     {
     case SpreadStyle::Uniform:
-        angle = calc_uniform_spread_angle(index);
+        angle = calc_uniform_spread_angle(wand_attributes, index);
         break;
 
     case SpreadStyle::Circular:
-        angle = calc_circular_spread_angle(index);
+        angle = calc_circular_spread_angle(wand_attributes, index);
         break;
 
     case SpreadStyle::Random:
-        angle = calc_random_spread_angle();
+        angle = calc_random_spread_angle(wand_attributes);
         break;
     default:
         break;
@@ -87,47 +134,55 @@ float Wand::calculate_bullet_angle(int index)
     return angle;
 }
 
-float Wand::calc_uniform_spread_angle(int num)
+float Wand::calc_uniform_spread_angle(const WandAttributes &wand_attributes, int num)
 {
-    if (_wand_attributes.bullet_count == 1)
+    if (wand_attributes.bullet_count == 1)
         return 0.0f;
 
-    float total_spread = _wand_attributes.spread_degrees;
+    float total_spread = wand_attributes.spread_degrees;
 
     return -total_spread * 0.5f +
-           num * (total_spread / (_wand_attributes.bullet_count - 1));
+           num * (total_spread / (wand_attributes.bullet_count - 1));
 }
 
-float Wand::calc_circular_spread_angle(int num)
+float Wand::calc_circular_spread_angle(const WandAttributes &wand_attributes, int num)
 {
-    return num * (360.0 / static_cast<float>(_wand_attributes.bullet_count));
+    return num * (360.0 / static_cast<float>(wand_attributes.bullet_count));
 }
 
-float Wand::calc_random_spread_angle()
+float Wand::calc_random_spread_angle(const WandAttributes &wand_attributes)
 {
     float r = static_cast<float>(std::rand()) / RAND_MAX;
 
-    float &sd = _wand_attributes.spread_degrees;
-    return -sd * 0.5f + r * sd;
+    float spread_degrees = wand_attributes.spread_degrees;
+    return -spread_degrees * 0.5f + r * spread_degrees;
 }
 
-float Wand::get_shot_delay(int index)
+float Wand::get_shot_delay(const WandAttributes &wand_attributes, int index)
 {
-    float delay;
-    switch (_wand_attributes.shot_style)
+    float delay = 0.0f;
+    switch (wand_attributes.shot_style)
     {
     case ShotStyle::Simultaneous:
         delay = 0.0f;
         break;
 
     case ShotStyle::Sequential:
-        delay = index * _wand_attributes.shot_delay_sec;
+        delay = index * wand_attributes.shot_delay_sec;
         break;
 
     case ShotStyle::ReverseSequential:
-        delay = (_wand_attributes.bullet_count - 1 - index) * _wand_attributes.shot_delay_sec;
+        delay = (wand_attributes.bullet_count - 1 - index) * wand_attributes.shot_delay_sec;
         break;
     }
 
-    return _wand_attributes.first_shot_delay + delay;
+    return wand_attributes.first_shot_delay + delay;
+}
+
+void Wand::seed_test_runes()
+{
+    (void)_rune_line.set_rune(0, std::make_shared<ShotgunRune>());
+    (void)_rune_line.set_rune(1, std::make_shared<TestWeaponRune>());
+    (void)_rune_line.set_rune(2, std::make_shared<BounceRune>());
+    (void)_rune_line.set_rune(3, std::make_shared<NestedTestWeaponRune>());
 }

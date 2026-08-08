@@ -104,11 +104,11 @@ engine::core::Vector2 RoomScene::closest_enemy_to_point(engine::core::Vector2 &p
 // imgui debug
 void RoomScene::on_imgui()
 {
-    if (_player && !_player->is_destroyed())
-    {
-        ImGui::Separator();
-        _player->wand().debug_data().render_debugger();
-    }
+    // if (_player && !_player->is_destroyed())
+    // {
+    //     ImGui::Separator();
+    //     _player->wand().debug_data().render_debugger();
+    // }
 }
 
 void RoomScene::on_exit()
