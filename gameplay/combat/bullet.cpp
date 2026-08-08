@@ -6,13 +6,6 @@
 #include "../scene/room_scene.h"
 #include "bullet_behavior/bullet_behavior_context.h"
 
-// temp
-#include "bullet_behavior/behaviors/pierce_behavior.h"
-#include "bullet_behavior/behaviors/bounce_behavior.h"
-#include "bullet_behavior/behaviors/homing_behavior.h"
-#include "bullet_behavior/behaviors/acceleration_behavior.h"
-#include "bullet_behavior/behaviors/curve_behavior.h"
-
 constexpr double kRadiansToDegrees = 57.29577951308232;
 
 Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
@@ -27,19 +20,17 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
 
     _bullet_attributes = bullet_attributes;
 
+    for (const std::function<void(BulletBehaviorSet &)> &append_behavior : _bullet_attributes.bullet_behavior_appenders)
+    {
+        append_behavior(_behaviors);
+    }
+
     // Original damage of bullet before flight
     _base_damage = _bullet_attributes.damage;
 
     // Call on fire behaviors
     BulletBehaviorContext context{.bullet = *this};
     _behaviors.on_fire(context);
-
-    // Temp
-    _behaviors.add(std::make_unique<BounceBehavior>(20));
-    _behaviors.add(std::make_unique<PierceBehavior>(40));
-    _behaviors.add(std::make_unique<HomingBehavior>(800, true));
-    _behaviors.add(std::make_unique<CurveBehavior>(1000));
-    _behaviors.add(std::make_unique<AccelerationBehavior>(200));
 }
 
 // Todo collision box doesnt align with texture rotation

@@ -3,7 +3,10 @@
 #include "../../engine/core/geometry/vector2.h"
 #include "status_effect.h"
 
+#include <functional>
 #include <memory>
+
+class BulletBehaviorSet;
 
 struct Bullet_Attributes
 {
@@ -17,7 +20,9 @@ struct Bullet_Attributes
 
     float damage = 100.0f;
 
+    // ToDo redo status effect system
     std::shared_ptr<StatusEffect> status_effect = nullptr;
+    std::vector<std::function<void(BulletBehaviorSet &)>> bullet_behavior_appenders;
 
     float damage_cooldown_sec = 0.3;
 };
@@ -69,5 +74,7 @@ struct ShotDescriptor
 
     // Bullet position position relative to character pos
     engine::core::Vector2 spawn_offset;
+    engine::core::Vector2 shot_direction;
+
     float spawn_delay_sec;
 };
