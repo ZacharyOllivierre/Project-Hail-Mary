@@ -8,6 +8,8 @@
 #include <array>
 #include <string_view>
 
+#define AUDIO_SERVICE (::engine::audio::AudioService::instance())
+
 namespace engine::audio
 {
 
