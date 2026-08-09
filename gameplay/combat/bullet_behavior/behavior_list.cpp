@@ -68,6 +68,12 @@ void CollisionEffectBehavior::spawn_effect(BulletBehaviorContext &context)
 void CurveBehavior::on_update(BulletBehaviorContext &context)
 {
     engine::core::Vector2 velocity = context.bullet.desired_velocity();
+
+    // Bullets only curve when going a real speed
+    float min_speed = 1.0f;
+    if (velocity.length() < min_speed)
+        return;
+
     engine::core::Vector2 forward = velocity.normalized();
 
     // Local left/right relative to travel direction.
@@ -76,15 +82,6 @@ void CurveBehavior::on_update(BulletBehaviorContext &context)
     // Apply curve
     velocity += left * (_curve * (context.delta));
 
-    /*
-    Todo this is a larger problem with how bullet keeps and
-    updates two sources for stats:
-    Bullet attributes
-    Projectile velocity in base class
-    Bullets update both but behaviors only effect projectile velocity
-
-    Additionally behaviors will need to be able to access bullet attributes.
-    */
     context.bullet.set_velocity(velocity);
 }
 
@@ -102,6 +99,11 @@ void GrowthBehavior::on_update(BulletBehaviorContext &context)
 
 void HomingBehavior::on_update(BulletBehaviorContext &context)
 {
+    // Bullets only home when going a real speed
+    float min_speed = 1.0f;
+    if (context.bullet.desired_velocity().length() < min_speed)
+        return;
+
     RoomScene *room_scene = engine::scene::SceneManager::instance()->try_find_scene<RoomScene>();
     if (!room_scene)
     {
@@ -152,4 +154,63 @@ bool PierceBehavior::on_entity_collision(BulletBehaviorContext &context)
 
     _pierces--;
     return true;
+}
+
+bool WallStickBehavior::on_collision(BulletBehaviorContext &context)
+{
+    if (_stick_length <= 0.0f)
+        return false;
+
+    _last_collision_direction = context.collision_direction;
+
+    engine::core::Vector2 velocity =
+        context.bullet.desired_velocity();
+
+    float speed = velocity.length();
+
+    engine::core::Vector2 wall_direction =
+        -context.collision_direction.normalized();
+
+    _stored_velocity = wall_direction * speed;
+
+    context.bullet.set_velocity(wall_direction * 0.0001f);
+
+    _stuck_to_wall = true;
+    _elapsed_since_activation = 0.0f;
+
+    return true;
+}
+
+void WallStickBehavior::on_update(BulletBehaviorContext &context)
+{
+    if (!_stuck_to_wall)
+        return;
+
+    _stick_length -= context.delta;
+    _elapsed_since_activation += context.delta;
+
+    // Activate collision effects
+    if (_elapsed_since_activation >= _activation_interval)
+    {
+        _elapsed_since_activation = 0.0f;
+
+        context.bullet.set_velocity(_stored_velocity);
+        _stuck_to_wall = false;
+
+        BulletBehaviorContext collision_context{
+            .bullet = context.bullet,
+            .collision_direction = _last_collision_direction,
+            .delta = context.delta};
+
+        context.bullet.behavior_set()->replay_collision_behaviors_except(
+            collision_context,
+            this);
+    }
+
+    // Wall stick ends
+    if (_stick_length <= 0)
+    {
+        context.bullet.set_velocity(_stored_velocity);
+        _stuck_to_wall = false;
+    }
 }

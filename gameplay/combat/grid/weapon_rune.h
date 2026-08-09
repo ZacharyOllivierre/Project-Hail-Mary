@@ -87,7 +87,7 @@ public:
         _bullet_attributes.damage_cooldown_sec = 0.3f;
 
         set_added_slots(2);
-        set_consumed_runes(2);
+        set_consumed_runes(3);
         set_consumption_fire_interval_seconds(0.1f);
         set_consume_type(WeaponConsumeType::FireNested);
     }
@@ -107,14 +107,14 @@ public:
         _wand_attributes.spawn_distance = 32.0f;
         _wand_attributes.effect_chance = 0.6f;
 
-        _bullet_attributes.bullet_speed = 300.0f;
+        _bullet_attributes.bullet_speed = 600.0f;
         _bullet_attributes.max_age = 20.0f;
         _bullet_attributes.bullet_size = {48.0f, 48.0f};
         _bullet_attributes.damage = 100.0f;
         _bullet_attributes.damage_cooldown_sec = 0.5f;
 
         set_added_slots(7);
-        set_consumed_runes(4);
+        set_consumed_runes(5);
         set_consumption_fire_interval_seconds(0.2f);
         set_consume_type(WeaponConsumeType::FireNested);
     }

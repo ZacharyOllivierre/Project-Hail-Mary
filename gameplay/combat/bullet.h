@@ -28,6 +28,8 @@ public:
     // Temporary fix to expose bullet attributes to behaviors (see curve behavior.cpp for comment)
     inline Bullet_Attributes *get_bullet_attributes() { return &_bullet_attributes; }
 
+    BulletBehaviorSet *behavior_set() { return &_behaviors; }
+
 private:
     void update_hit_cooldowns(double &delta);
 

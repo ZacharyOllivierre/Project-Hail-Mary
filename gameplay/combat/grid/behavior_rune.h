@@ -139,3 +139,29 @@ protected:
 private:
     int _pierces = 0;
 };
+
+class WallStickRune : public BehaviorRune
+{
+public:
+    explicit WallStickRune(float stick_length = 0.0f, float activation_interval = 0.0f)
+        : _stick_length(stick_length), _activation_interval(activation_interval)
+    {
+    }
+
+protected:
+    std::function<void(BulletBehaviorSet &)> make_appender() const override
+    {
+        float stick_length = _stick_length;
+        float activation_interval = _activation_interval;
+
+        return [stick_length, activation_interval](BulletBehaviorSet &behavior_set)
+        {
+            behavior_set.add(std::make_unique<WallStickBehavior>(stick_length,
+                                                                 activation_interval));
+        };
+    }
+
+private:
+    float _stick_length = 0.0f;
+    float _activation_interval = 0.0f;
+};

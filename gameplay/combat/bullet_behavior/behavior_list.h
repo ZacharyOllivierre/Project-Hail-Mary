@@ -62,6 +62,7 @@ private:
     std::string _effect_key;
 };
 
+// Curves bullet -val for left +val for right
 class CurveBehavior : public BulletBehavior
 {
 public:
@@ -75,6 +76,7 @@ private:
     float _curve = 0.0f;
 };
 
+// Grows bullet damage during flight
 class GrowthBehavior : public BulletBehavior
 {
 public:
@@ -91,6 +93,7 @@ private:
     float _base_damage = 0.0f;
 };
 
+// Bullet homes to nearest enemy
 class HomingBehavior : public BulletBehavior
 {
 public:
@@ -106,6 +109,7 @@ private:
     bool _homing_maintains_speed = true;
 };
 
+// Bullets continue flight after entity collision
 class PierceBehavior : public BulletBehavior
 {
 public:
@@ -117,4 +121,32 @@ public:
 
 private:
     int _pierces = 0;
+};
+
+// Bullets stick to walls and repeat on collision effects on interval
+class WallStickBehavior : public BulletBehavior
+{
+public:
+    explicit WallStickBehavior(float stick_length = 0.0f, float activation_interval = 0.0f)
+        : _stick_length(stick_length), _activation_interval(activation_interval)
+    {
+    }
+
+    bool on_collision(BulletBehaviorContext &context) override;
+
+    void on_update(BulletBehaviorContext &context) override;
+
+private:
+    bool _stuck_to_wall = false;
+    engine::core::Vector2 _last_collision_direction = engine::core::Vector2::zero();
+
+    // How long bullet sticks for
+    float _stick_length = 0.0f;
+
+    // How long between collision behaviors activations
+    float _activation_interval = 0.0f;
+    float _elapsed_since_activation = 0.0f;
+
+    // Velocity of bullet before freeze
+    engine::core::Vector2 _stored_velocity;
 };

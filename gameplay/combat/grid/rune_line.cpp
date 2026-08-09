@@ -55,20 +55,6 @@ bool RuneLine::set_rune(int slot_index, std::shared_ptr<const Rune> rune)
 
     _runes[slot_index] = std::move(rune);
 
-    const std::shared_ptr<const Rune> &stored_rune = _runes[slot_index];
-    if (stored_rune && stored_rune->type() == RuneType::Weapon)
-    {
-        const WeaponRune *weapon_rune = dynamic_cast<const WeaponRune *>(stored_rune.get());
-        if (weapon_rune)
-        {
-            int added_slots = weapon_rune->added_slots();
-            if (added_slots > 0)
-            {
-                _runes.insert(_runes.begin() + slot_index + 1, added_slots, nullptr);
-            }
-        }
-    }
-
     return true;
 }
 
@@ -152,7 +138,7 @@ RuneWeaponNode RuneLine::build_weapon_node(int weapon_slot_index, int scope_end_
     node.consumption = weapon_rune->consumption();
     weapon_rune->apply_weapon(node.loadout);
 
-        // By default the subtree only covers the weapon itself, it will grow
+    // By default the subtree only covers the weapon itself, it will grow
     // to include consumed children as they are discovered.
     subtree_end_index = weapon_slot_index + 1;
 
@@ -173,6 +159,12 @@ RuneWeaponNode RuneLine::build_weapon_node(int weapon_slot_index, int scope_end_
             {
                 const WeaponConsumptionData child_consumption = child_weapon->consumption();
                 int child_scope_end = slot_index + 1 + child_consumption.consumed_runes;
+
+                if (child_scope_end > scope_end_index)
+                {
+                    child_scope_end = scope_end_index;
+                }
+
                 if (child_scope_end > slot_count())
                 {
                     child_scope_end = slot_count();
@@ -181,6 +173,7 @@ RuneWeaponNode RuneLine::build_weapon_node(int weapon_slot_index, int scope_end_
                 int child_subtree_end_index = child_scope_end;
                 RuneWeaponNode child_node = build_weapon_node(slot_index, child_scope_end, child_subtree_end_index);
                 child_node.consumption = child_consumption;
+
                 if (child_subtree_end_index > subtree_end_index)
                 {
                     subtree_end_index = child_subtree_end_index;
