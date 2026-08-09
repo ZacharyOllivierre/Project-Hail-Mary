@@ -80,61 +80,42 @@ public:
         _wand_attributes.spawn_distance = 32.0f;
         _wand_attributes.effect_chance = 0.6f;
 
-        _bullet_attributes.bullet_speed = 800.0f;
-        _bullet_attributes.max_age = 0.3f;
+        _bullet_attributes.bullet_speed = 1500.0f;
+        _bullet_attributes.max_age = 0.5f;
         _bullet_attributes.bullet_size = {24.0f, 24.0f};
         _bullet_attributes.damage = 30.0f;
         _bullet_attributes.damage_cooldown_sec = 0.3f;
 
-        set_added_slots(5);
-        set_consumed_runes(1);
-        set_consumption_fire_interval_seconds(1.0f);
+        set_added_slots(2);
+        set_consumed_runes(2);
+        set_consumption_fire_interval_seconds(0.1f);
         set_consume_type(WeaponConsumeType::FireNested);
     }
 };
 
-class TestWeaponRune : public WeaponRune
+class Fireball : public WeaponRune
 {
 public:
-    TestWeaponRune() : WeaponRune()
+    Fireball() : WeaponRune()
     {
-        _wand_attributes.bullet_count = 2;
+        _wand_attributes.bullet_count = 1;
         _wand_attributes.spread_style = SpreadStyle::Uniform;
-        _wand_attributes.spread_degrees = 45;
+        _wand_attributes.spread_degrees = 10;
         _wand_attributes.shot_style = ShotStyle::Simultaneous;
-        _wand_attributes.shot_delay_sec = 0.12f;
+        _wand_attributes.first_shot_delay = 0.2f;
+        _wand_attributes.shot_delay_sec = 0.5f;
         _wand_attributes.spawn_distance = 32.0f;
+        _wand_attributes.effect_chance = 0.6f;
 
-        _bullet_attributes.bullet_speed = 400.0f;
-        _bullet_attributes.max_age = 10.0f;
-        _bullet_attributes.damage = 1.0f;
+        _bullet_attributes.bullet_speed = 300.0f;
+        _bullet_attributes.max_age = 20.0f;
+        _bullet_attributes.bullet_size = {48.0f, 48.0f};
+        _bullet_attributes.damage = 100.0f;
+        _bullet_attributes.damage_cooldown_sec = 0.5f;
 
-        set_added_slots(1);
-        set_consumed_runes(1);
-        set_consumption_fire_interval_seconds(1.0f);
-        set_consume_type(WeaponConsumeType::FireNested);
-    }
-};
-
-class NestedTestWeaponRune : public WeaponRune
-{
-public:
-    NestedTestWeaponRune() : WeaponRune()
-    {
-        _wand_attributes.bullet_count = 2;
-        _wand_attributes.spread_style = SpreadStyle::Circular;
-        _wand_attributes.spread_degrees = 20.0f;
-        _wand_attributes.shot_style = ShotStyle::Simultaneous;
-        _wand_attributes.shot_delay_sec = 0.08f;
-        _wand_attributes.spawn_distance = 40.0f;
-
-        _bullet_attributes.bullet_speed = 200.0f;
-        _bullet_attributes.max_age = 10.0f;
-        _bullet_attributes.damage = 7.0f;
-
-        set_added_slots(1);
-        set_consumed_runes(1);
-        set_consumption_fire_interval_seconds(1.0f);
+        set_added_slots(7);
+        set_consumed_runes(4);
+        set_consumption_fire_interval_seconds(0.2f);
         set_consume_type(WeaponConsumeType::FireNested);
     }
 };

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+// TODO added slots not working (delete comment somewhere else).
 namespace
 {
     // merge child modifiers into the parent loadout without overwriting the parent weapon's base state.
@@ -42,7 +43,6 @@ bool RuneLine::in_bounds(int slot_index) const noexcept
 
 bool RuneLine::set_rune(int slot_index, std::shared_ptr<const Rune> rune)
 {
-    // Allow the rune line to grow when a later slot is populated.
     if (slot_index < 0)
     {
         return false;
@@ -152,8 +152,8 @@ RuneWeaponNode RuneLine::build_weapon_node(int weapon_slot_index, int scope_end_
     node.consumption = weapon_rune->consumption();
     weapon_rune->apply_weapon(node.loadout);
 
-    /* By default the subtree only covers the weapon itself, it will grow
-     to include consumed children as they are discovered. */
+        // By default the subtree only covers the weapon itself, it will grow
+    // to include consumed children as they are discovered.
     subtree_end_index = weapon_slot_index + 1;
 
     int slot_index = weapon_slot_index + 1;
