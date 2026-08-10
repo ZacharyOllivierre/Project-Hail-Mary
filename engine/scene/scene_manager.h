@@ -53,6 +53,9 @@ public:
 	// Added for button end
 
 private:
+	void attach_to_scene(Scene* scene) noexcept;
+	void detach_from_scene(Scene* scene) noexcept;
+
 	Scene* _current_scene = nullptr;
 	SceneFactory _scene_factory;
 };
@@ -68,9 +71,13 @@ void SceneManager::switch_to(Args&&... args)
 		return;
 
 	if (_current_scene)
+	{
+		detach_from_scene(_current_scene);
 		_current_scene->on_exit();
+	}
 
 	_current_scene = next_scene;
+	attach_to_scene(_current_scene);
 	_current_scene->on_enter();
 }
 
@@ -86,6 +93,7 @@ bool SceneManager::destroy_scene()
 
 	if (_current_scene == target_scene)
 	{
+		detach_from_scene(_current_scene);
 		_current_scene->on_exit();
 		_current_scene = nullptr;
 	}

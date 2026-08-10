@@ -68,15 +68,6 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
     }
 }
 
-void RoomScene::spawn_effect(const engine::animation::EffectSpawnRequest &request)
-{
-    std::unique_ptr<engine::animation::Effect> effect = engine::animation::EffectManager::instance()->create_effect(request);
-    if (!effect)
-        return;
-
-    add_object(std::move(effect));
-}
-
 engine::core::Vector2 RoomScene::closest_enemy_to_point(engine::core::Vector2 &point)
 {
     if (_enemies.empty())

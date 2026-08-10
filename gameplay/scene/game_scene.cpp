@@ -1,6 +1,5 @@
 #include "game_scene.h"
 
-#include "../../engine/animation/effect_manager.h"
 #include "../../engine/core/geometry/rect.h"
 #include "../../engine/core/render/render_command.h"
 #include "../../engine/core/render/sdl_convert.h"
@@ -86,7 +85,6 @@ void GameScene::on_render(SDL_Renderer *renderer)
 void GameScene::on_input(const engine::input::InputSnapshot &input, const std::vector<engine::input::InputEvent> &events)
 {
 	engine::scene::Scene::on_input(input, events);
-	consume_player_effect_requests();
 
 	if (_player && _player->is_destroyed())
 		_player = nullptr;
@@ -144,23 +142,4 @@ void GameScene::destroy_tracked_objects()
 	destroy_all_scene_objects();
 	_player = nullptr;
 	_map = nullptr;
-}
-
-void GameScene::consume_player_effect_requests()
-{
-	if (!_player || _player->is_destroyed() || _player->is_dead())
-		return;
-
-	std::vector<engine::animation::EffectSpawnRequest> effect_requests =
-		_player->drain_effect_spawn_requests();
-
-	for (const engine::animation::EffectSpawnRequest &request : effect_requests)
-	{
-		std::unique_ptr<engine::animation::Effect> effect =
-			engine::animation::EffectManager::instance()->create_effect(request);
-		if (!effect)
-			continue;
-
-		add_object(std::move(effect));
-	}
 }

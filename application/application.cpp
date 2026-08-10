@@ -166,5 +166,6 @@ int Application::run(int argc, char **argv)
 
 void Application::shutdown()
 {
+	engine::scene::SceneManager::instance()->shutdown();
 	engine::audio::AudioService::instance()->shutdown();
 }

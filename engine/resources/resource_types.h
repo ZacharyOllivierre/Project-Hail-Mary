@@ -26,11 +26,11 @@ struct AnimationBuildRequest
 	size_t segment_index = 0;
 };
 
-struct EffectBuildRequest
+struct AnimationEffectBuildRequest
 {
 	std::string effect_key;
 	std::string animation_key;
-	std::optional<engine::core::Vector2> default_size;
-	std::optional<double> angle_degrees;
+	engine::core::Vector2 default_size;
+	double default_angle_degrees = 0.0;
 };
 }

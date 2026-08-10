@@ -21,8 +21,6 @@ private:
 	void spawn_player();
 	void spawn_map();
 	void destroy_tracked_objects();
-	void consume_player_effect_requests();
-
 	PlayerCharacter* _player = nullptr;
 
 	engine::core::GameObject* _map = nullptr;
