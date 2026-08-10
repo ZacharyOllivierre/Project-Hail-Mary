@@ -19,6 +19,22 @@ private:
     float _acceleration = 0.0f;
 };
 
+// Decelerates bullet during flight to a min if provided
+class DecelerationBehavior : public BulletBehavior
+{
+public:
+    explicit DecelerationBehavior(float deceleration = 0.0f, float min_speed = 0.0f)
+        : _deceleration(deceleration), _min_speed(min_speed)
+    {
+    }
+
+    void on_update(BulletBehaviorContext &context) override;
+
+private:
+    float _deceleration = 0.0f;
+    float _min_speed = 0.0f;
+};
+
 // Bounces bullet on projectile structure collision
 class BounceBehavior : public BulletBehavior
 {

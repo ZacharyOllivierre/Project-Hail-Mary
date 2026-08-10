@@ -41,6 +41,30 @@ private:
     float _acceleration = 0.0f;
 };
 
+class DecelerationRune : public BehaviorRune
+{
+public:
+    explicit DecelerationRune(float deceleration = 0, float min_speed = 0)
+        : _deceleration(deceleration), _min_speed(min_speed)
+    {
+    }
+
+protected:
+    std::function<void(BulletBehaviorSet &)> make_appender() const override
+    {
+        float deceleration = _deceleration;
+        float min_speed = _min_speed;
+        return [deceleration, min_speed](BulletBehaviorSet &behavior_set)
+        {
+            behavior_set.add(std::make_unique<DecelerationBehavior>(deceleration, min_speed));
+        };
+    }
+
+private:
+    float _deceleration = 0.0f;
+    float _min_speed = 0.0;
+};
+
 class BounceRune : public BehaviorRune
 {
 public:
@@ -144,9 +168,7 @@ class WallStickRune : public BehaviorRune
 {
 public:
     explicit WallStickRune(float stick_length = 0.0f, float activation_interval = 0.0f)
-        : _stick_length(stick_length), _activation_interval(activation_interval)
-    {
-    }
+        : _stick_length(stick_length), _activation_interval(activation_interval) {}
 
 protected:
     std::function<void(BulletBehaviorSet &)> make_appender() const override

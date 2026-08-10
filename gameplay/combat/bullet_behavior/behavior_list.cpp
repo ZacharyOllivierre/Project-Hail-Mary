@@ -10,11 +10,30 @@
 
 void AccelerationBehavior::on_update(BulletBehaviorContext &context)
 {
-    engine::core::Vector2 newVelocity = context.bullet.desired_velocity();
+    engine::core::Vector2 new_velocity = context.bullet.desired_velocity();
     engine::core::Vector2 direction = context.bullet.desired_velocity().normalized();
-    newVelocity += direction * (_acceleration * context.delta);
+    new_velocity += direction * (_acceleration * context.delta);
 
-    context.bullet.set_velocity(newVelocity);
+    context.bullet.set_velocity(new_velocity);
+}
+
+void DecelerationBehavior::on_update(BulletBehaviorContext &context)
+{
+    engine::core::Vector2 velocity = context.bullet.desired_velocity();
+    float speed = velocity.length();
+
+    // enforce min speed
+    if (speed <= _min_speed)
+    {
+        return;
+    }
+
+    float new_speed = speed - (_deceleration * context.delta);
+    new_speed = std::max(new_speed, _min_speed); // enforce min speed
+
+    engine::core::Vector2 direction = velocity.normalized();
+
+    context.bullet.set_velocity(new_speed * direction);
 }
 
 bool BounceBehavior::on_collision(BulletBehaviorContext &context)

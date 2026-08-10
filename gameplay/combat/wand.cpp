@@ -182,14 +182,14 @@ float Wand::get_shot_delay(const WandAttributes &wand_attributes, int index)
 void Wand::seed_test_runes()
 {
     // Weapon consumption example
-    (void)_rune_line.set_rune(0, std::make_shared<Fireball>());
-    (void)_rune_line.set_rune(1, std::make_shared<BulletCountUpRune>(1));
-    (void)_rune_line.set_rune(2, std::make_shared<WallStickRune>(5, 1));
-    (void)_rune_line.set_rune(3, std::make_shared<HomingRune>(300));
-    (void)_rune_line.set_rune(4, std::make_shared<ShotgunRune>());
-    (void)_rune_line.set_rune(5, std::make_shared<BounceRune>(10));
-    (void)_rune_line.set_rune(6, std::make_shared<SpreadStyleChangeRune>(SpreadStyle::Circular));
-    (void)_rune_line.set_rune(7, std::make_shared<ShotgunRune>());
+    // (void)_rune_line.set_rune(0, std::make_shared<Fireball>());
+    // (void)_rune_line.set_rune(1, std::make_shared<BulletCountUpRune>(1));
+    // (void)_rune_line.set_rune(2, std::make_shared<WallStickRune>(5, 1));
+    // (void)_rune_line.set_rune(3, std::make_shared<HomingRune>(300));
+    // (void)_rune_line.set_rune(4, std::make_shared<ShotgunRune>());
+    // (void)_rune_line.set_rune(5, std::make_shared<BounceRune>(10));
+    // (void)_rune_line.set_rune(6, std::make_shared<SpreadStyleChangeRune>(SpreadStyle::Circular));
+    // (void)_rune_line.set_rune(7, std::make_shared<ShotgunRune>());
 
     // Behavior before weapon test
     // (void)_rune_line.set_rune(0, std::make_shared<BounceRune>(2));
@@ -206,4 +206,9 @@ void Wand::seed_test_runes()
     // // (void)_rune_line.set_rune(4, std::make_shared<CurveRune>(600));
     // (void)_rune_line.set_rune(4, std::make_shared<HomingRune>(600));
     // (void)_rune_line.set_rune(5, std::make_shared<PierceRune>(7));
+
+    // Deceleration Test
+    (void)_rune_line.set_rune(1, std::make_shared<Fireball>());
+    (void)_rune_line.set_rune(2, std::make_shared<DecelerationRune>(500, 100));
+    // (void)_rune_line.set_rune(3, std::make_shared<HomingRune>(600));
 }
