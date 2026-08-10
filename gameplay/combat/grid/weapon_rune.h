@@ -117,5 +117,11 @@ public:
         set_consumed_runes(5);
         set_consumption_fire_interval_seconds(0.2f);
         set_consume_type(WeaponConsumeType::FireNested);
+
+        // Sound
+        _bullet_attributes.sound_on_collision = "fireball_explosion";
+        _bullet_attributes.sound_on_entity_collision = "fireball_explosion";
+        _bullet_attributes.sound_on_fire = "fireball_shoot";
+        _bullet_attributes.sound_on_death = "";
     }
 };

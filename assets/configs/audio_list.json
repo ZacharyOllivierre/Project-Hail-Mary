@@ -2,6 +2,12 @@
   "sounds": {
     "test": {
       "path": "test.wav"
+    },
+    "fireball_shoot": {
+      "path": "fireball_shoot.wav"
+    },
+    "fireball_explosion": {
+      "path": "fireball_explosion.wav"
     }
   },
   "music": {}

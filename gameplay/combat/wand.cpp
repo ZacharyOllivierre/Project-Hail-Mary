@@ -208,7 +208,12 @@ void Wand::seed_test_runes()
     // (void)_rune_line.set_rune(5, std::make_shared<PierceRune>(7));
 
     // Deceleration Test
-    (void)_rune_line.set_rune(1, std::make_shared<Fireball>());
-    (void)_rune_line.set_rune(2, std::make_shared<DecelerationRune>(500, 100));
+    // (void)_rune_line.set_rune(1, std::make_shared<Fireball>());
+    // (void)_rune_line.set_rune(2, std::make_shared<DecelerationRune>(500, 100));
     // (void)_rune_line.set_rune(3, std::make_shared<HomingRune>(600));
+
+    // Bullet Audio Test
+    (void)_rune_line.set_rune(1, std::make_shared<Fireball>());
+    (void)_rune_line.set_rune(2, std::make_shared<WallStickRune>(3, 1));
+    (void)_rune_line.set_rune(3, std::make_shared<BounceRune>(5));
 }

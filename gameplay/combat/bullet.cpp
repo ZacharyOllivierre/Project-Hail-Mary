@@ -5,6 +5,7 @@
 #include "../../engine/scene/scene_manager.h"
 #include "../scene/room_scene.h"
 #include "bullet_behavior/bullet_behavior_context.h"
+#include "../../engine/audio/audio_service.h"
 
 constexpr double kRadiansToDegrees = 57.29577951308232;
 
@@ -31,6 +32,12 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     // Call on fire behaviors
     BulletBehaviorContext context{.bullet = *this};
     _behaviors.on_fire(context);
+
+    // Call on fire sound if given
+    if (!_bullet_attributes.sound_on_fire.empty())
+    {
+        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_fire);
+    }
 }
 
 // Todo collision box doesnt align with texture rotation
@@ -57,6 +64,12 @@ void Bullet::on_collision(const engine::core::Vector2 &collision_direction) noex
         .collision_direction = collision_direction};
 
     _behaviors.on_collision(context);
+
+    // Play structure collision sound
+    if (!_bullet_attributes.sound_on_collision.empty())
+    {
+        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_collision);
+    }
 }
 
 void Bullet::on_entity_collision(GameObject *entity) noexcept
@@ -67,6 +80,12 @@ void Bullet::on_entity_collision(GameObject *entity) noexcept
     // call on entity behaviors
     BulletBehaviorContext context{.bullet = *this, .entity = entity};
     _behaviors.on_entity_collision(context);
+
+    // Play entity collision sound
+    if (!_bullet_attributes.sound_on_collision.empty())
+    {
+        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_entity_collision);
+    }
 }
 
 void Bullet::on_destroy() noexcept
@@ -74,6 +93,12 @@ void Bullet::on_destroy() noexcept
     // Call on destroy behaviors
     BulletBehaviorContext context{.bullet = *this};
     _behaviors.on_death(context);
+
+    // Play projectile death sound
+    if (!_bullet_attributes.sound_on_collision.empty())
+    {
+        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_death);
+    }
 }
 
 void Bullet::update(double delta)

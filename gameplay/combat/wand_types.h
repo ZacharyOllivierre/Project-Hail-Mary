@@ -25,6 +25,15 @@ struct Bullet_Attributes
     std::vector<std::function<void(BulletBehaviorSet &)>> bullet_behavior_appenders;
 
     float damage_cooldown_sec = 0.3;
+
+    // Sound keys for bullet event hooks, empty = no sound
+    std::string sound_on_fire;
+    std::string sound_on_collision;
+    std::string sound_on_entity_collision;
+    std::string sound_on_death;
+
+    // todo need to implement this
+    std::string sound_during_flight;
 };
 
 enum class SpreadStyle
