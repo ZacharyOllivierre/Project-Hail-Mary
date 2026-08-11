@@ -65,6 +65,7 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
 
 	if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
 	{
+        std::cout << "effect" << std::endl;
 		engine::effects::AnimationEffectSpawnRequest request;
 		request.effect_key = _effect_id;
 		request.position = center();
@@ -73,7 +74,10 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
 		request.flip = _facing_direction == FacingDirection::Left
 			? engine::core::SpriteFlip::Horizontal
 			: engine::core::SpriteFlip::None;
-		(void)EFFECT_SERVICE->request_animation_effect(request);
+        if (!EFFECT_SERVICE->request_animation_effect(request))
+        {
+            std::cout << "false" << std::endl;
+        }
 	}
 }
 

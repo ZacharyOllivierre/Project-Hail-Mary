@@ -1,6 +1,7 @@
 #pragma once
 
 #include "animation/animation_effect.h"
+#include "number/floating_number_effect.h"
 
 #include <optional>
 #include <string>
@@ -48,6 +49,19 @@ struct AnimationEffectSpawnRequest
 	AnimationEffect::Callback on_started;
 	AnimationEffect::Callback on_finished;
 	std::vector<ScheduledCallbackRequest> scheduled_callbacks;
+};
+
+struct FloatingNumberEffectSpawnRequest
+{
+	std::string text;
+	FloatingNumberColor color = FloatingNumberColor::White;
+	engine::core::Vector2 position;
+	FloatingNumberAlignment alignment = FloatingNumberAlignment::Center;
+	float target_height = 20.0f;
+	double start_delay_seconds = 0.0;
+	double lifetime_seconds = 0.6;
+	FloatingNumberEffects effects;
+	FloatingNumberEffect::Callback on_finished;
 };
 
 }

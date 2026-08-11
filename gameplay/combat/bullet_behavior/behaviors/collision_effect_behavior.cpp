@@ -17,5 +17,8 @@ void CollisionEffectBehavior::spawn_effect(BulletBehaviorContext &context)
     engine::core::Vector2 v = context.bullet.desired_velocity();
     request.angle_degrees = std::atan2(v.y, v.x) * kRadiansToDegrees + 180;
 
-	(void)EFFECT_SERVICE->request_animation_effect(request);
+	if (!EFFECT_SERVICE->request_animation_effect(request))
+	{
+		//someting
+	}
 }

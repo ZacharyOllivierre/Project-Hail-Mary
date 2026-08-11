@@ -11,4 +11,10 @@ bool EffectService::request_animation_effect(
 	return EffectManager::instance()->dispatch(request);
 }
 
+bool  EffectService::request_floating_number_effect(
+	const FloatingNumberEffectSpawnRequest& request)
+{
+	(void)request;
+}
+
 }
