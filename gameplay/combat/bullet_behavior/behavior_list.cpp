@@ -3,8 +3,6 @@
 #include "../../../engine/core/geometry/vector2.h"
 #include "../bullet.h"
 
-// Collision effect
-#include "../../../engine/animation/effect_manager.h"
 #include "../../../engine/scene/scene_manager.h"
 #include "../../scene/room_scene.h"
 
@@ -62,8 +60,8 @@ bool BounceBehavior::on_collision(BulletBehaviorContext &context)
 
     // Call bounce sound effect
     engine::audio::SoundPlayOptions options{
-        .group = engine::audio::SoundGroup::Wand,
         .loops = 0,
+        .group = engine::audio::SoundGroup::Wand,
         .start_delay = std::chrono::milliseconds{0}};
 
     AUDIO_SERVICE->request_sound("bounce", options);
@@ -161,8 +159,8 @@ bool PierceBehavior::on_entity_collision(BulletBehaviorContext &context)
 
     // Call pierce sound effect
     engine::audio::SoundPlayOptions options{
-        .group = engine::audio::SoundGroup::Wand,
         .loops = 0,
+        .group = engine::audio::SoundGroup::Wand,
         .start_delay = std::chrono::milliseconds{0}};
 
     AUDIO_SERVICE->request_sound(

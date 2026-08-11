@@ -1,15 +1,13 @@
 #include "scene_manager.h"
 
+#include "../effects/runtime/effect_manager.h"
+
 namespace engine::scene
 {
 
 SceneManager::~SceneManager()
 {
-    if (_current_scene)
-    {
-        _current_scene->on_exit();
-        _current_scene = nullptr;
-    }
+	shutdown();
 }
 
 void SceneManager::on_update(double delta)
@@ -44,6 +42,7 @@ void SceneManager::shutdown()
 {
     if (_current_scene)
     {
+		detach_from_scene(_current_scene);
         _current_scene->on_exit();
         _current_scene = nullptr;
     }
@@ -55,5 +54,21 @@ void SceneManager::reset_current_scene()
 {
     if (_current_scene)
         _current_scene->reset();
+}
+
+void SceneManager::attach_to_scene(Scene* scene) noexcept
+{
+	if (!scene)
+		return;
+
+	engine::effects::EffectManager::instance()->bind_active_scene(*scene);
+}
+
+void SceneManager::detach_from_scene(Scene* scene) noexcept
+{
+	if (!scene)
+		return;
+
+	engine::effects::EffectManager::instance()->unbind_active_scene(*scene);
 }
 }

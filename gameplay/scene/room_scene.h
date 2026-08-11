@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../engine/animation/effect_manager.h"
 #include "../../engine/scene/scene.h"
 #include "../../engine/core/geometry/vector2.h"
 #include "../characters/enemy.h"
@@ -24,8 +23,6 @@ public:
     void on_update(double delta) override;
     void on_render(SDL_Renderer *renderer) override;
     void on_input(const engine::input::InputSnapshot &input, const std::vector<engine::input::InputEvent> &events) override;
-
-    void spawn_effect(const engine::animation::EffectSpawnRequest &request);
 
     engine::core::Vector2 closest_enemy_to_point(engine::core::Vector2 &point);
 

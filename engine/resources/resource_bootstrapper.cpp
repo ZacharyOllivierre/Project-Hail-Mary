@@ -3,7 +3,7 @@
 #include "resource_manager.h"
 
 #include "../animation/animation_manager.h"
-#include "../animation/effect_manager.h"
+#include "../effects/runtime/effect_manager.h"
 #include "../io/loaders/audio_manifest_loader.h"
 #include "../io/loaders/configs_list_loader.h"
 #include "../io/loaders/fonts_manifest_loader.h"
@@ -460,7 +460,7 @@ bool load_effects(
 		return false;
 	}
 
-	std::vector<EffectBuildRequest> effect_requests;
+	std::vector<AnimationEffectBuildRequest> effect_requests;
 	effect_requests.reserve(effects_node.size());
 
 	for (size_t index = 0; index < effects_node.size(); ++index)
@@ -469,7 +469,7 @@ bool load_effects(
 		if (!effect_node.is_object())
 		{
 			std::cout << "Read effect config failed:\n"
-				<< "engine::animation::Effect entry is not an object at index " << index << std::endl;
+				<< "engine::effects::AnimationEffect entry is not an object at index " << index << std::endl;
 			return false;
 		}
 
@@ -591,15 +591,16 @@ bool load_effects(
 			return false;
 		}
 
-		EffectBuildRequest effect_request;
+		AnimationEffectBuildRequest effect_request;
 		effect_request.effect_key = std::move(effect_config.effect_key);
 		effect_request.animation_key = std::move(effect_config.animation_key);
-		effect_request.default_size = effect_config.default_size;
-		effect_request.angle_degrees = effect_config.angle_degrees;
+		effect_request.default_size = effect_config.default_size.value_or(
+			engine::core::Vector2::zero());
+		effect_request.default_angle_degrees = effect_config.angle_degrees.value_or(0.0);
 		effect_requests.push_back(std::move(effect_request));
 	}
 
-	if (!engine::animation::EffectManager::instance()->register_effect(effect_requests))
+	if (!engine::effects::EffectManager::instance()->register_animation_effect(effect_requests))
 	{
 		std::cout << "Register effect definitions failed." << std::endl;
 		return false;

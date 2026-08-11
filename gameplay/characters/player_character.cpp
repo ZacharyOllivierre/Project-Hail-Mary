@@ -2,6 +2,7 @@
 
 #include "../../engine/animation/animation_manager.h"
 #include "../../engine/core/render/render_command.h"
+#include "../../engine/effects/effect_service.h"
 #include "../../engine/input/input_state.h"
 
 #include "../../engine/physics/collision_manager.h"
@@ -62,16 +63,22 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
         _facing_direction = FacingDirection::Right;
     set_animation_state(movement.is_zero() ? AnimationState::Idle : AnimationState::Move);
 
-    if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
-    {
-        _pending_effect_requests.push_back({.effect_key = _effect_id,
-                                            .position = center(),
-                                            .anchor = engine::animation::EffectAnchor::Center,
-                                            .size = engine::core::Vector2{500.0f, 500.0f},
-                                            .flip = _facing_direction == FacingDirection::Left
-                                                        ? engine::core::SpriteFlip::Horizontal
-                                                        : engine::core::SpriteFlip::None});
-    }
+	if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
+	{
+        std::cout << "effect" << std::endl;
+		engine::effects::AnimationEffectSpawnRequest request;
+		request.effect_key = _effect_id;
+		request.position = center();
+		request.anchor = engine::effects::EffectAnchor::Center;
+		request.size = engine::core::Vector2{200.0f, 200.0f};
+		request.flip = _facing_direction == FacingDirection::Left
+			? engine::core::SpriteFlip::Horizontal
+			: engine::core::SpriteFlip::None;
+        if (!EFFECT_SERVICE->request_animation_effect(request))
+        {
+            std::cout << "false" << std::endl;
+        }
+	}
 }
 
 void PlayerCharacter::submit_render_commands(std::vector<engine::core::RenderCommand> &out_commands) const
@@ -97,13 +104,6 @@ std::vector<ShotDescriptor> PlayerCharacter::create_projectile(const engine::cor
 Wand &PlayerCharacter::wand() noexcept
 {
     return _wand;
-}
-
-std::vector<engine::animation::EffectSpawnRequest> PlayerCharacter::drain_effect_spawn_requests()
-{
-    std::vector<engine::animation::EffectSpawnRequest> requests = std::move(_pending_effect_requests);
-    _pending_effect_requests.clear();
-    return requests;
 }
 
 void PlayerCharacter::set_animation_state(AnimationState state)

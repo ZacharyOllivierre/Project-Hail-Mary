@@ -2,7 +2,6 @@
 
 #include "character.h"
 #include "../../engine/animation/animation.h"
-#include "../../engine/animation/effect_manager.h"
 #include "../../engine/input/contracts/input_snapshot_receiver.h"
 #include "../combat/wand.h"
 
@@ -28,9 +27,6 @@ public:
     [[nodiscard]] std::vector<ShotDescriptor> create_projectile(
         const engine::core::Vector2& direction);
     [[nodiscard]] Wand& wand() noexcept;
-    [[nodiscard]] std::vector<engine::animation::EffectSpawnRequest>
-        drain_effect_spawn_requests();
-
 protected:
     [[nodiscard]] engine::core::Rect make_body_collision_rect(
         const engine::core::Rect& render_rect) const noexcept override;
@@ -56,7 +52,6 @@ private:
     std::string _character_id;
     std::string _effect_id;
     Wand _wand;
-    std::vector<engine::animation::EffectSpawnRequest> _pending_effect_requests;
     std::unique_ptr<engine::animation::Animation> _animation;
     AnimationState _animation_state = AnimationState::Idle;
     FacingDirection _facing_direction = FacingDirection::Right;

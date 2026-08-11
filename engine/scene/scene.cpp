@@ -115,8 +115,10 @@ namespace engine::scene
 
 	void Scene::on_update(double delta)
 	{
-		for (const UpdatableEntry &entry : _updatables)
+		const std::size_t update_count = _updatables.size();
+		for (std::size_t index = 0; index < update_count; ++index)
 		{
+			const UpdatableEntry entry = _updatables[index];
 			engine::core::SceneObject *object = entry.object;
 
 			if (!object || object->is_destroyed() || !object->is_active())

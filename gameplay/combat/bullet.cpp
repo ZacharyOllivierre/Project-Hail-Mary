@@ -44,8 +44,8 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     if (!_bullet_attributes.sound_on_fire.empty())
     {
         engine::audio::SoundPlayOptions options{
-            .group = engine::audio::SoundGroup::Wand,
             .loops = 0,
+            .group = engine::audio::SoundGroup::Wand,
             .start_delay = std::chrono::milliseconds{0}};
         AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_fire, options);
     }
@@ -55,8 +55,8 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     if (!_bullet_attributes.sound_during_flight.empty())
     {
         engine::audio::SoundPlayOptions options{
-            .group = engine::audio::SoundGroup::Wand,
             .loops = -1,
+            .group = engine::audio::SoundGroup::Wand,
             .start_delay = std::chrono::milliseconds{0}};
         flight_sound = AUDIO_SERVICE->request_sound(_bullet_attributes.sound_during_flight, options).handle;
     }
@@ -91,8 +91,8 @@ void Bullet::on_collision(const engine::core::Vector2 &collision_direction) noex
     if (!_bullet_attributes.sound_on_collision.empty())
     {
         engine::audio::SoundPlayOptions options{
-            .group = engine::audio::SoundGroup::Wand,
             .loops = 0,
+            .group = engine::audio::SoundGroup::Wand,
             .start_delay = std::chrono::milliseconds{0}};
         AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_collision, options);
     }
@@ -111,8 +111,8 @@ void Bullet::on_entity_collision(GameObject *entity) noexcept
     if (!_bullet_attributes.sound_on_entity_collision.empty())
     {
         engine::audio::SoundPlayOptions options{
-            .group = engine::audio::SoundGroup::Wand,
             .loops = 0,
+            .group = engine::audio::SoundGroup::Wand,
             .start_delay = std::chrono::milliseconds{0}};
         AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_entity_collision, options);
     }
@@ -128,8 +128,8 @@ void Bullet::on_destroy() noexcept
     if (!_bullet_attributes.sound_on_death.empty())
     {
         engine::audio::SoundPlayOptions options{
-            .group = engine::audio::SoundGroup::Wand,
             .loops = 0,
+            .group = engine::audio::SoundGroup::Wand,
             .start_delay = std::chrono::milliseconds{0}};
         AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_death, options);
     }
