@@ -66,33 +66,9 @@ bool BounceBehavior::on_collision(BulletBehaviorContext &context)
         .loops = 0,
         .start_delay = std::chrono::milliseconds{0}};
 
-    AUDIO_SERVICE->request_sound(
-        "bounce",
-        options);
+    AUDIO_SERVICE->request_sound("bounce", options);
 
     return true;
-}
-
-// Redefinition (here and bullet.cpp)
-constexpr double kRadiansToDegrees = 57.29577951308232;
-
-void CollisionEffectBehavior::spawn_effect(BulletBehaviorContext &context)
-{
-    RoomScene *room_scene = engine::scene::SceneManager::instance()->try_find_scene<RoomScene>();
-
-    if (!room_scene)
-        return;
-
-    engine::animation::EffectSpawnRequest request;
-    request.effect_key = _effect_key;
-    request.position = context.bullet.center();
-    request.anchor = engine::animation::EffectAnchor::Center;
-
-    // Angle effect opposite bullet degrees
-    engine::core::Vector2 v = context.bullet.desired_velocity();
-    request.angle_degrees = std::atan2(v.y, v.x) * kRadiansToDegrees + 180;
-
-    room_scene->spawn_effect(request);
 }
 
 // Todo this code doesnt make sense looking back

@@ -98,7 +98,7 @@ class Fireball : public WeaponRune
 public:
     Fireball() : WeaponRune()
     {
-        _wand_attributes.bullet_count = 1;
+        _wand_attributes.bullet_count = 5;
         _wand_attributes.spread_style = SpreadStyle::Uniform;
         _wand_attributes.spread_degrees = 10;
         _wand_attributes.shot_style = ShotStyle::Simultaneous;

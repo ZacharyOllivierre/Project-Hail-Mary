@@ -49,35 +49,6 @@ private:
     int _remaining_bounces;
 };
 
-#include <string>
-// Spawns a visual effect on collision
-// This behavior does not have a matching behavior rune
-class CollisionEffectBehavior : public BulletBehavior
-{
-public:
-    explicit CollisionEffectBehavior(std::string effect_key) : _effect_key(effect_key)
-    {
-    }
-
-    bool on_collision(BulletBehaviorContext &context) override
-    {
-        spawn_effect(context);
-        return false;
-    }
-
-    bool on_entity_collision(BulletBehaviorContext &context) override
-    {
-        spawn_effect(context);
-        return false;
-    }
-
-private:
-    void spawn_effect(BulletBehaviorContext &context);
-
-private:
-    std::string _effect_key;
-};
-
 // Curves bullet -val for left +val for right
 class CurveBehavior : public BulletBehavior
 {
