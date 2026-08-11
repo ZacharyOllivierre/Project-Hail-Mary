@@ -15,6 +15,8 @@ bool  EffectService::request_floating_number_effect(
 	const FloatingNumberEffectSpawnRequest& request)
 {
 	(void)request;
+
+	return false;
 }
 
 }

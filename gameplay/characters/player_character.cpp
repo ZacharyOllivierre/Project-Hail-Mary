@@ -70,7 +70,7 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
 		request.effect_key = _effect_id;
 		request.position = center();
 		request.anchor = engine::effects::EffectAnchor::Center;
-		request.size = engine::core::Vector2{500.0f, 500.0f};
+		request.size = engine::core::Vector2{200.0f, 200.0f};
 		request.flip = _facing_direction == FacingDirection::Left
 			? engine::core::SpriteFlip::Horizontal
 			: engine::core::SpriteFlip::None;
