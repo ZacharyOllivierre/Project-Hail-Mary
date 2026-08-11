@@ -33,10 +33,32 @@ Bullet::Bullet(const Bullet_Attributes &bullet_attributes) noexcept
     BulletBehaviorContext context{.bullet = *this};
     _behaviors.on_fire(context);
 
+    // Configure Wand sound group
+    engine::audio::SoundGroupConfig config{
+        .max_simultaneous = 12,
+        .cooldown = std::chrono::milliseconds{0},
+        .overflow_policy = engine::audio::SoundOverflowPolicy::ReplaceOldest};
+    AUDIO_SERVICE->set_sound_group_config(engine::audio::SoundGroup::Wand, config);
+
     // Call on fire sound if given
     if (!_bullet_attributes.sound_on_fire.empty())
     {
-        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_fire);
+        engine::audio::SoundPlayOptions options{
+            .group = engine::audio::SoundGroup::Wand,
+            .loops = 0,
+            .start_delay = std::chrono::milliseconds{0}};
+        AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_fire, options);
+    }
+
+    // Start in flight sound if given
+    // Plays indefinitely until stopped by on death
+    if (!_bullet_attributes.sound_during_flight.empty())
+    {
+        engine::audio::SoundPlayOptions options{
+            .group = engine::audio::SoundGroup::Wand,
+            .loops = -1,
+            .start_delay = std::chrono::milliseconds{0}};
+        flight_sound = AUDIO_SERVICE->request_sound(_bullet_attributes.sound_during_flight, options).handle;
     }
 }
 
@@ -68,7 +90,11 @@ void Bullet::on_collision(const engine::core::Vector2 &collision_direction) noex
     // Play structure collision sound
     if (!_bullet_attributes.sound_on_collision.empty())
     {
-        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_collision);
+        engine::audio::SoundPlayOptions options{
+            .group = engine::audio::SoundGroup::Wand,
+            .loops = 0,
+            .start_delay = std::chrono::milliseconds{0}};
+        AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_collision, options);
     }
 }
 
@@ -82,9 +108,13 @@ void Bullet::on_entity_collision(GameObject *entity) noexcept
     _behaviors.on_entity_collision(context);
 
     // Play entity collision sound
-    if (!_bullet_attributes.sound_on_collision.empty())
+    if (!_bullet_attributes.sound_on_entity_collision.empty())
     {
-        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_entity_collision);
+        engine::audio::SoundPlayOptions options{
+            .group = engine::audio::SoundGroup::Wand,
+            .loops = 0,
+            .start_delay = std::chrono::milliseconds{0}};
+        AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_entity_collision, options);
     }
 }
 
@@ -95,9 +125,19 @@ void Bullet::on_destroy() noexcept
     _behaviors.on_death(context);
 
     // Play projectile death sound
-    if (!_bullet_attributes.sound_on_collision.empty())
+    if (!_bullet_attributes.sound_on_death.empty())
     {
-        AUDIO_SERVICE->play_sound(_bullet_attributes.sound_on_death);
+        engine::audio::SoundPlayOptions options{
+            .group = engine::audio::SoundGroup::Wand,
+            .loops = 0,
+            .start_delay = std::chrono::milliseconds{0}};
+        AUDIO_SERVICE->request_sound(_bullet_attributes.sound_on_death, options);
+    }
+
+    if (flight_sound)
+    {
+        AUDIO_SERVICE->stop_sound(*flight_sound);
+        flight_sound.reset();
     }
 }
 

@@ -31,8 +31,6 @@ struct Bullet_Attributes
     std::string sound_on_collision;
     std::string sound_on_entity_collision;
     std::string sound_on_death;
-
-    // todo need to implement this
     std::string sound_during_flight;
 };
 

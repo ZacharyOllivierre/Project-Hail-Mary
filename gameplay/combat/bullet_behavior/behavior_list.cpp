@@ -8,6 +8,8 @@
 #include "../../../engine/scene/scene_manager.h"
 #include "../../scene/room_scene.h"
 
+#include "../../../engine/audio/audio_service.h"
+
 void AccelerationBehavior::on_update(BulletBehaviorContext &context)
 {
     engine::core::Vector2 new_velocity = context.bullet.desired_velocity();
@@ -57,6 +59,16 @@ bool BounceBehavior::on_collision(BulletBehaviorContext &context)
     }
 
     context.bullet.set_velocity(reflected_velocity);
+
+    // Call bounce sound effect
+    engine::audio::SoundPlayOptions options{
+        .group = engine::audio::SoundGroup::Wand,
+        .loops = 0,
+        .start_delay = std::chrono::milliseconds{0}};
+
+    AUDIO_SERVICE->request_sound(
+        "bounce",
+        options);
 
     return true;
 }
@@ -170,6 +182,16 @@ bool PierceBehavior::on_entity_collision(BulletBehaviorContext &context)
     {
         return false;
     }
+
+    // Call pierce sound effect
+    engine::audio::SoundPlayOptions options{
+        .group = engine::audio::SoundGroup::Wand,
+        .loops = 0,
+        .start_delay = std::chrono::milliseconds{0}};
+
+    AUDIO_SERVICE->request_sound(
+        "pierce",
+        options);
 
     _pierces--;
     return true;

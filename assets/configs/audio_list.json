@@ -8,6 +8,15 @@
     },
     "fireball_explosion": {
       "path": "fireball_explosion.wav"
+    },
+    "fireball_flight": {
+      "path": "fireball_flight.wav"
+    },
+    "pierce": {
+      "path": "pierce.wav"
+    },
+    "bounce": {
+      "path": "bounce.wav"
     }
   },
   "music": {}

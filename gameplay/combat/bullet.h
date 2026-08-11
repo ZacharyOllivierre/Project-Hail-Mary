@@ -4,6 +4,7 @@
 #include "projectile.h"
 #include "attack_info.h"
 #include "bullet_behavior/bullet_behavior_set.h"
+#include "../../engine/audio/sound_playback_types.h"
 
 #include <SDL.h>
 #include <string>
@@ -42,4 +43,6 @@ private:
 
     // Collision spam fix prevents repeated damage every frame from pierce
     std::unordered_map<GameObject *, float> _hit_cooldowns;
+
+    std::optional<engine::audio::SoundHandle> flight_sound;
 };

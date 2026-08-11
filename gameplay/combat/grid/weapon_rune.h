@@ -119,9 +119,10 @@ public:
         set_consume_type(WeaponConsumeType::FireNested);
 
         // Sound
-        _bullet_attributes.sound_on_collision = "fireball_explosion";
-        _bullet_attributes.sound_on_entity_collision = "fireball_explosion";
+        // _bullet_attributes.sound_on_collision = "";
+        // _bullet_attributes.sound_on_entity_collision = "";
         _bullet_attributes.sound_on_fire = "fireball_shoot";
-        _bullet_attributes.sound_on_death = "";
+        _bullet_attributes.sound_on_death = "fireball_explosion";
+        _bullet_attributes.sound_during_flight = "fireball_flight";
     }
 };
