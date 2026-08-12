@@ -1,5 +1,6 @@
 #include "projectile_manager.h"
 #include "projectile_service.h"
+#include "../../engine/tools/logger.h"
 
 bool ProjectileManager::bind_scene(engine::scene::Scene& scene, engine::physics::PhysicsManager& physics)
 {
@@ -16,7 +17,7 @@ void ProjectileManager::unbind_scene() noexcept
 	_scene_info = {};
 }
 
-void ProjectileManager::enqueue_fire_request(ProjectileInformation inform, std::vector<ShotDescriptor> shots)
+void ProjectileManager::enqueue_fire_request(ProjectileInformation inform, std::vector<ShotDescriptor> shots)noexcept
 {
 
 }

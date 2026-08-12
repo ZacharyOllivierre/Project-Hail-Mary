@@ -12,7 +12,7 @@ namespace engine::object_query
         friend engine::tools::Singleton<GameObjectQueryService>;
 
     public:
-    }
+    };
 
 
 }
