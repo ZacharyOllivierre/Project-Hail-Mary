@@ -5,7 +5,6 @@
 #include "../../engine/input/input_state.h"
 #include "../../engine/tools/logger.h"
 
-#include "game_scene.h"
 #include "room_scene.h"
 
 #include <SDL_ttf.h> // Added for text

@@ -29,6 +29,7 @@ vector<ShotDescriptor> Wand::attack(const engine::core::Vector2 &direction)
         _wand_attributes = weapon_nodes.front().loadout.wand_attributes;
         _bullet_attributes = weapon_nodes.front().loadout.bullet_attributes;
     }
+
     return shots;
 }
 

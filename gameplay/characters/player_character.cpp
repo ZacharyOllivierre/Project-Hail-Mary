@@ -8,6 +8,8 @@
 
 #include "../../engine/physics/collision_manager.h"
 
+#include "../combat/projectile_service.h"
+
 #include <utility>
 
 PlayerCharacter::PlayerCharacter(std::string character_id,
@@ -96,9 +98,17 @@ void PlayerCharacter::submit_render_commands(std::vector<engine::core::RenderCom
         out_commands.push_back(std::move(command));
 }
 
-std::vector<ShotDescriptor> PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
+void PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
 {
-    return _wand.attack(direction);
+    //mabey put requset in wand?
+    ProjectileFireRequest requset;
+    requset.source = this;
+    requset.shots = _wand.attack(direction);
+    requset.collision.layer = engine::physics::CollisionLayer::PlayerProjectile;
+    requset.collision.targets = engine::physics::CollisionTarget::Enemy;
+    ENGINE_LOG_DEBUG("PlayerCharacter", "create_projectile");
+
+    PROJECTILE_SERVICE->request_fire(requset);
 }
 
 Wand &PlayerCharacter::wand() noexcept

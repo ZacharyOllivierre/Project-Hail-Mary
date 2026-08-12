@@ -63,6 +63,7 @@ void ProjectileManager::update(double delta)
 
     const float elapsed = static_cast<float>(std::max(0.0, delta));
 
+    // Iterate through all scheduled shots and copy over / spawn ready ones
     for (auto iterator = _scheduled_projectiles.begin();iterator != _scheduled_projectiles.end();)
     {
         if (!iterator->source)
@@ -98,6 +99,7 @@ void ProjectileManager::spawn_projectile(ScheduledProjectile scheduled)
         return;
     }
 
+    // Update bullut spawn position with offset relative to player
     Bullet_Attributes attributes = std::move(scheduled.shot.bullet_attributes);
     attributes.start_position =scheduled.source->center() + scheduled.shot.spawn_offset;
 
@@ -116,13 +118,15 @@ void ProjectileManager::spawn_projectile(ScheduledProjectile scheduled)
                 scheduled.collision.targets,
                 [added_projectile](const engine::physics::CollisionInfo& collision_info)
                 {
-                    CombatReceiver* receiver =
-                        dynamic_cast<CombatReceiver*>(collision_info.other.owner());
+                    // forward projectile damage through CombatReciever
+                    CombatReceiver* receiver =dynamic_cast<CombatReceiver*>(collision_info.other.owner());
 
                     if (!receiver)
                         return;
 
                     engine::core::GameObject* target = collision_info.other.owner();
+
+                    // Attack only valid if not on bullets cooldown list
                     if (!added_projectile->can_hit(target))
                         return;
 

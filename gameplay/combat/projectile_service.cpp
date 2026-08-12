@@ -8,6 +8,8 @@
 
 void ProjectileService::request_fire(ProjectileFireRequest request)
 {
+    ENGINE_LOG_DEBUG("ProjectileService", "request_fire");
+
     if (!request.source)
     {
         ENGINE_LOG_ERROR("ProjectileService", "Fire request source is null.");

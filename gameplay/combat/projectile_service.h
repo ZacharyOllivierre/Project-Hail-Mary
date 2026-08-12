@@ -4,6 +4,8 @@
 
 #include "../../engine/tools/singleton.h"
 
+#define PROJECTILE_SERVICE (ProjectileService::instance())
+
 class ProjectileService final : public engine::tools::Singleton<ProjectileService>
 {
     friend class engine::tools::Singleton<ProjectileService>;
