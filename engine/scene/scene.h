@@ -32,13 +32,6 @@ namespace engine::scene
 {
 
 
-
-
-
-
-
-
-
 class Scene
 {
 public:

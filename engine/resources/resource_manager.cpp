@@ -3,8 +3,8 @@
 #include "atlas/atlas_manager.h"
 #include "resource_bootstrapper.h"
 #include "../io/path_manager.h"
+#include "../tools/logger.h"
 
-#include <iostream>
 #include <memory>
 
 namespace engine::resources
@@ -21,7 +21,7 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 {
 	if (!renderer)
 	{
-		std::cout << "ResourceManager init failed: renderer is null." << std::endl;
+		ENGINE_LOG_ERROR("resource","ResourceManager init failed: renderer is null.");
 		return false;
 	}
 
@@ -29,15 +29,13 @@ bool ResourceManager::init(SDL_Renderer* renderer)
 
 	if (!engine::io::PathManager::instance()->init())
 	{
-		std::cout << "ResourceManager init failed: engine::io::PathManager init fail." << std::endl;
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "engine::io::PathManager init fail");
+		ENGINE_LOG_ERROR("resource","ResourceManager init failed: engine::io::PathManager init fail.");
 		return false;
 	}
 
 	if (!ResourceBootstrapper::bootstrap(*this, renderer))
 	{
-		std::cout << "ResourceManager init failed: resource bootstrap failed."
-			<< std::endl;
+		ENGINE_LOG_ERROR("resource","ResourceManager init failed: resource bootstrap failed.");
 		return false;
 	}
 

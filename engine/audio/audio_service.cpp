@@ -1,8 +1,8 @@
 #include "audio_service.h"
 
 #include "../resources/resource_manager.h"
+#include "../tools/logger.h"
 
-#include <SDL.h>
 #include <SDL_mixer.h>
 
 #include <algorithm>
@@ -19,10 +19,7 @@ bool AudioService::init(const AudioSettings& settings)
 	if (Mix_AllocateChannels(static_cast<int>(kSoundChannelCount))
 		< static_cast<int>(kSoundChannelCount))
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Audio service failed to allocate sound channels: %s",
-			Mix_GetError());
+		ENGINE_LOG_WARN("audio","Audio service failed to allocate sound channels: " << Mix_GetError());
 		return false;
 	}
 
@@ -57,9 +54,7 @@ SoundRequestResult AudioService::request_sound(
 {
 	if (!_initialized)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play sound failed: audio service is not initialized.");
+		ENGINE_LOG_WARN("audio","Play sound failed: audio service is not initialized.");
 		return {};
 	}
 
@@ -67,11 +62,7 @@ SoundRequestResult AudioService::request_sound(
 		engine::resources::ResourceManager::instance()->find_sound(key);
 	if (!sound)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play sound failed: sound does not exist: %.*s",
-			static_cast<int>(key.size()),
-			key.data());
+		ENGINE_LOG_WARN("audio","Play sound failed: sound does not exist: " << key);
 		return {};
 	}
 
@@ -141,9 +132,7 @@ bool AudioService::set_sound_group_config(
 {
 	if (!_sound_scheduler.set_group_config(group, config))
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Sound group config exceeds its fixed maximum or has a negative cooldown.");
+		ENGINE_LOG_WARN("audio","Sound group config exceeds its fixed maximum or has a negative cooldown.");
 		return false;
 	}
 
@@ -170,9 +159,7 @@ bool AudioService::play_music(std::string_view key, int loops)
 {
 	if (!_initialized)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play music failed: audio service is not initialized.");
+		ENGINE_LOG_WARN("audio","Play music failed: audio service is not initialized.");
 		return false;
 	}
 
@@ -180,23 +167,14 @@ bool AudioService::play_music(std::string_view key, int loops)
 		engine::resources::ResourceManager::instance()->find_music(key);
 	if (!music)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play music failed: music does not exist: %.*s",
-			static_cast<int>(key.size()),
-			key.data());
+		ENGINE_LOG_WARN("audio","Play music failed: music does not exist: " << key);
 		return false;
 	}
 
 	stop_music();
 	if (Mix_PlayMusic(music, loops) != 0)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play music failed: %.*s error: %s",
-			static_cast<int>(key.size()),
-			key.data(),
-			Mix_GetError());
+		ENGINE_LOG_WARN("audio","Play music failed: " << key << " error: " << Mix_GetError());
 		return false;
 	}
 
@@ -250,23 +228,14 @@ int AudioService::start_sound(
 		engine::resources::ResourceManager::instance()->find_sound(key);
 	if (!sound)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play sound failed: sound does not exist: %.*s",
-			static_cast<int>(key.size()),
-			key.data());
+		ENGINE_LOG_WARN("audio","Play sound failed: sound does not exist: " << key);
 		return -1;
 	}
 
 	const int channel = Mix_PlayChannel(-1, sound, loops);
 	if (channel < 0)
 	{
-		SDL_LogWarn(
-			SDL_LOG_CATEGORY_AUDIO,
-			"Play sound failed: %.*s error: %s",
-			static_cast<int>(key.size()),
-			key.data(),
-			Mix_GetError());
+		ENGINE_LOG_WARN("audio","Play sound failed: " << key << " error: " << Mix_GetError());
 	}
 	else
 	{

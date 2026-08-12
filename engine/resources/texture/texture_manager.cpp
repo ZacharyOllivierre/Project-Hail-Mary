@@ -1,6 +1,6 @@
 #include "texture_manager.h"
+#include "../../tools/logger.h"
 #include <SDL_image.h>
-#include <iostream>
 #include <utility>
 
 namespace engine::resources
@@ -10,7 +10,7 @@ bool TextureManager::load_texture(SDL_Renderer* renderer, const std::string& key
 {
 	if (!renderer)
 	{
-		std::cout << "Load texture failed: renderer is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load texture failed: renderer is empty.");
 
 		return false;
 	}
@@ -24,14 +24,13 @@ bool TextureManager::store_texture(const std::string& key, SDL_Texture* texture)
 {
 	if (key.empty())
 	{
-		std::cout << "Store texture failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Store texture failed: key is empty.");
 		return false;
 	}
 
 	if (!texture)
 	{
-		std::cout << "Store texture failed: texture is null: "
-			<< key << std::endl;
+		ENGINE_LOG_WARN("resource","Store texture failed: texture is null: " << key);
 		return false;
 	}
 

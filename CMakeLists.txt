@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(Hail LANGUAGES C CXX)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -132,6 +134,10 @@ endif()
 add_subdirectory(application)
 add_subdirectory(engine)
 add_subdirectory(gameplay)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 add_subdirectory(thirdparty/imgui)
 

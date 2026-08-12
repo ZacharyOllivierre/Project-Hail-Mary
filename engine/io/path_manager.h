@@ -14,12 +14,14 @@ class PathManager : public engine::tools::Singleton<PathManager>
 public:
     bool init();
     bool ensure_runtime_dirs() const;
+    [[nodiscard]] bool is_initialized() const noexcept { return _initialized; }
 
     const std::filesystem::path& root() const;
 
 
     std::filesystem::path assets() const;
     std::filesystem::path player_data() const;
+    std::filesystem::path logs() const;
 
     std::filesystem::path configs() const;
     std::filesystem::path fonts() const;
@@ -45,5 +47,6 @@ private:
 
 private:
     std::filesystem::path _root;
+    bool _initialized = false;
 };
 }

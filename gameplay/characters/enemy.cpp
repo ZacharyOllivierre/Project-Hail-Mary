@@ -3,8 +3,8 @@
 #include "../../engine/animation/animation_manager.h"
 #include "../../engine/core/render/render_command.h"
 #include "../../engine/physics/collision_manager.h"
+#include "../../engine/tools/logger.h"
 
-#include <iostream>
 #include <utility>
 
 Enemy::Enemy(
@@ -70,8 +70,8 @@ void Enemy::set_animation_state(AnimationState state)
             _character_id + "." + suffix);
     if (!animation)
     {
-        std::cout << "Set Enemy animation failed: "
-                  << _character_id << "." << suffix << '\n';
+		ENGINE_LOG_WARN("gameplay","Set Enemy animation failed: "
+			<< _character_id << "." << suffix);
         return;
     }
 

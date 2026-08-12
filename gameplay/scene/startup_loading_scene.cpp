@@ -4,10 +4,10 @@
 #include "../../engine/resources/resource_manager.h"
 #include "../../engine/scene/scene_manager.h"
 #include "../../engine/input/input_state.h"
+#include "../../engine/tools/logger.h"
 #include "menu_scene.h"
 
 #include <SDL_image.h>
-#include <iostream>
 
 void StartUpLoadingScene::on_enter()
 {
@@ -30,7 +30,7 @@ void StartUpLoadingScene::on_update(double delta)
 	{
 		_state = LoadingState::Failed;
 		_error_message = "engine::resources::ResourceManager init fail";
-		std::cout << "Startup loading failed: " << _error_message << std::endl;
+		ENGINE_LOG_ERROR("scene","Startup loading failed: " << _error_message);
 		return;
 	}
 
@@ -106,7 +106,7 @@ bool StartUpLoadingScene::ensure_preload_texture(SDL_Renderer* renderer)
 	if (!engine::io::PathManager::instance()->init())
 	{
 		_error_message = "engine::io::PathManager init fail";
-		std::cout << "Startup preload failed: " << _error_message << std::endl;
+		ENGINE_LOG_ERROR("scene","Startup preload failed: " << _error_message);
 		return false;
 	}
 
@@ -116,8 +116,8 @@ bool StartUpLoadingScene::ensure_preload_texture(SDL_Renderer* renderer)
 	if (!_preload_texture)
 	{
 		_error_message = "Failed to load preload image: " + preload_path.string();
-		std::cout << "Startup preload failed: " << _error_message
-			<< " error: " << IMG_GetError() << std::endl;
+		ENGINE_LOG_ERROR("scene","Startup preload failed: " << _error_message
+			<< " error: " << IMG_GetError());
 		return false;
 	}
 
@@ -133,4 +133,3 @@ void StartUpLoadingScene::render_preload_texture(SDL_Renderer* renderer) const
 	const SDL_Rect destination_rect{ 886, 606, 400, 100 };
 	SDL_RenderCopy(renderer, _preload_texture, nullptr, &destination_rect);
 }
-

@@ -1,8 +1,8 @@
 #include "texture_manifest_loader.h"
 
 #include "../json_loader.h"
+#include "../../tools/logger.h"
 
-#include <iostream>
 #include <utility>
 
 namespace engine::io
@@ -19,21 +19,21 @@ bool TextureManifestLoader::load(
 	const JsonReadResult result = loader.open_file(manifest_path);
 	if (!result)
 	{
-		std::cout << "Load texture manifest failed: " << result.error;
+		ENGINE_LOG_ERROR("resource","Load texture manifest failed: " << result.error);
 		return false;
 	}
 
 	if (!loader.root().is_object())
 	{
-		std::cout << "Load texture manifest failed: root is not an object: "
-			<< manifest_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load texture manifest failed: root is not an object: "
+			<< manifest_path);
 		return false;
 	}
 
 	if (!loader.root().contains("textures") || !loader.root().at("textures").is_object())
 	{
-		std::cout << "Load texture manifest failed: textures is missing or not an object: "
-			<< manifest_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load texture manifest failed: textures is missing or not an object: "
+			<< manifest_path);
 		return false;
 	}
 
@@ -44,16 +44,16 @@ bool TextureManifestLoader::load(
 	{
 		if (!texture.value().is_object())
 		{
-			std::cout << "Load texture manifest failed: texture entry is not an object: "
-				<< texture.key() << std::endl;
+			ENGINE_LOG_ERROR("resource","Load texture manifest failed: texture entry is not an object: "
+				<< texture.key());
 			return false;
 		}
 
 		const json& texture_node = texture.value();
 		if (!texture_node.contains("path") || !texture_node.at("path").is_string())
 		{
-			std::cout << "Load texture manifest failed: path is missing or not a string: "
-				<< texture.key() << std::endl;
+			ENGINE_LOG_ERROR("resource","Load texture manifest failed: path is missing or not a string: "
+				<< texture.key());
 			return false;
 		}
 

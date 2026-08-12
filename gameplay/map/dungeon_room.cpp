@@ -2,12 +2,11 @@
 
 #include "../../engine/core/render/render_command.h"
 #include "../../engine/resources/resource_manager.h"
+#include "../../engine/tools/logger.h"
 
 #include <SDL.h>
 
 #include <utility>
-
-#include <iostream>
 
 namespace
 {
@@ -67,7 +66,7 @@ DungeonRoom::DungeonRoom()
 
     if (!_tile_sheet_texture)
     {
-        std::cout << "DungeonRoom texture not found in resource manager." << std::endl;
+		ENGINE_LOG_WARN("gameplay","DungeonRoom texture not found in resource manager.");
     }
 
     generate();

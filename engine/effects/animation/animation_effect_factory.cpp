@@ -1,8 +1,7 @@
 #include "animation_effect_factory.h"
 
 #include "../../animation/animation_manager.h"
-
-#include <SDL.h>
+#include "../../tools/logger.h"
 
 #include <algorithm>
 #include <optional>
@@ -74,9 +73,8 @@ std::unique_ptr<AnimationEffect> AnimationEffectFactory::create(
 			definition.animation_key);
 	if (!animation)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Create animation effect failed: animation creation failed: %s",
-			definition.animation_key.c_str());
+		ENGINE_LOG_WARN("effects","Create animation effect failed: animation creation failed: "
+			<< definition.animation_key);
 		return nullptr;
 	}
 

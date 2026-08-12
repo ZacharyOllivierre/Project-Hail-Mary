@@ -1,6 +1,5 @@
 #include "path_manager.h"
-
-#include <iostream>
+#include "../tools/logger.h"
 #include <string>
 
 namespace engine::io
@@ -13,12 +12,13 @@ bool PathManager::init()
 
     if (!root_path.has_value())
     {
-        std::cout << "PathManager init failed: project root not found from "
-            << std::filesystem::current_path() << std::endl;
+		ENGINE_LOG_ERROR("application","PathManager init failed: project root not found from "
+			<< std::filesystem::current_path());
         return false;
     }
 
     _root = root_path.value();
+    _initialized = true;
     return true;
 }
 
@@ -28,6 +28,7 @@ bool PathManager::ensure_runtime_dirs() const
     {
         std::filesystem::create_directories(player_data());
         std::filesystem::create_directories(saves());
+        std::filesystem::create_directories(logs());
         return true;
     }
     catch (const std::filesystem::filesystem_error&)
@@ -70,6 +71,11 @@ std::filesystem::path PathManager::textures() const
 std::filesystem::path PathManager::player_data() const
 {
     return _root / "player_data";
+}
+
+std::filesystem::path PathManager::logs() const
+{
+    return _root / "logs";
 }
 
 std::filesystem::path PathManager::saves() const

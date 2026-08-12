@@ -1,8 +1,8 @@
 #include "fonts_manifest_loader.h"
 
 #include "../json_loader.h"
+#include "../../tools/logger.h"
 
-#include <iostream>
 #include <utility>
 
 namespace engine::io
@@ -19,21 +19,21 @@ bool FontsManifestLoader::load(
 	const JsonReadResult result = loader.open_file(manifest_path);
 	if (!result)
 	{
-		std::cout << "Load fonts manifest failed: " << result.error;
+		ENGINE_LOG_ERROR("resource","Load fonts manifest failed: " << result.error);
 		return false;
 	}
 
 	if (!loader.root().is_object())
 	{
-		std::cout << "Load fonts manifest failed: root is not an object: "
-			<< manifest_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load fonts manifest failed: root is not an object: "
+			<< manifest_path);
 		return false;
 	}
 
 	if (!loader.root().contains("fonts") || !loader.root().at("fonts").is_array())
 	{
-		std::cout << "Load fonts manifest failed: fonts is missing or not an array: "
-			<< manifest_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load fonts manifest failed: fonts is missing or not an array: "
+			<< manifest_path);
 		return false;
 	}
 
@@ -42,29 +42,25 @@ bool FontsManifestLoader::load(
 	{
 		if (!font.is_object())
 		{
-			std::cout << "Load fonts manifest failed: font entry is not an object."
-				<< std::endl;
+			ENGINE_LOG_ERROR("resource","Load fonts manifest failed: font entry is not an object.");
 			return false;
 		}
 
 		if (!font.contains("key") || !font.at("key").is_string())
 		{
-			std::cout << "Load fonts manifest failed: key is missing or not a string."
-				<< std::endl;
+			ENGINE_LOG_ERROR("resource","Load fonts manifest failed: key is missing or not a string.");
 			return false;
 		}
 
 		if (!font.contains("file") || !font.at("file").is_string())
 		{
-			std::cout << "Load fonts manifest failed: file is missing or not a string."
-				<< std::endl;
+			ENGINE_LOG_ERROR("resource","Load fonts manifest failed: file is missing or not a string.");
 			return false;
 		}
 
 		if (!font.contains("size") || !font.at("size").is_number_integer())
 		{
-			std::cout << "Load fonts manifest failed: size is missing or not an integer."
-				<< std::endl;
+			ENGINE_LOG_ERROR("resource","Load fonts manifest failed: size is missing or not an integer.");
 			return false;
 		}
 
