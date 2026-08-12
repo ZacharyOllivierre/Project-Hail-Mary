@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-/*TODO Move effect into weapon runes*/
+// TODO Move effect into weapon runes
 
 Wand::Wand()
     : _rune_line(1), _debug_data(_wand_attributes, _bullet_attributes)
@@ -214,7 +214,7 @@ void Wand::seed_test_runes()
 
     // Bullet Audio Test
     (void)_rune_line.set_rune(1, std::make_shared<Fireball>());
-    (void)_rune_line.set_rune(2, std::make_shared<WallStickRune>(3, 1));
+    // (void)_rune_line.set_rune(2, std::make_shared<WallStickRune>(3, 1));
     // (void)_rune_line.set_rune(3, std::make_shared<PierceRune>(5));
-    // (void)_rune_line.set_rune(4, std::make_shared<BounceRune>(5));
+    (void)_rune_line.set_rune(4, std::make_shared<BounceRune>(5));
 }
