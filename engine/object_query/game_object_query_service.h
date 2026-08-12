@@ -10,7 +10,6 @@ namespace engine::object_query
         : public engine::tools::Singleton<GameObjectQueryService>
     {
         friend engine::tools::Singleton<GameObjectQueryService>;
-
     public:
     };
 
