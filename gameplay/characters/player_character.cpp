@@ -108,7 +108,7 @@ void PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
     requset.collision.targets = engine::physics::CollisionTarget::Enemy;
     ENGINE_LOG_DEBUG("PlayerCharacter", "create_projectile");
 
-    PROJECTILE_SERVICE->request_fire(requset);
+    PROJECTILE_SERVICE->request_fire(std::move(requset));
 }
 
 Wand &PlayerCharacter::wand() noexcept

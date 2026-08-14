@@ -4,5 +4,6 @@ build-web/
 .vs/
 out/
 site/
+logs/
 build-vs-x64/
 .DS_Store

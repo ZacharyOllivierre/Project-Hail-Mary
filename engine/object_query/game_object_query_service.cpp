@@ -1,1 +1,0 @@
-#include "game_object_query_service.h"

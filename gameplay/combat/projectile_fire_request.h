@@ -23,6 +23,7 @@ struct ProjectileCollisionProfile
     {
         const bool has_layer = layer != engine::physics::CollisionLayer::None;
         const bool has_targets = targets != engine::physics::CollisionTarget::None;
+
         return has_layer == has_targets;
     }
 };

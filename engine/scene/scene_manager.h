@@ -31,6 +31,8 @@ public:
 	);
 
 	void shutdown();
+	[[nodiscard]] Scene* current_scene() noexcept { return _current_scene; }
+	[[nodiscard]] const Scene* current_scene() const noexcept { return _current_scene; }
 
 	template<typename T, typename... Args>
 	void switch_to(Args&&... args);
