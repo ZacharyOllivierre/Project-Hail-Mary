@@ -7,11 +7,13 @@
 
 #include <concepts>
 #include <limits>
+#include <optional>
 
 #define GAME_OBJECT_SERVICE (GameObjectService::instance())
 
 class Character;
 class Enemy;
+
 
 class GameObjectService final : public engine::tools::Singleton<GameObjectService>
 {
@@ -25,18 +27,16 @@ public:
         const engine::core::GameObject* exclude = nullptr) const
     {
         return find_nearest_object_if<T>(
-            origin,exclude,
-            nullptr,[](const T&) { return true; });
+            origin,exclude, std::nullopt,[](const T&) { return true; });
     }
 
     template <typename T = engine::core::GameObject>
         requires std::derived_from<T, engine::core::GameObject>
     [[nodiscard]] T* find_nearest_object(const engine::core::Vector2& origin,
-        engine::core::DepthLayer layer,const engine::core::GameObject* exclude = nullptr) const
+        std::optional<const engine::core::DepthLayer> layer, const engine::core::GameObject* exclude = nullptr) const
     {
         return find_nearest_object_if<T>(
-            origin,exclude,&layer,
-            [](const T&) { return true; });
+            origin,exclude,layer,[](const T&) { return true; });
     }
 
     [[nodiscard]] Character* find_nearest_character(const engine::core::Vector2& origin,
@@ -50,7 +50,7 @@ private:
     template <typename T, typename Predicate>
         requires std::derived_from<T, engine::core::GameObject>
     [[nodiscard]] T* find_nearest_object_if(const engine::core::Vector2& origin,
-        const engine::core::GameObject* exclude,const engine::core::DepthLayer* layer,
+        const engine::core::GameObject* exclude,std::optional<const engine::core::DepthLayer> layer,
         Predicate&& predicate) const
     {
         engine::scene::Scene* scene =engine::scene::SceneManager::instance()->current_scene();
@@ -62,12 +62,9 @@ private:
 
         float nearest_distance_squared = std::numeric_limits<float>::max();
 
-        scene->for_each_game_object([&](engine::core::GameObject& object)
+        const auto consider_object =[&](engine::core::GameObject& object)
             {
                 if (&object == exclude || object.is_destroyed() || !object.is_active())
-                    return;
-
-                if (layer && object.depth_layer() != *layer)
                     return;
 
                 T* candidate = dynamic_cast<T*>(&object);
@@ -81,7 +78,12 @@ private:
                     nearest = candidate;
                     nearest_distance_squared = distance_squared;
                 }
-            });
+            };
+
+        if (layer)
+            scene->for_each_game_object(layer.value(), consider_object);
+        else
+            scene->for_each_game_object(consider_object);
 
         return nearest;
     }

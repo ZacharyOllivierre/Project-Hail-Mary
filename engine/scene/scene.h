@@ -83,6 +83,34 @@ public:
 		}
 	}
 
+	template <typename Visitor>
+	void for_each_game_object(engine::core::DepthLayer layer,Visitor&& visitor)
+	{
+		const size_t layer_index = static_cast<size_t>(layer);
+		if (layer_index >= _object_layers.size())
+			return;
+
+		for (std::unique_ptr<engine::core::GameObject>& object : _object_layers[layer_index])
+		{
+			if (object)
+				visitor(*object);
+		}
+	}
+
+	template <typename Visitor>
+	void for_each_game_object(engine::core::DepthLayer layer,Visitor&& visitor) const
+	{
+		const size_t layer_index = static_cast<size_t>(layer);
+		if (layer_index >= _object_layers.size())
+			return;
+
+		for (const std::unique_ptr<engine::core::GameObject>& object : _object_layers[layer_index])
+		{
+			if (object)
+				visitor(*object);
+		}
+	}
+
 	template <typename T, typename... Args>
 	T* create_and_add_object(Args&&... args)
 	{
