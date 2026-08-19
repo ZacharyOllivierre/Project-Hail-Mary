@@ -2,8 +2,7 @@
 
 #include "../../animation/animation_manager.h"
 #include "../../scene/scene.h"
-
-#include <SDL.h>
+#include "../../tools/logger.h"
 
 #include <utility>
 
@@ -27,22 +26,20 @@ bool EffectManager::register_animation_effect(
 {
 	if (request.effect_key.empty())
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Register animation effect failed: effect key is empty.");
+		ENGINE_LOG_WARN("effects","Register animation effect failed: effect key is empty.");
 		return false;
 	}
 
 	if (request.animation_key.empty())
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Register animation effect failed: animation key is empty.");
+		ENGINE_LOG_WARN("effects","Register animation effect failed: animation key is empty.");
 		return false;
 	}
 
 	if (request.default_size.x < 0.0f || request.default_size.y < 0.0f
 		|| ((request.default_size.x == 0.0f) != (request.default_size.y == 0.0f)))
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+		ENGINE_LOG_WARN("effects",
 			"Register animation effect failed: default size must provide positive width and height.");
 		return false;
 	}
@@ -50,9 +47,8 @@ bool EffectManager::register_animation_effect(
 	if (!engine::animation::AnimationManager::instance()->find_definition(
 		request.animation_key))
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Register animation effect failed: animation definition does not exist: %s",
-			request.animation_key.c_str());
+		ENGINE_LOG_WARN("effects","Register animation effect failed: animation definition does not exist: "
+			<< request.animation_key);
 		return false;
 	}
 
@@ -84,8 +80,7 @@ bool EffectManager::dispatch(const AnimationEffectSpawnRequest& request)
 {
 	if (!_active_scene)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Spawn animation effect failed: there is no active scene.");
+		ENGINE_LOG_WARN("effects","Spawn animation effect failed: there is no active scene.");
 		return false;
 	}
 
@@ -93,9 +88,8 @@ bool EffectManager::dispatch(const AnimationEffectSpawnRequest& request)
 		find_animation_effect_definition(request.effect_key);
 	if (!definition)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			"Spawn animation effect failed: definition does not exist: %s",
-			request.effect_key.c_str());
+		ENGINE_LOG_WARN("effects","Spawn animation effect failed: definition does not exist: "
+			<< request.effect_key);
 		return false;
 	}
 
@@ -107,8 +101,7 @@ bool EffectManager::dispatch(const AnimationEffectSpawnRequest& request)
 	if (_active_scene->add_object(std::move(effect)))
 		return true;
 
-	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-		"Spawn animation effect failed: active scene rejected the effect.");
+	ENGINE_LOG_WARN("effects","Spawn animation effect failed: active scene rejected the effect.");
 	return false;
 }
 

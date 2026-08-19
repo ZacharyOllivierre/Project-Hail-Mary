@@ -2,9 +2,13 @@
 
 #include "../../engine/physics/collision_manager.h"
 #include "../../engine/input/input_state.h"
+
 #include "../combat/bullet.h"
 #include "../combat/attack_info.h"
 #include "../combat/projectile.h"
+
+#include "../combat/projectile_manager.h"
+
 #include "../map/dungeon_room.h"
 #include "../../thirdparty/imgui/imgui.h"
 
@@ -22,13 +26,16 @@ void RoomScene::on_enter()
     generate_enemies(EnemyType::GoblinWitch, 2);
     generate_enemies(EnemyType::Wizard, 1);
     generate_enemies(EnemyType::SkeletonElite, 2);
+
+
+    ProjectileManager::instance()->bind_scene(*this, physics_manager());
 }
 
 void RoomScene::on_update(double delta)
 {
     this->engine::scene::Scene::on_update(delta);
 
-    spawn_scheduled_projectiles(delta);
+    ProjectileManager::instance()->update(delta);
 
     if (_player && !_player->is_destroyed() && !_player->is_dead())
     {
@@ -63,8 +70,7 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
         }
 
         // Get schedule of projectiles from wand attack and add to buffer
-        vector<ShotDescriptor> shots = _player->create_projectile(shot_direction);
-        _scheduled_projectiles.insert(_scheduled_projectiles.end(), shots.begin(), shots.end());
+        _player->create_projectile(shot_direction);
     }
 }
 
@@ -105,6 +111,8 @@ void RoomScene::on_imgui()
 void RoomScene::on_exit()
 {
     this->destroy_all_scene_objects();
+    ProjectileManager::instance()->clear();
+    ProjectileManager::instance()->unbind_scene();
     _enemies.clear();
     _scheduled_projectiles.clear();
     _collision_world.set_room(nullptr);
@@ -129,60 +137,6 @@ void RoomScene::reset()
     generate_enemies(EnemyType::GoblinWitch, 2);
     generate_enemies(EnemyType::Wizard, 1);
     generate_enemies(EnemyType::SkeletonElite, 2);
-}
-
-// Iterate through all scheduled shots and copy over / spawn ready ones
-void RoomScene::spawn_scheduled_projectiles(double delta)
-{
-    // Update projectile timer and spawn any shots which timer is at or below 0
-    for (auto it = _scheduled_projectiles.begin(); it != _scheduled_projectiles.end();)
-    {
-        it->spawn_delay_sec -= delta;
-
-        if (it->spawn_delay_sec > 0.0f)
-        {
-            ++it;
-            continue;
-        }
-
-        // Update bullut spawn position with offset relative to player
-        Bullet_Attributes &bullet_attributes = it->bullet_attributes;
-        bullet_attributes.start_position = _player->center() + it->spawn_offset;
-        std::unique_ptr<Projectile> projectile = std::make_unique<Bullet>(bullet_attributes);
-
-        Projectile *added_projectile = add_object(std::move(projectile));
-        it = _scheduled_projectiles.erase(it);
-
-        if (!added_projectile)
-            continue;
-
-        physics_manager().register_body(
-            added_projectile,
-            added_projectile,
-            added_projectile);
-
-        engine::physics::CollisionBox *collision_box = engine::physics::CollisionManager::instance()->create_box(
-            added_projectile,
-            engine::physics::CollisionLayer::PlayerProjectile,
-            engine::physics::CollisionTarget::Enemy,
-            [added_projectile](const engine::physics::CollisionInfo &collision_info)
-            {
-                // forward projectile damage through CombatReciever
-                CombatReceiver *receiver = dynamic_cast<CombatReceiver *>(collision_info.other.owner());
-
-                if (!receiver)
-                    return;
-
-                // Attack only valid if not on bullets cooldown list
-                if (added_projectile->can_hit(collision_info.other.owner()))
-                {
-                    receiver->receive_attack(added_projectile->attack_info());
-                    added_projectile->on_entity_collision(collision_info.other.owner());
-                }
-            });
-
-        added_projectile->set_collision_box(collision_box);
-    }
 }
 
 engine::core::Vector2 RoomScene::get_shot_direction(int pointer_x, int pointer_y)

@@ -1,9 +1,11 @@
 #pragma once
 #include "../engine/tools/singleton.h"
+#include "../engine/tools/logger.h"
 #include "../engine/input/input_system.h"
 
 #include <SDL.h>
 #include <cstdlib>
+#include <source_location>
 
 class Application: public engine::tools::Singleton<Application>
 {
@@ -17,10 +19,14 @@ public:
     void shutdown();
 
 
-    void init_assert(bool flag, const char* err_msg)
+    void init_assert(bool flag, const char* err_msg,
+        std::source_location location = std::source_location::current())
     {
         if (flag)
             return;
+        auto* logger = engine::tools::Logger::instance();
+        logger->error("application",err_msg,location);
+        logger->terminating("application","Application startup aborted.",location);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Game Start Error", err_msg, _window);
         exit(-1);
     }

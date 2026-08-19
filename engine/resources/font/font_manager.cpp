@@ -1,6 +1,5 @@
 #include "font_manager.h"
-
-#include <iostream>
+#include "../../tools/logger.h"
 
 namespace engine::resources
 {
@@ -10,27 +9,27 @@ bool FontManager::load_font(const std::string& key,const std::filesystem::path& 
 {
 	if (key.empty())
 	{
-		std::cout << "Load font failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load font failed: key is empty.");
 		return false;
 	}
 
 	if (file_path.empty())
 	{
-		std::cout << "Load font failed: file path is empty: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Load font failed: file path is empty: " << key);
 		return false;
 	}
 
 	if (point_size <= 0)
 	{
-		std::cout << "Load font failed: point size is invalid: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Load font failed: point size is invalid: " << key);
 		return false;
 	}
 
 	TTF_Font* font = TTF_OpenFont(file_path.string().c_str(), point_size);
 	if (!font)
 	{
-		std::cout << "Load font failed: " << file_path
-			<< " error: " << TTF_GetError() << std::endl;
+		ENGINE_LOG_WARN("resource","Load font failed: " << file_path
+			<< " error: " << TTF_GetError());
 		return false;
 	}
 
@@ -41,7 +40,7 @@ bool FontManager::store_font(const std::string& key, TTF_Font* font)
 {
 	if (key.empty())
 	{
-		std::cout << "Store font failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Store font failed: key is empty.");
 		if (font)
 		{
 			TTF_CloseFont(font);
@@ -51,7 +50,7 @@ bool FontManager::store_font(const std::string& key, TTF_Font* font)
 
 	if (!font)
 	{
-		std::cout << "Store font failed: font is null: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Store font failed: font is null: " << key);
 		return false;
 	}
 

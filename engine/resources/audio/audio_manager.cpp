@@ -1,6 +1,5 @@
 #include "audio_manager.h"
-
-#include <iostream>
+#include "../../tools/logger.h"
 
 namespace engine::resources
 {
@@ -12,21 +11,21 @@ bool AudioManager::load_sound(
 {
 	if (key.empty())
 	{
-		std::cout << "Load sound failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load sound failed: key is empty.");
 		return false;
 	}
 
 	if (file_path.empty())
 	{
-		std::cout << "Load sound failed: file path is empty: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Load sound failed: file path is empty: " << key);
 		return false;
 	}
 
 	Mix_Chunk* sound = Mix_LoadWAV(file_path.string().c_str());
 	if (!sound)
 	{
-		std::cout << "Load sound failed: " << file_path
-			<< " error: " << Mix_GetError() << std::endl;
+		ENGINE_LOG_WARN("resource","Load sound failed: " << file_path
+			<< " error: " << Mix_GetError());
 		return false;
 	}
 
@@ -40,21 +39,21 @@ bool AudioManager::load_music(
 {
 	if (key.empty())
 	{
-		std::cout << "Load music failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load music failed: key is empty.");
 		return false;
 	}
 
 	if (file_path.empty())
 	{
-		std::cout << "Load music failed: file path is empty: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Load music failed: file path is empty: " << key);
 		return false;
 	}
 
 	Mix_Music* music = Mix_LoadMUS(file_path.string().c_str());
 	if (!music)
 	{
-		std::cout << "Load music failed: " << file_path
-			<< " error: " << Mix_GetError() << std::endl;
+		ENGINE_LOG_WARN("resource","Load music failed: " << file_path
+			<< " error: " << Mix_GetError());
 		return false;
 	}
 
@@ -65,7 +64,7 @@ bool AudioManager::store_sound(const std::string& key, Mix_Chunk* sound)
 {
 	if (key.empty())
 	{
-		std::cout << "Store sound failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Store sound failed: key is empty.");
 		if (sound)
 			Mix_FreeChunk(sound);
 		return false;
@@ -73,7 +72,7 @@ bool AudioManager::store_sound(const std::string& key, Mix_Chunk* sound)
 
 	if (!sound)
 	{
-		std::cout << "Store sound failed: sound is null: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Store sound failed: sound is null: " << key);
 		return false;
 	}
 
@@ -95,7 +94,7 @@ bool AudioManager::store_music(const std::string& key, Mix_Music* music)
 {
 	if (key.empty())
 	{
-		std::cout << "Store music failed: key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Store music failed: key is empty.");
 		if (music)
 			Mix_FreeMusic(music);
 		return false;
@@ -103,7 +102,7 @@ bool AudioManager::store_music(const std::string& key, Mix_Music* music)
 
 	if (!music)
 	{
-		std::cout << "Store music failed: music is null: " << key << std::endl;
+		ENGINE_LOG_WARN("resource","Store music failed: music is null: " << key);
 		return false;
 	}
 

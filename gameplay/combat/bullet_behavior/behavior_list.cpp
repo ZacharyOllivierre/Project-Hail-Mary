@@ -109,6 +109,7 @@ void HomingBehavior::on_update(BulletBehaviorContext &context)
     if (context.bullet.desired_velocity().length() < min_speed)
         return;
 
+    //need object query service
     RoomScene *room_scene = engine::scene::SceneManager::instance()->try_find_scene<RoomScene>();
     if (!room_scene)
     {
@@ -118,6 +119,8 @@ void HomingBehavior::on_update(BulletBehaviorContext &context)
     float speed = context.bullet.desired_velocity().length();
     ;
     engine::core::Vector2 pos = context.bullet.center();
+
+    //need object query service
     engine::core::Vector2 target = room_scene->closest_enemy_to_point(pos);
 
     if (target.is_zero())

@@ -4,10 +4,12 @@
 #include "../../engine/core/render/render_command.h"
 #include "../../engine/effects/effect_service.h"
 #include "../../engine/input/input_state.h"
+#include "../../engine/tools/logger.h"
 
 #include "../../engine/physics/collision_manager.h"
 
-#include <iostream>
+#include "../combat/projectile_service.h"
+
 #include <utility>
 
 PlayerCharacter::PlayerCharacter(std::string character_id,
@@ -65,7 +67,7 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
 
 	if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
 	{
-        std::cout << "effect" << std::endl;
+		ENGINE_LOG_DEBUG("gameplay","effect");
 		engine::effects::AnimationEffectSpawnRequest request;
 		request.effect_key = _effect_id;
 		request.position = center();
@@ -76,7 +78,7 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
 			: engine::core::SpriteFlip::None;
         if (!EFFECT_SERVICE->request_animation_effect(request))
         {
-            std::cout << "false" << std::endl;
+			ENGINE_LOG_DEBUG("gameplay","false");
         }
 	}
 }
@@ -96,9 +98,17 @@ void PlayerCharacter::submit_render_commands(std::vector<engine::core::RenderCom
         out_commands.push_back(std::move(command));
 }
 
-std::vector<ShotDescriptor> PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
+void PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
 {
-    return _wand.attack(direction);
+    //mabey put requset in wand?
+    ProjectileFireRequest requset;
+    requset.source = this;
+    requset.shots = _wand.attack(direction);
+    requset.collision.layer = engine::physics::CollisionLayer::PlayerProjectile;
+    requset.collision.targets = engine::physics::CollisionTarget::Enemy;
+    ENGINE_LOG_DEBUG("PlayerCharacter", "create_projectile");
+
+    PROJECTILE_SERVICE->request_fire(std::move(requset));
 }
 
 Wand &PlayerCharacter::wand() noexcept
@@ -117,7 +127,8 @@ void PlayerCharacter::set_animation_state(AnimationState state)
     if (_animation)
         _animation_state = state;
     else
-        std::cout << "Set PlayerCharacter animation failed: " << _character_id << "." << suffix << '\n';
+		ENGINE_LOG_WARN("gameplay","Set PlayerCharacter animation failed: "
+			<< _character_id << "." << suffix);
 }
 
 engine::core::Rect PlayerCharacter::make_body_collision_rect(

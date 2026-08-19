@@ -3,11 +3,10 @@
 #include "../../engine/scene/scene_manager.h"
 #include "../../engine/resources/resource_manager.h"
 #include "../../engine/input/input_state.h"
+#include "../../engine/tools/logger.h"
 
-#include "game_scene.h"
 #include "room_scene.h"
 
-#include <iostream>
 #include <SDL_ttf.h> // Added for text
 
 // Menu text
@@ -26,7 +25,7 @@ void draw_text(
 
 	if (!surface)
 	{
-		std::cout << "Failed to create text surface: " << TTF_GetError() << std::endl;
+		ENGINE_LOG_WARN("scene","Failed to create text surface: " << TTF_GetError());
 		return;
 	}
 
@@ -34,7 +33,7 @@ void draw_text(
 
 	if (!texture)
 	{
-		std::cout << "Failed to create text texture: " << SDL_GetError() << std::endl;
+		ENGINE_LOG_WARN("scene","Failed to create text texture: " << SDL_GetError());
 		SDL_FreeSurface(surface);
 		return;
 	}
@@ -52,14 +51,14 @@ void MenuScene::on_enter()
 {
 	_paused = false;
 
-	std::cout << "Entered MenuScene" << std::endl;
+	ENGINE_LOG_INFO("scene","Entered MenuScene");
 
 	// Added for  menutext
 	if (TTF_WasInit() == 0)
 	{
 		if (TTF_Init() == -1)
 		{
-			std::cout << "Failed to initialize SDL_ttf: " << TTF_GetError() << std::endl;
+			ENGINE_LOG_ERROR("scene","Failed to initialize SDL_ttf: " << TTF_GetError());
 			return;
 		}
 	}
@@ -69,7 +68,7 @@ void MenuScene::on_enter()
 
 	if (!_menu_font)
 	{
-		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
+		ENGINE_LOG_WARN("scene","Failed to load font: " << TTF_GetError());
 	}
 	// Added for menu text
 }
@@ -141,7 +140,7 @@ void MenuScene::on_input(
 	// Starts the gameplay scene if the confirm input, like Enter, was just pressed.
 	if (input.state.is_just_pressed(engine::input::InputAction::Confirm))
 	{
-		std::cout << "Start pressed from keyboard!" << std::endl;
+		ENGINE_LOG_INFO("scene","Start pressed from keyboard!");
 		engine::scene::SceneManager::instance()->switch_to<RoomScene>();
 	}
 }
@@ -149,7 +148,7 @@ void MenuScene::on_input(
 // Runs when menu scene is exited.
 void MenuScene::on_exit()
 {
-	std::cout << "Leaving MenuScene" << std::endl;
+	ENGINE_LOG_INFO("scene","Leaving MenuScene");
 
 	// Destroy button when leaving the menu.
 	_start_button.reset();
@@ -196,7 +195,7 @@ void MenuScene::create_start_button(SDL_Renderer *renderer)
 	// Runs when start button is clicked.
 	_start_button->set_on_click([]()
 								{
-		std::cout << "Start button clicked!" << std::endl;
+		ENGINE_LOG_INFO("scene","Start button clicked!");
 
 		// This sends the program from menu_scene to game_scene.
 		engine::scene::SceneManager::instance()->switch_to<RoomScene>(); });

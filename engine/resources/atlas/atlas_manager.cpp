@@ -1,8 +1,7 @@
 #include "atlas_manager.h"
 
 #include "../texture/texture_manager.h"
-
-#include <iostream>
+#include "../../tools/logger.h"
 
 namespace engine::resources
 {
@@ -24,20 +23,20 @@ bool AtlasManager::load_atlas(
 {
 	if (!renderer)
 	{
-		std::cout << "Load atlas failed: renderer is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load atlas failed: renderer is empty.");
 		return false;
 	}
 
 	if (request.atlas_key.empty())
 	{
-		std::cout << "Load atlas failed: atlas key is empty." << std::endl;
+		ENGINE_LOG_WARN("resource","Load atlas failed: atlas key is empty.");
 		return false;
 	}
 
 	if (request.frame_paths.empty())
 	{
-		std::cout << "Load atlas failed: frame path list is empty: "
-			<< request.atlas_key << std::endl;
+		ENGINE_LOG_WARN("resource","Load atlas failed: frame path list is empty: "
+			<< request.atlas_key);
 		return false;
 	}
 
@@ -57,8 +56,8 @@ bool AtlasManager::load_atlas(
 		{
 			if (!texture_manager.load_texture(renderer, texture_key, frame_path))
 			{
-				std::cout << "Load atlas frame texture failed: "
-					<< texture_key << " <- " << frame_path.string() << std::endl;
+				ENGINE_LOG_WARN("resource","Load atlas frame texture failed: "
+					<< texture_key << " <- " << frame_path.string());
 				return false;
 			}
 
@@ -67,15 +66,13 @@ bool AtlasManager::load_atlas(
 
 		if (!texture)
 		{
-			std::cout << "Resolve atlas frame texture failed: "
-				<< texture_key << std::endl;
+			ENGINE_LOG_WARN("resource","Resolve atlas frame texture failed: " << texture_key);
 			return false;
 		}
 
 		if (!atlas.add_frame(frame_path, texture))
 		{
-			std::cout << "Add atlas frame failed: "
-				<< frame_path.string() << std::endl;
+			ENGINE_LOG_WARN("resource","Add atlas frame failed: " << frame_path.string());
 			return false;
 		}
 	}

@@ -3,6 +3,7 @@
 #include "../engine/audio/audio_service.h"
 #include "../engine/io/path_manager.h"
 #include "../engine/scene/scene_manager.h"
+#include "../engine/tools/logger.h"
 
 #include "../gameplay/scene/menu_scene.h"
 #include "../gameplay/scene/startup_loading_scene.h"
@@ -11,7 +12,6 @@
 #include "../thirdparty/imgui/imgui_impl_sdlrenderer2.h"
 
 #include <ctime>
-#include <iostream>
 
 #include <SDL_image.h>
 #include <SDL_mixer.h>
@@ -19,6 +19,7 @@
 
 Application::Application()
 {
+	engine::tools::Logger::instance()->initialize_console();
 	init_assert(!SDL_Init(SDL_INIT_EVERYTHING), "SDL2 Error");
 
 	int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
@@ -37,7 +38,7 @@ Application::Application()
 
 	if (SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
 	{
-		SDL_Log("Failed to enter fullscreen: %s", SDL_GetError());
+		ENGINE_LOG_WARN("application","Failed to enter fullscreen: " << SDL_GetError());
 		SDL_ClearError();
 
 		SDL_SetWindowSize(_window, _logical_width, _logical_height);
@@ -83,6 +84,7 @@ bool Application::init(int argc, char **argv)
 
 	init_assert(engine::io::PathManager::instance()->init(), "engine::io::PathManager init fail");
 	init_assert(engine::io::PathManager::instance()->ensure_runtime_dirs(), "Runtime dir init fail");
+	engine::tools::Logger::instance()->initialize_file();
 	init_assert(
 		engine::audio::AudioService::instance()->init({}),
 		"AudioService init fail");
@@ -168,4 +170,5 @@ void Application::shutdown()
 {
 	engine::scene::SceneManager::instance()->shutdown();
 	engine::audio::AudioService::instance()->shutdown();
+	engine::tools::Logger::instance()->shutdown();
 }

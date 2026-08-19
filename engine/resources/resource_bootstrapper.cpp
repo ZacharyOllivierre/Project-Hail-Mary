@@ -10,10 +10,10 @@
 #include "../io/loaders/texture_manifest_loader.h"
 #include "../io/json_loader.h"
 #include "../io/path_manager.h"
+#include "../tools/logger.h"
 
 #include <algorithm>
 #include <functional>
-#include <iostream>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -64,8 +64,8 @@ bool resolve_required_config_path(
 	const std::filesystem::path* config_path = registry.find(config_key);
 	if (!config_path)
 	{
-		std::cout << "Resource bootstrap failed: config is missing from configs_list.json: "
-			<< config_key << std::endl;
+		ENGINE_LOG_ERROR("resource","Resource bootstrap failed: config is missing from configs_list.json: "
+			<< config_key);
 		return false;
 	}
 
@@ -216,8 +216,7 @@ bool load_fonts(
 			file_path,
 			entry.point_size))
 		{
-			std::cout << "Load font failed during bootstrap: "
-				<< entry.key << std::endl;
+			ENGINE_LOG_ERROR("resource","Load font failed during bootstrap: " << entry.key);
 			return false;
 		}
 	}
@@ -242,8 +241,7 @@ bool load_audio(
 			resolve_resource_path(audio_root, entry.file_path);
 		if (!resource_manager.load_sound(entry.key, file_path))
 		{
-			std::cout << "Load sound failed during bootstrap: "
-				<< entry.key << std::endl;
+			ENGINE_LOG_ERROR("resource","Load sound failed during bootstrap: " << entry.key);
 			return false;
 		}
 	}
@@ -254,8 +252,7 @@ bool load_audio(
 			resolve_resource_path(audio_root, entry.file_path);
 		if (!resource_manager.load_music(entry.key, file_path))
 		{
-			std::cout << "Load music failed during bootstrap: "
-				<< entry.key << std::endl;
+			ENGINE_LOG_ERROR("resource","Load music failed during bootstrap: " << entry.key);
 			return false;
 		}
 	}
@@ -281,8 +278,7 @@ bool load_textures(
 			resolve_resource_path(texture_root, entry.file_path);
 		if (!resource_manager.load_texture(renderer, entry.key, file_path))
 		{
-			std::cout << "Load texture failed during bootstrap: "
-				<< entry.key << std::endl;
+			ENGINE_LOG_ERROR("resource","Load texture failed during bootstrap: " << entry.key);
 			return false;
 		}
 	}
@@ -299,8 +295,7 @@ bool load_character_animations(
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
-		std::cout << "Load character animation config failed:\n"
-			<< open_result.error;
+		ENGINE_LOG_ERROR("resource","Load character animation config failed:\n" << open_result.error);
 		return false;
 	}
 
@@ -310,16 +305,14 @@ bool load_character_animations(
 	const JsonReadResult characters_result = loader.get_array("characters", characters);
 	if (!characters_result)
 	{
-		std::cout << "Read characters list failed:\n"
-			<< characters_result.error;
+		ENGINE_LOG_ERROR("resource","Read characters list failed:\n" << characters_result.error);
 		return false;
 	}
 
 	const JsonReadResult animations_result = loader.get_array("animation", animations);
 	if (!animations_result)
 	{
-		std::cout << "Read animation list failed:\n"
-			<< animations_result.error;
+		ENGINE_LOG_ERROR("resource","Read animation list failed:\n" << animations_result.error);
 		return false;
 	}
 
@@ -328,8 +321,7 @@ bool load_character_animations(
 		loader.get_object("animation_settings", animation_settings_root);
 	if (!settings_root_result)
 	{
-		std::cout << "Read animation settings root failed:\n"
-			<< settings_root_result.error;
+		ENGINE_LOG_ERROR("resource","Read animation settings root failed:\n" << settings_root_result.error);
 		return false;
 	}
 
@@ -341,9 +333,9 @@ bool load_character_animations(
 			loader.get_object(*animation_settings_root, animation_name, animation_node);
 		if (!animation_node_result)
 		{
-			std::cout << "Read animation settings failed for "
+			ENGINE_LOG_ERROR("resource","Read animation settings failed for "
 				<< animation_name << ":\n"
-				<< animation_node_result.error;
+				<< animation_node_result.error);
 			return false;
 		}
 
@@ -351,18 +343,18 @@ bool load_character_animations(
 		const JsonReadResult fps_result = loader.get(*animation_node, "fps", settings.fps);
 		if (!fps_result)
 		{
-			std::cout << "Read animation fps failed for "
+			ENGINE_LOG_ERROR("resource","Read animation fps failed for "
 				<< animation_name << ":\n"
-				<< fps_result.error;
+				<< fps_result.error);
 			return false;
 		}
 
 		const JsonReadResult loop_result = loader.get(*animation_node, "loop", settings.loop);
 		if (!loop_result)
 		{
-			std::cout << "Read animation loop flag failed for "
+			ENGINE_LOG_ERROR("resource","Read animation loop flag failed for "
 				<< animation_name << ":\n"
-				<< loop_result.error;
+				<< loop_result.error);
 			return false;
 		}
 
@@ -385,8 +377,7 @@ bool load_character_animations(
 				frame_paths,
 				error))
 			{
-				std::cout << "Collect animation frames failed: "
-					<< error << std::endl;
+				ENGINE_LOG_ERROR("resource","Collect animation frames failed: " << error);
 				return false;
 			}
 
@@ -399,8 +390,7 @@ bool load_character_animations(
 			const Atlas* atlas = build_atlas(atlas_request);
 			if (!atlas)
 			{
-				std::cout << "Build atlas failed: "
-					<< animation_key << std::endl;
+				ENGINE_LOG_ERROR("resource","Build atlas failed: " << animation_key);
 				return false;
 			}
 
@@ -413,8 +403,7 @@ bool load_character_animations(
 			animation_request.loop = settings.loop;
 			if (!engine::animation::AnimationManager::instance()->register_animation(animation_request, atlas))
 			{
-				std::cout << "Register character animation failed: "
-					<< animation_key << std::endl;
+				ENGINE_LOG_ERROR("resource","Register character animation failed: " << animation_key);
 				return false;
 			}
 		}
@@ -432,31 +421,27 @@ bool load_effects(
 	const JsonReadResult open_result = loader.open_file(config_path);
 	if (!open_result)
 	{
-		std::cout << "Load effect config failed:\n"
-			<< open_result.error;
+		ENGINE_LOG_ERROR("resource","Load effect config failed:\n" << open_result.error);
 		return false;
 	}
 
 	const json& root = loader.root();
 	if (!root.is_object())
 	{
-		std::cout << "Read effect config failed:\n"
-			<< "JSON root is not an object." << std::endl;
+		ENGINE_LOG_ERROR("resource","Read effect config failed:\nJSON root is not an object.");
 		return false;
 	}
 
 	if (!root.contains("effects"))
 	{
-		std::cout << "Read effect config failed:\n"
-			<< "JSON key missing: effects" << std::endl;
+		ENGINE_LOG_ERROR("resource","Read effect config failed:\nJSON key missing: effects");
 		return false;
 	}
 
 	const json& effects_node = root.at("effects");
 	if (!effects_node.is_array())
 	{
-		std::cout << "Read effect config failed:\n"
-			<< "JSON value is not an array: effects" << std::endl;
+		ENGINE_LOG_ERROR("resource","Read effect config failed:\nJSON value is not an array: effects");
 		return false;
 	}
 
@@ -468,8 +453,8 @@ bool load_effects(
 		const json& effect_node = effects_node.at(index);
 		if (!effect_node.is_object())
 		{
-			std::cout << "Read effect config failed:\n"
-				<< "engine::effects::AnimationEffect entry is not an object at index " << index << std::endl;
+			ENGINE_LOG_ERROR("resource","Read effect config failed:\n"
+				<< "engine::effects::AnimationEffect entry is not an object at index " << index);
 			return false;
 		}
 
@@ -479,8 +464,8 @@ bool load_effects(
 			loader.get(effect_node, "effect_key", effect_config.effect_key);
 		if (!effect_key_result)
 		{
-			std::cout << "Read effect key failed at index " << index << ":\n"
-				<< effect_key_result.error;
+			ENGINE_LOG_ERROR("resource","Read effect key failed at index " << index << ":\n"
+				<< effect_key_result.error);
 			return false;
 		}
 
@@ -488,9 +473,9 @@ bool load_effects(
 			loader.get(effect_node, "animation_key", effect_config.animation_key);
 		if (!animation_key_result)
 		{
-			std::cout << "Read effect animation key failed for "
+			ENGINE_LOG_ERROR("resource","Read effect animation key failed for "
 				<< effect_config.effect_key << ":\n"
-				<< animation_key_result.error;
+				<< animation_key_result.error);
 			return false;
 		}
 
@@ -498,9 +483,9 @@ bool load_effects(
 			loader.get(effect_node, "directory_path", effect_config.directory_path);
 		if (!directory_result)
 		{
-			std::cout << "Read effect directory failed for "
+			ENGINE_LOG_ERROR("resource","Read effect directory failed for "
 				<< effect_config.effect_key << ":\n"
-				<< directory_result.error;
+				<< directory_result.error);
 			return false;
 		}
 
@@ -508,9 +493,9 @@ bool load_effects(
 			loader.get(effect_node, "fps", effect_config.fps);
 		if (!fps_result)
 		{
-			std::cout << "Read effect fps failed for "
+			ENGINE_LOG_ERROR("resource","Read effect fps failed for "
 				<< effect_config.effect_key << ":\n"
-				<< fps_result.error;
+				<< fps_result.error);
 			return false;
 		}
 
@@ -518,9 +503,9 @@ bool load_effects(
 			loader.get(effect_node, "loop", effect_config.loop);
 		if (!loop_result)
 		{
-			std::cout << "Read effect loop flag failed for "
+			ENGINE_LOG_ERROR("resource","Read effect loop flag failed for "
 				<< effect_config.effect_key << ":\n"
-				<< loop_result.error;
+				<< loop_result.error);
 			return false;
 		}
 
@@ -530,9 +515,9 @@ bool load_effects(
 			std::string error;
 			if (!read_vector2(loader, effect_node, "default_size", default_size, error))
 			{
-				std::cout << "Read effect default size failed for "
+				ENGINE_LOG_ERROR("resource","Read effect default size failed for "
 					<< effect_config.effect_key << ":\n"
-					<< error << std::endl;
+					<< error);
 				return false;
 			}
 
@@ -546,9 +531,9 @@ bool load_effects(
 				loader.get(effect_node, "angle_degrees", angle_degrees);
 			if (!angle_result)
 			{
-				std::cout << "Read effect angle failed for "
+				ENGINE_LOG_ERROR("resource","Read effect angle failed for "
 					<< effect_config.effect_key << ":\n"
-					<< angle_result.error;
+					<< angle_result.error);
 				return false;
 			}
 
@@ -561,9 +546,9 @@ bool load_effects(
 			engine::io::PathManager::instance()->resolve_asset_path(effect_config.directory_path);
 		if (!collect_png_frame_paths(directory_path, frame_paths, error))
 		{
-			std::cout << "Collect effect frames failed for "
+			ENGINE_LOG_ERROR("resource","Collect effect frames failed for "
 				<< effect_config.effect_key << ": "
-				<< error << std::endl;
+				<< error);
 			return false;
 		}
 
@@ -574,8 +559,8 @@ bool load_effects(
 		const Atlas* atlas = build_atlas(atlas_request);
 		if (!atlas)
 		{
-			std::cout << "Build effect atlas failed: "
-				<< effect_config.animation_key << std::endl;
+			ENGINE_LOG_ERROR("resource","Build effect atlas failed: "
+				<< effect_config.animation_key);
 			return false;
 		}
 
@@ -586,8 +571,8 @@ bool load_effects(
 		animation_request.loop = effect_config.loop;
 		if (!engine::animation::AnimationManager::instance()->register_animation(animation_request, atlas))
 		{
-			std::cout << "Register effect animation failed: "
-				<< effect_config.animation_key << std::endl;
+			ENGINE_LOG_ERROR("resource","Register effect animation failed: "
+				<< effect_config.animation_key);
 			return false;
 		}
 
@@ -602,7 +587,7 @@ bool load_effects(
 
 	if (!engine::effects::EffectManager::instance()->register_animation_effect(effect_requests))
 	{
-		std::cout << "Register effect definitions failed." << std::endl;
+		ENGINE_LOG_ERROR("resource","Register effect definitions failed.");
 		return false;
 	}
 
@@ -617,7 +602,7 @@ bool ResourceBootstrapper::bootstrap(
 {
 	if (!renderer)
 	{
-		std::cout << "Resource bootstrap failed: renderer is empty." << std::endl;
+		ENGINE_LOG_ERROR("resource","Resource bootstrap failed: renderer is empty.");
 		return false;
 	}
 

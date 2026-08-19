@@ -30,7 +30,6 @@ public:
     void on_imgui() override;
 
 private:
-    void spawn_scheduled_projectiles(double delta);
     engine::core::Vector2 get_shot_direction(int pointer_x, int pointer_y);
 
     void build_room();

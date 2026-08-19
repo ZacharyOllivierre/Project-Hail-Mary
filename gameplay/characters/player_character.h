@@ -24,8 +24,7 @@ public:
     void submit_render_commands(
         std::vector<engine::core::RenderCommand>& out_commands) const override;
 
-    [[nodiscard]] std::vector<ShotDescriptor> create_projectile(
-        const engine::core::Vector2& direction);
+    void  create_projectile(const engine::core::Vector2& direction);
     [[nodiscard]] Wand& wand() noexcept;
 protected:
     [[nodiscard]] engine::core::Rect make_body_collision_rect(

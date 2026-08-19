@@ -2,8 +2,8 @@
 
 #include "../json_loader.h"
 #include "../path_manager.h"
+#include "../../tools/logger.h"
 
-#include <iostream>
 #include <string>
 
 namespace engine::io
@@ -20,21 +20,21 @@ bool ConfigsListLoader::load(
 	const JsonReadResult result = loader.open_file(configs_list_path);
 	if (!result)
 	{
-		std::cout << "Load configs list failed: " << result.error;
+		ENGINE_LOG_ERROR("resource","Load configs list failed: " << result.error);
 		return false;
 	}
 
 	if (!loader.root().is_object())
 	{
-		std::cout << "Load configs list failed: root is not an object: "
-			<< configs_list_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load configs list failed: root is not an object: "
+			<< configs_list_path);
 		return false;
 	}
 
 	if (!loader.root().contains("configs") || !loader.root().at("configs").is_array())
 	{
-		std::cout << "Load configs list failed: configs is missing or not an array: "
-			<< configs_list_path << std::endl;
+		ENGINE_LOG_ERROR("resource","Load configs list failed: configs is missing or not an array: "
+			<< configs_list_path);
 		return false;
 	}
 
@@ -42,8 +42,7 @@ bool ConfigsListLoader::load(
 	{
 		if (!item.is_string())
 		{
-			std::cout << "Load configs list failed: config entry is not a string."
-				<< std::endl;
+			ENGINE_LOG_ERROR("resource","Load configs list failed: config entry is not a string.");
 			return false;
 		}
 
@@ -52,8 +51,8 @@ bool ConfigsListLoader::load(
 			PathManager::instance()->resolve_config_path(config_name + ".json");
 		if (!std::filesystem::is_regular_file(config_path))
 		{
-			std::cout << "Load configs list failed: config file does not exist: "
-				<< config_path << std::endl;
+			ENGINE_LOG_ERROR("resource","Load configs list failed: config file does not exist: "
+				<< config_path);
 			return false;
 		}
 
