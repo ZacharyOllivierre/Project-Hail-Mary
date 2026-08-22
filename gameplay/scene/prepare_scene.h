@@ -2,10 +2,11 @@
 
 #include "../../engine/scene/scene.h"
 
-class PrepareScene : public engine::scene::Scene
+class PrepareScene final : public engine::scene::Scene
 {
-	PrepareScene();
-	~PrepareScene();
+public:
+	PrepareScene() = default;
+	~PrepareScene() override = default;
 
 	void on_enter() override;
 	void on_update(double delta) override;
