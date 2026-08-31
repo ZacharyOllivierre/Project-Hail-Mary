@@ -1,6 +1,7 @@
 {
   "characters": [
     "elves",
+    "player/protagonist",
     "joker",
     "enemy/GoblinWitch",
     "enemy/Skeleton",

@@ -171,7 +171,7 @@ void RoomScene::spawn_player()
         return;
 
     _player = create_and_add_object<PlayerCharacter>(
-        "elves",
+        "player/protagonist",
         engine::core::Vector2(540.0f, 540.0f),
         engine::core::Vector2(64.0f, 64.0f),
         "fire.impact_radial");
