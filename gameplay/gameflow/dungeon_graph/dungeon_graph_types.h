@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 
 enum class MainRoomType
