@@ -31,6 +31,12 @@ Project Hail Mary 当前已经实现可玩的战斗切片：启动后进入菜�
 
 仓库已包含 Windows 构建配置所需的 SDL2 相关运行时库。建议使用 Visual Studio 2022 或更新版本，并使用 64 位生成器。
 
+自动安装 CMake、MSVC 构建工具并构建项目：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup\setup-windows.ps1
+```
+
 ```bash
 cmake -S . -B build -A x64
 cmake --build build --config Release
@@ -40,6 +46,14 @@ cmake --build build --config Release
 ### macOS
 
 先安装 SDL2 依赖：
+
+自动安装 Homebrew、CMake 和所有 SDL2 依赖并构建项目：
+
+```bash
+bash setup/setup-macos.sh
+```
+
+手动安装依赖：
 
 ```bash
 brew install sdl2 sdl2_image sdl2_net sdl2_mixer sdl2_ttf
