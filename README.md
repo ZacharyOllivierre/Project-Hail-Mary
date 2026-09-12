@@ -31,6 +31,12 @@ For the complete production assessment, read [Project Status](introduction/proje
 
 The repository includes the required SDL2-related runtime libraries for the bundled Windows build configuration. Use Visual Studio 2022 or newer with a 64-bit generator.
 
+Install CMake and the MSVC Build Tools automatically, then build the project:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\environment\setup-windows.ps1
+```
+
 ```bash
 cmake -S . -B build -A x64
 cmake --build build --config Release
@@ -41,22 +47,51 @@ cmake --build build --config Release
 
 Install the SDL2 dependencies first:
 
+Install Homebrew, CMake, and every SDL2 dependency automatically, then build the project:
+
+```bash
+bash environment/setup-macos.sh
+```
+
+To install dependencies manually:
+
 ```bash
 brew install sdl2 sdl2_image sdl2_net sdl2_mixer sdl2_ttf
 ```
 
-Then configure, build, and run:
+Then configure and build:
 
 ```bash
 cmake -S . -B build
 cmake --build build
+```
+
+## Run the Game
+
+From the repository root, run:
+
+```bash
 ./build/Hail
+```
+
+If you are already in the `build/` directory, run:
+
+```bash
+./Hail
 ```
 
 ## Tests
 
+From the repository root, run:
+
 ```bash
 ctest --test-dir build --output-on-failure
+```
+
+If you are already in the `build/` directory, run:
+
+```bash
+ctest --output-on-failure
 ```
 
 Current tests provide basic regression coverage; they are not yet a complete gameplay validation suite.
