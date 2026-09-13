@@ -33,6 +33,16 @@ void PlayerCharacter::update(double delta)
 {
     Character::update(delta);
 
+    // move controller supplies temporary ability velocity normal movement continues after
+    const bool was_ability_active = _movement_abilities.is_active();
+
+    _movement_abilities.update(static_cast<float>(scaled_delta(delta)));
+
+    if (_movement_abilities.is_active())
+        set_desired_velocity(_movement_abilities.active_velocity());
+    else if (was_ability_active)
+        set_desired_velocity(engine::core::Vector2::zero());
+
     if (_animation)
         _animation->update(scaled_delta(delta));
 }
@@ -54,6 +64,10 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
         move_y += 1.0f;
 
     const engine::core::Vector2 movement{move_x, move_y};
+
+    if (_movement_abilities.is_active())
+        return;
+
     set_desired_velocity(
         movement.is_zero()
             ? engine::core::Vector2::zero()
@@ -65,22 +79,70 @@ void PlayerCharacter::on_input_snapshot(const engine::input::InputSnapshot &inpu
         _facing_direction = FacingDirection::Right;
     set_animation_state(movement.is_zero() ? AnimationState::Idle : AnimationState::Move);
 
-	if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
-	{
-		ENGINE_LOG_DEBUG("gameplay","effect");
-		engine::effects::AnimationEffectSpawnRequest request;
-		request.effect_key = _effect_id;
-		request.position = center();
-		request.anchor = engine::effects::EffectAnchor::Center;
-		request.size = engine::core::Vector2{200.0f, 200.0f};
-		request.flip = _facing_direction == FacingDirection::Left
-			? engine::core::SpriteFlip::Horizontal
-			: engine::core::SpriteFlip::None;
+    if (input.state.is_just_pressed(engine::input::InputAction::Attack) && !_effect_id.empty())
+    {
+        ENGINE_LOG_DEBUG("gameplay", "effect");
+        engine::effects::AnimationEffectSpawnRequest request;
+        request.effect_key = _effect_id;
+        request.position = center();
+        request.anchor = engine::effects::EffectAnchor::Center;
+        request.size = engine::core::Vector2{200.0f, 200.0f};
+        request.flip = _facing_direction == FacingDirection::Left
+                           ? engine::core::SpriteFlip::Horizontal
+                           : engine::core::SpriteFlip::None;
         if (!EFFECT_SERVICE->request_animation_effect(request))
         {
-			ENGINE_LOG_DEBUG("gameplay","false");
+            ENGINE_LOG_DEBUG("gameplay", "false");
         }
-	}
+    }
+}
+
+void PlayerCharacter::activate_movement_ability(
+    MovementAbilityType type,
+    const engine::core::Vector2 &target) noexcept
+{
+    if (is_dead())
+        return;
+
+    const MovementAbilityController::ActivationResult result = _movement_abilities.activate(
+        type, target, center(), size(), movement_direction());
+    if (!result.activated)
+        return;
+
+    if (result.teleported)
+        set_position(result.destination - size() * 0.5f);
+}
+
+void PlayerCharacter::set_movement_bounds(const engine::core::Rect &bounds) noexcept
+{
+    _movement_abilities.set_bounds(bounds);
+}
+
+void PlayerCharacter::set_movement_ability(MovementAbilityType type) noexcept
+{
+    _movement_abilities.set_selected(type);
+}
+
+MovementAbilityType PlayerCharacter::movement_ability() const noexcept
+{
+    return _movement_abilities.selected();
+}
+
+engine::core::Vector2 PlayerCharacter::movement_direction() const noexcept
+{
+    const engine::core::Vector2 velocity = desired_velocity();
+    if (!velocity.is_zero())
+        return velocity.normalized();
+
+    return _facing_direction == FacingDirection::Left
+               ? engine::core::Vector2(-1.0f, 0.0f)
+               : engine::core::Vector2(1.0f, 0.0f);
+}
+
+engine::core::Vector2 PlayerCharacter::teleport_destination(
+    const engine::core::Vector2 &target) const noexcept
+{
+    return _movement_abilities.teleport_destination(target, center(), size());
 }
 
 void PlayerCharacter::submit_render_commands(std::vector<engine::core::RenderCommand> &out_commands) const
@@ -100,7 +162,7 @@ void PlayerCharacter::submit_render_commands(std::vector<engine::core::RenderCom
 
 void PlayerCharacter::create_projectile(const engine::core::Vector2 &direction)
 {
-    //mabey put requset in wand?
+    // mabey put requset in wand?
     ProjectileFireRequest requset;
     requset.source = this;
     requset.shots = _wand.attack(direction);
@@ -127,12 +189,12 @@ void PlayerCharacter::set_animation_state(AnimationState state)
     if (_animation)
         _animation_state = state;
     else
-		ENGINE_LOG_WARN("gameplay","Set PlayerCharacter animation failed: "
-			<< _character_id << "." << suffix);
+        ENGINE_LOG_WARN("gameplay", "Set PlayerCharacter animation failed: "
+                                        << _character_id << "." << suffix);
 }
 
 engine::core::Rect PlayerCharacter::make_body_collision_rect(
-    const engine::core::Rect& render_rect) const noexcept
+    const engine::core::Rect &render_rect) const noexcept
 {
     return make_bottom_centered_scaled_rect(render_rect, {0.65f, 0.38f});
 }

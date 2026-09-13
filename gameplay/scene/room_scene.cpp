@@ -27,7 +27,6 @@ void RoomScene::on_enter()
     generate_enemies(EnemyType::Wizard, 1);
     generate_enemies(EnemyType::SkeletonElite, 2);
 
-
     ProjectileManager::instance()->bind_scene(*this, physics_manager());
 }
 
@@ -61,6 +60,34 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
     if (!_player || _player->is_destroyed() || _player->is_dead())
         return;
 
+    // movement abilities
+    if (input.state.is_just_pressed(engine::input::InputAction::MovementAbility))
+    {
+        engine::core::Vector2 target = engine::core::Vector2::zero();
+        if (input.has_pointer_position)
+        {
+            const SDL_FPoint mouse_world = camera.screen_to_world(
+                static_cast<float>(input.pointer_x),
+                static_cast<float>(input.pointer_y));
+            target = {mouse_world.x, mouse_world.y};
+        }
+
+        const MovementAbilityType ability = _player->movement_ability();
+        bool valid_teleport = ability != MovementAbilityType::Teleport;
+
+        if (ability == MovementAbilityType::Teleport && input.has_pointer_position)
+        {
+            // Validate the destination before the player bypasses tile collision.
+            const engine::core::Vector2 destination = _player->teleport_destination(target);
+            const engine::core::Vector2 translation = destination - _player->center();
+
+            valid_teleport = _collision_world.is_floor_area(_player->collision_rect().translated(translation));
+        }
+        if (valid_teleport)
+        {
+            _player->activate_movement_ability(ability, target);
+        }
+    }
     if (input.state.is_just_pressed(engine::input::InputAction::Attack))
     {
         engine::core::Vector2 shot_direction(1.0f, 0.0f);
@@ -179,6 +206,7 @@ void RoomScene::spawn_player()
     if (_player)
     {
         _player->set_move_speed(200.0f);
+        _player->set_movement_bounds(_room->world_rect());
         physics_manager().register_body(_player, _player, _player);
     }
 }
