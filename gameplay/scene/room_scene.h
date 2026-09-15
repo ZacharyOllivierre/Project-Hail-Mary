@@ -7,6 +7,7 @@
 #include "../generator/enemy_generator.h"
 #include "../map/dungeon_room.h"
 #include "room_tile_collision_world.h"
+#include "../combat/aoe.h" //aoe testing
 
 #include <SDL.h>
 
@@ -35,6 +36,13 @@ private:
     void build_room();
     void spawn_player();
     void generate_enemies(EnemyType type, std::size_t count);
+
+    //aoe testing
+    AreaOfEffect* create_explosion(
+        const engine::core::Vector2& position,
+        const engine::core::Vector2& size,
+        float duration,
+        float damage);
 
     PlayerCharacter *_player = nullptr;
     vector<ShotDescriptor> _scheduled_projectiles;

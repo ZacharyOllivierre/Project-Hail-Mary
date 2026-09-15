@@ -6,6 +6,7 @@
 #include "../combat/bullet.h"
 #include "../combat/attack_info.h"
 #include "../combat/projectile.h"
+#include "../combat/aoe.h" //aoe testing
 
 #include "../combat/projectile_manager.h"
 
@@ -67,6 +68,18 @@ void RoomScene::on_input(const engine::input::InputSnapshot &input, const std::v
         if (input.has_pointer_position)
         {
             shot_direction = get_shot_direction(input.pointer_x, input.pointer_y);
+
+            //aoe testing
+            const SDL_FPoint mouse_world = camera.screen_to_world(
+                static_cast<float>(input.pointer_x),
+                static_cast<float>(input.pointer_y));
+
+            create_explosion(
+                engine::core::Vector2(mouse_world.x, mouse_world.y),
+                engine::core::Vector2(128.0f, 128.0f),
+                2.0f,
+                10.0f);
+            //
         }
 
         // Get schedule of projectiles from wand attack and add to buffer
@@ -204,4 +217,18 @@ void RoomScene::generate_enemies(EnemyType type, std::size_t count)
         _enemies.push_back(added_enemy);
         physics_manager().register_body(added_enemy, added_enemy, added_enemy);
     }
+}
+
+//aoe testing
+AreaOfEffect* RoomScene::create_explosion(
+    const engine::core::Vector2& position,
+    const engine::core::Vector2& size,
+    float duration,
+    float damage)
+{
+    return add_object(std::make_unique<AreaOfEffect>(
+        position,
+        size,
+        duration,
+        damage));
 }
